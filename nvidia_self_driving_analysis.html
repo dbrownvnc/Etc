@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Nvidia 자율주행 기술 심층 분석 보고서</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', 'Malgun Gothic', sans-serif;
+            line-height: 1.8;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 40px 20px;
+            color: #2c3e50;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            border-radius: 20px;
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #76b852 0%, #8DC26F 100%);
+            color: white;
+            padding: 50px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.8em;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .header .meta {
+            font-size: 1.1em;
+            opacity: 0.95;
+            margin-top: 10px;
+        }
+        
+        .content {
+            padding: 50px;
+        }
+        
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin: 30px 0;
+        }
+        
+        .section {
+            margin-bottom: 50px;
+        }
+        
+        .section-title {
+            font-size: 2em;
+            color: #2c3e50;
+            border-left: 6px solid #76b852;
+            padding-left: 20px;
+            margin-bottom: 25px;
+            font-weight: 700;
+        }
+        
+        .subsection-title {
+            font-size: 1.5em;
+            color: #34495e;
+            margin: 25px 0 15px 0;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #ecf0f1;
+            font-weight: 600;
+        }
+        
+        .highlight-box {
+            background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+            border-left: 5px solid #667eea;
+            padding: 25px;
+            margin: 25px 0;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.07);
+        }
+        
+        .info-box {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            padding: 25px;
+            margin: 25px 0;
+            border-radius: 12px;
+        }
+        
+        .success-box {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            border-left: 5px solid #28a745;
+            padding: 25px;
+            margin: 25px 0;
+            border-radius: 10px;
+        }
+        
+        .warning-box {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+            border-left: 5px solid #ffc107;
+            padding: 25px;
+            margin: 25px 0;
+            border-radius: 10px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 18px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 1.05em;
+        }
+        
+        td {
+            padding: 18px;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .comparison-table th {
+            background: linear-gradient(135deg, #76b852 0%, #8DC26F 100%);
+        }
+        
+        .tech-table th {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        
+        ul, ol {
+            margin: 20px 0 20px 30px;
+        }
+        
+        li {
+            margin: 12px 0;
+            line-height: 1.8;
+        }
+        
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin: 30px 0;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+            transition: transform 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.2);
+        }
+        
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .stat-label {
+            font-size: 1.1em;
+            opacity: 0.95;
+        }
+        
+        .chart-container {
+            margin: 30px 0;
+            padding: 30px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.07);
+        }
+        
+        strong {
+            color: #2c3e50;
+            font-weight: 600;
+        }
+        
+        .emphasis {
+            background: linear-gradient(120deg, #f6d365 0%, #fda085 100%);
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+        
+        .conclusion {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            margin-top: 50px;
+            border-radius: 15px;
+            font-size: 1.1em;
+        }
+        
+        .footer {
+            background: #2c3e50;
+            color: white;
+            padding: 30px;
+            text-align: center;
+            font-size: 0.95em;
+        }
+        
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            .container {
+                box-shadow: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚗 Nvidia 자율주행 기술 심층 분석 보고서</h1>
+            <div class="meta">
+                <p><strong>출처:</strong> I Tested Nvidia's Self Driving Car… should Tesla be worried?</p>
+                <p><strong>영상 링크:</strong> https://youtu.be/EzAVW1VgzcI</p>
+                <p><strong>분석 일자:</strong> 2026년 1월 9일</p>
+            </div>
+        </div>
+
+        <div class="content">
+            <!-- Executive Summary -->
+            <div class="section">
+                <h2 class="section-title">📋 핵심 요약 (Executive Summary)</h2>
+                <div class="highlight-box">
+                    <p><strong>테스트 개요:</strong> 유튜버가 샌프란시스코에서 Nvidia의 자율주행 시스템이 탑재된 Mercedes 차량을 최초로 공개 시승했습니다. 이는 Nvidia 팀을 제외하고는 세계 최초로 일반인이 탑승한 역사적인 테스트였습니다.</p>
+                    
+                    <p style="margin-top: 20px;"><strong>주요 발견사항:</strong></p>
+                    <ul>
+                        <li><span class="emphasis">95%의 주행이 end-to-end AI 모델로 처리</span>되며, 나머지는 규칙 기반 시스템이 백업</li>
+                        <li>샌프란시스코의 극한 도로 환경(공사 구간, 응급차량, 자전거, 불법 주차 차량 등)에서 <strong>단 1회의 개입만 발생</strong></li>
+                        <li>Tesla FSD V14와 비교해도 손색없는 자연스러운 주행 경험 제공</li>
+                        <li>Waymo 자율주행 차량과의 조우에서도 안정적으로 대응</li>
+                        <li>보행자 수신호 인식, 신호등 화살표 구분 등 고급 기능 시연</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 테스트 통계 -->
+            <div class="section">
+                <h2 class="section-title">📊 테스트 주요 통계</h2>
+                <div class="stat-grid">
+                    <div class="stat-card">
+                        <div class="stat-number">1회</div>
+                        <div class="stat-label">운전자 개입 횟수</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">95%</div>
+                        <div class="stat-label">AI 모델 주행 비율</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">100만+</div>
+                        <div class="stat-label">학습 데이터 클립 수</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">10대</div>
+                        <div class="stat-label">카메라 센서</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">5대</div>
+                        <div class="stat-label">레이더 센서</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">L2++</div>
+                        <div class="stat-label">현재 자율주행 레벨</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 기술적 특징 -->
+            <div class="section">
+                <h2 class="section-title">🔬 Nvidia 자율주행 기술의 핵심 특징</h2>
+                
+                <h3 class="subsection-title">1. 하이브리드 AI 아키텍처</h3>
+                <div class="info-box">
+                    <p><strong>이중 시스템 구조:</strong></p>
+                    <ul>
+                        <li><strong>End-to-End AI 모델 (95%):</strong> 실제 인간 운전 데이터로 학습된 신경망이 주도적으로 운전 결정을 내립니다. 이 모델은 "우회전 금지(No Turn on Red)" 표지판을 보면 우회전하지 않도록 학습되어 있습니다.</li>
+                        <li><strong>규칙 기반(Classical) 시스템 (5%):</strong> 백업 시스템으로, 명시적으로 프로그래밍된 규칙을 따릅니다. 예를 들어 "우회전 금지" 표지판이 감지되면 우회전을 하지 않도록 코딩되어 있습니다.</li>
+                        <li><strong>시너지 효과:</strong> 두 시스템이 동시에 작동하며 서로를 검증하고 보완합니다.</li>
+                    </ul>
+                </div>
+
+                <h3 class="subsection-title">2. 센서 융합 전략</h3>
+                <div class="two-column">
+                    <div>
+                        <div class="info-box">
+                            <h4><strong>현재 (L2++)</strong></h4>
+                            <ul>
+                                <li><strong>카메라 10대:</strong> 360도 시야 확보</li>
+                                <li><strong>레이더 5대:</strong> 거리 측정 및 악천후 대응</li>
+                                <li><strong>프로세서:</strong> Nvidia Orin</li>
+                                <li><strong>특징:</strong> 운전자가 항상 주시해야 함</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="info-box">
+                            <h4><strong>향후 (L3/L4)</strong></h4>
+                            <ul>
+                                <li><strong>카메라 + 레이더</strong></li>
+                                <li><strong>LiDAR 추가:</strong> 센서 중복성 확보</li>
+                                <li><strong>프로세서:</strong> Nvidia Thor</li>
+                                <li><strong>특징:</strong> 운전자 주시 불필요 (조건부)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <h3 class="subsection-title">3. 맵리스(Mapless) 기술</h3>
+                <div class="success-box">
+                    <p><strong>혁신적인 접근:</strong> Nvidia의 시스템은 HD 맵을 사용하지 않습니다.</p>
+                    <ul>
+                        <li><strong>SD(Standard Definition) 맵:</strong> 경로 찾기(routing)에만 사용</li>
+                        <li><strong>실시간 인식:</strong> 카메라와 레이더가 실시간으로 보는 정보만으로 주행 경로(trajectory) 계획</li>
+                        <li><strong>장점:</strong> 도로 공사, 폐쇄, 차선 변경 등 예상치 못한 상황에 유연하게 대응 가능</li>
+                        <li><strong>의미:</strong> Waymo처럼 사전에 상세 지도를 만들 필요가 없어 <span class="emphasis">확장성이 매우 우수</span>합니다</li>
+                    </ul>
+                </div>
+
+                <h3 class="subsection-title">4. 고급 인식 능력</h3>
+                <table class="tech-table">
+                    <thead>
+                        <tr>
+                            <th>인식 기능</th>
+                            <th>설명</th>
+                            <th>실제 테스트 결과</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>교통 신호 이해</strong></td>
+                            <td>전용 녹색 화살표와 직진 적색 신호 구분</td>
+                            <td>✅ 즉시 인식하고 우회전 수행</td>
+                        </tr>
+                        <tr>
+                            <td><strong>표지판 인식</strong></td>
+                            <td>우회전 금지, 교차로 진입 금지(Keep Clear) 등</td>
+                            <td>✅ 정확히 인식하고 규칙 준수</td>
+                        </tr>
+                        <tr>
+                            <td><strong>차량 방향지시등</strong></td>
+                            <td>다른 차량의 깜빡이 및 비상등 감지</td>
+                            <td>✅ Waymo의 방향지시등 보고 선제적 감속</td>
+                        </tr>
+                        <tr>
+                            <td><strong>보행자 수신호</strong></td>
+                            <td>손으로 "가세요" 신호 인식</td>
+                            <td>✅ 여성 보행자의 손 신호 인식 후 진행</td>
+                        </tr>
+                        <tr>
+                            <td><strong>응급 차량</strong></td>
+                            <td>소방차, 구급차 인식 및 양보</td>
+                            <td>⚠️ 아직 개발 중 (운전자 개입 필요)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>언덕/고저차</strong></td>
+                            <td>샌프란시스코식 급경사 인식</td>
+                            <td>✅ 언덕 정상 접근 시 선제적 감속</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 실제 주행 테스트 시나리오 -->
+            <div class="section">
+                <h2 class="section-title">🛣️ 실제 주행 테스트: 극한의 시나리오들</h2>
+                
+                <div class="chart-container">
+                    <h3 style="text-align: center; margin-bottom: 20px; color: #2c3e50;">샌프란시스코 주행 테스트: 조우한 상황들</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 25%;">시나리오</th>
+                                <th style="width: 40%;">상황 설명</th>
+                                <th style="width: 20%;">시스템 대응</th>
+                                <th style="width: 15%;">결과</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>불법 주차 차량</strong></td>
+                                <td>차선을 막고 있는 이중 주차 차량 여러 대</td>
+                                <td>방향지시등 켜고 인접 차선으로 우회 후 복귀</td>
+                                <td>✅ 성공</td>
+                            </tr>
+                            <tr>
+                                <td><strong>도로 공사</strong></td>
+                                <td>차선 표시가 전혀 없는 공사 구간</td>
+                                <td>"차선이 사라졌지만 주행 가능한 경로"로 인식하고 통과</td>
+                                <td>✅ 성공</td>
+                            </tr>
+                            <tr>
+                                <td><strong>자전거 운전자</strong></td>
+                                <td>도로에서 주행 중인 자전거</td>
+                                <td>신중하게 거리 유지하며 추월</td>
+                                <td>✅ 성공</td>
+                            </tr>
+                            <tr>
+                                <td><strong>전용 녹색 화살표</strong></td>
+                                <td>우회전 화살표는 녹색, 직진은 적색</td>
+                                <td>즉시 인식하고 인간처럼 우회전 수행</td>
+                                <td>✅ 성공</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Waymo와 조우 #1</strong></td>
+                                <td>양쪽 모두 방향지시등 켜고 진행하려 함</td>
+                                <td>Waymo의 깜빡이 감지 후 선제적 감속</td>
+                                <td>✅ 성공</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Waymo와 조우 #2</strong></td>
+                                <td>동시에 출발하려는 상황</td>
+                                <td>급제동 후 양보, Waymo도 제동하여 양보</td>
+                                <td>✅ 성공</td>
+                            </tr>
+                            <tr>
+                                <td><strong>소방차 + 교차로</strong></td>
+                                <td>소방차가 넓게 회전, 보행자, 차량 혼재</td>
+                                <td>오른쪽으로 치우쳐 공간 확보, 신중한 진행</td>
+                                <td>✅ 성공</td>
+                            </tr>
+                            <tr>
+                                <td><strong>소방차 + 막힌 교차로</strong></td>
+                                <td>소방차가 교차로를 막고 있고, 자전거, 보행자 출현</td>
+                                <td>이중 황색선 넘어 반대편 차선으로 주행, 매우 신중하게 통과</td>
+                                <td>⚠️ 운전자 개입 필요 (초기 빌드 한계)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>보행자 수신호</strong></td>
+                                <td>여성 보행자가 손으로 "가세요" 신호</td>
+                                <td>손 신호 인식 후 진행</td>
+                                <td>✅ 성공</td>
+                            </tr>
+                            <tr>
+                                <td><strong>부주의한 운전자</strong></td>
+                                <td>스마트폰 보며 갑자기 끼어들기</td>
+                                <td>선제적 감속, 안전하게 순서 양보</td>
+                                <td>⚠️ 운전자가 잠시 개입 후 재활성화</td>
+                            </tr>
+                            <tr>
+                                <td><strong>불법 유턴</strong></td>
+                                <td>차량이 도로 중간에서 갑자기 유턴</td>
+                                <td>정지 후 안전하게 대기</td>
+                                <td>✅ 성공</td>
+                            </tr>
+                            <tr>
+                                <td><strong>급경사 언덕</strong></td>
+                                <td>샌프란시스코 특유의 가파른 언덕</td>
+                                <td>언덕 정상 접근 시 자동 감속 (반대편 상황 대비)</td>
+                                <td>✅ 성공</td>
+                            </tr>
+                            <tr>
+                                <td><strong>비보호 좌회전</strong></td>
+                                <td>맞은편 차량 대기 중 좌회전 시도</td>
+                                <td>약간의 망설임 후 진행 (다소 공격적)</td>
+                                <td>⚠️ 성공했으나 개선 필요</td>
+                            </tr>
+                            <tr>
+                                <td><strong>4방향 정지 표지</strong></td>
+                                <td>복잡한 교차로에서 순서 판단</td>
+                                <td>올바른 순서로 진행</td>
+                                <td>✅ 성공</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="success-box" style="margin-top: 30px;">
+                    <h4><strong>💡 테스터의 핵심 평가</strong></h4>
+                    <p>"가장 지루한 드라이브였다 - 좋은 의미에서" (Most boring ride ever - in a good way)</p>
+                    <p style="margin-top: 15px;">테스터는 많은 문제가 발생할 것으로 예상했지만, 샌프란시스코의 극심한 교통 혼잡 상황에서도 시스템이 자연스럽고 부드럽게 작동하여 마치 숙련된 인간 운전자가 운전하는 것처럼 느껴졌다고 평가했습니다.</p>
+                </div>
+            </div>
+
+            <!-- 경쟁사 비교 -->
+            <div class="section">
+                <h2 class="section-title">⚔️ 경쟁사 비교 분석</h2>
+                
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>항목</th>
+                            <th>Tesla FSD V14</th>
+                            <th>Waymo</th>
+                            <th>Rivian</th>
+                            <th>Nvidia (Mercedes)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>자율주행 레벨</strong></td>
+                            <td>L2 (일부 L4 로보택시)</td>
+                            <td>L4 (완전 무인)</td>
+                            <td>L2</td>
+                            <td>L2++ (L3/L4 개발 중)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>센서 구성</strong></td>
+                            <td>카메라만 (Vision Only)</td>
+                            <td>카메라 + LiDAR + 레이더</td>
+                            <td>카메라 + 레이더</td>
+                            <td>카메라 + 레이더 (L3/L4는 LiDAR 추가)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>HD 맵 의존도</strong></td>
+                            <td>불필요 (Vision Only)</td>
+                            <td>높음 (사전 매핑 필수)</td>
+                            <td>중간</td>
+                            <td>낮음 (Mapless 기술)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>OTA 업데이트</strong></td>
+                            <td>✅ 지속적</td>
+                            <td>✅ 지속적</td>
+                            <td>✅ 지속적</td>
+                            <td>✅ 계획됨</td>
+                        </tr>
+                        <tr>
+                            <td><strong>칩셋</strong></td>
+                            <td>Tesla AI4 (자체 제작)</td>
+                            <td>다양 (자체 포함)</td>
+                            <td>자체 개발 (Nvidia 협력)</td>
+                            <td>Nvidia Orin → Thor</td>
+                        </tr>
+                        <tr>
+                            <td><strong>주요 강점</strong></td>
+                            <td>
+                                • 대규모 실도로 데이터<br>
+                                • 수백만 대 차량 운행<br>
+                                • 빠른 개선 속도<br>
+                                • 전국 어디서나 사용 가능
+                            </td>
+                            <td>
+                                • L4 완전 무인 달성<br>
+                                • 샌프란시스코 등 특정 지역에서 상용화

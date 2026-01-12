@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>파월 의장 충격 고백 - 법무부 형사 기소 소환장 분석</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=Noto+Serif+KR:wght@600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary-dark: #1a1a2e;
+            --accent-red: #dc2626;
+            --accent-gold: #d4a574;
+            --text-primary: #1f2937;
+            --text-secondary: #4b5563;
+            --bg-cream: #faf9f7;
+            --bg-white: #ffffff;
+            --border-light: #e5e7eb;
+            --warning-bg: #fef3c7;
+            --warning-border: #f59e0b;
+        }
+        
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background: var(--bg-cream);
+            color: var(--text-primary);
+            line-height: 1.8;
+            font-size: 16px;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 0 16px;
+        }
+        
+        /* 헤더 섹션 */
+        .header {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, #16213e 100%);
+            padding: 32px 16px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            opacity: 0.5;
+        }
+        
+        .breaking-badge {
+            display: inline-block;
+            background: var(--accent-red);
+            color: white;
+            padding: 6px 14px;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            margin-bottom: 16px;
+            position: relative;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        .header-title {
+            font-family: 'Noto Serif KR', serif;
+            font-size: 26px;
+            font-weight: 700;
+            color: white;
+            line-height: 1.4;
+            position: relative;
+            margin-bottom: 16px;
+        }
+        
+        .header-subtitle {
+            color: rgba(255,255,255,0.8);
+            font-size: 15px;
+            position: relative;
+        }
+        
+        .meta-info {
+            display: flex;
+            gap: 16px;
+            margin-top: 20px;
+            padding-top: 16px;
+            border-top: 1px solid rgba(255,255,255,0.2);
+            position: relative;
+        }
+        
+        .meta-item {
+            color: rgba(255,255,255,0.7);
+            font-size: 13px;
+        }
+        
+        /* 경고 배너 */
+        .alert-banner {
+            background: linear-gradient(90deg, #7f1d1d 0%, #991b1b 100%);
+            color: white;
+            padding: 16px;
+            text-align: center;
+        }
+        
+        .alert-banner p {
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        /* 핵심 요약 카드 */
+        .summary-card {
+            background: var(--bg-white);
+            margin: 20px 16px;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border-left: 4px solid var(--accent-red);
+        }
+        
+        .summary-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary-dark);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .summary-list {
+            list-style: none;
+        }
+        
+        .summary-list li {
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-light);
+            font-size: 15px;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+        
+        .summary-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .summary-list .number {
+            background: var(--primary-dark);
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+        
+        /* 섹션 스타일 */
+        .section {
+            background: var(--bg-white);
+            margin: 20px 16px;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+        }
+        
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--border-light);
+        }
+        
+        .section-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--primary-dark);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary-dark);
+        }
+        
+        .content-block {
+            margin-bottom: 20px;
+        }
+        
+        .content-block:last-child {
+            margin-bottom: 0;
+        }
+        
+        .content-block h4 {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+            padding-left: 12px;
+            border-left: 3px solid var(--accent-gold);
+        }
+        
+        .content-block p {
+            font-size: 15px;
+            color: var(--text-secondary);
+            line-height: 1.9;
+        }
+        
+        .highlight {
+            background: linear-gradient(120deg, #fef3c7 0%, #fef3c7 100%);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+        
+        .strong-highlight {
+            background: linear-gradient(120deg, #fee2e2 0%, #fee2e2 100%);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 700;
+            color: #991b1b;
+        }
+        
+        /* 인용구 박스 */
+        .quote-box {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-left: 4px solid var(--accent-gold);
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 0 12px 12px 0;
+            position: relative;
+        }
+        
+        .quote-box::before {
+            content: '"';
+            position: absolute;
+            top: 10px;
+            left: 12px;
+            font-size: 48px;
+            color: var(--accent-gold);
+            opacity: 0.3;
+            font-family: Georgia, serif;
+            line-height: 1;
+        }
+        
+        .quote-box p {
+            font-style: italic;
+            font-size: 15px;
+            color: var(--text-primary);
+            padding-left: 20px;
+            line-height: 1.8;
+        }
+        
+        .quote-box .quote-source {
+            font-style: normal;
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-top: 12px;
+            padding-left: 20px;
+            font-weight: 500;
+        }
+        
+        /* 타임라인 */
+        .timeline {
+            position: relative;
+            padding-left: 24px;
+        }
+        
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 6px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--border-light);
+        }
+        
+        .timeline-item {
+            position: relative;
+            padding-bottom: 24px;
+        }
+        
+        .timeline-item:last-child {
+            padding-bottom: 0;
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -22px;
+            top: 6px;
+            width: 12px;
+            height: 12px;
+            background: var(--accent-red);
+            border-radius: 50%;
+            border: 3px solid var(--bg-white);
+            box-shadow: 0 0 0 2px var(--accent-red);
+        }
+        
+        .timeline-date {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--accent-red);
+            margin-bottom: 4px;
+        }
+        
+        .timeline-content {
+            font-size: 15px;
+            color: var(--text-secondary);
+        }
+        
+        /* 다이어그램 */
+        .diagram-container {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border-radius: 12px;
+            padding: 24px 16px;
+            margin: 20px 0;
+        }
+        
+        .diagram-title {
+            color: white;
+            font-size: 14px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 20px;
+            letter-spacing: 1px;
+        }
+        
+        .flow-diagram {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            align-items: center;
+        }
+        
+        .flow-box {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            padding: 14px 20px;
+            text-align: center;
+            width: 100%;
+            max-width: 280px;
+        }
+        
+        .flow-box.highlight-box {
+            background: rgba(220, 38, 38, 0.3);
+            border-color: var(--accent-red);
+        }
+        
+        .flow-box span {
+            color: white;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .flow-arrow {
+            color: var(--accent-gold);
+            font-size: 20px;
+        }
+        
+        /* 비교 테이블 */
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0;
+            font-size: 14px;
+        }
+        
+        .comparison-table th {
+            background: var(--primary-dark);
+            color: white;
+            padding: 12px 10px;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        .comparison-table td {
+            padding: 12px 10px;
+            border-bottom: 1px solid var(--border-light);
+            vertical-align: top;
+        }
+        
+        .comparison-table tr:nth-child(even) {
+            background: #f9fafb;
+        }
+        
+        .comparison-table .label-cell {
+            font-weight: 600;
+            color: var(--text-primary);
+            width: 35%;
+        }
+        
+        /* 영향 분석 카드 */
+        .impact-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .impact-card {
+            background: #f9fafb;
+            border-radius: 10px;
+            padding: 16px;
+            border-left: 4px solid var(--accent-red);
+        }
+        
+        .impact-card.positive {
+            border-left-color: #10b981;
+        }
+        
+        .impact-card.negative {
+            border-left-color: var(--accent-red);
+        }
+        
+        .impact-card.neutral {
+            border-left-color: #f59e0b;
+        }
+        
+        .impact-card h5 {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+        
+        .impact-card p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+        
+        /* 용어 설명 박스 */
+        .glossary-box {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 10px;
+            padding: 16px;
+            margin: 16px 0;
+        }
+        
+        .glossary-box h5 {
+            font-size: 14px;
+            font-weight: 700;
+            color: #1e40af;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .glossary-item {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            padding-left: 12px;
+            border-left: 2px solid #60a5fa;
+        }
+        
+        .glossary-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .glossary-item strong {
+            color: var(--text-primary);
+        }
+        
+        /* 결론 섹션 */
+        .conclusion-section {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            margin: 20px 16px;
+            padding: 24px;
+            border-radius: 12px;
+            color: white;
+        }
+        
+        .conclusion-section .section-title {
+            color: white;
+            margin-bottom: 16px;
+        }
+        
+        .conclusion-section p {
+            font-size: 15px;
+            line-height: 1.9;
+            color: rgba(255,255,255,0.9);
+        }
+        
+        .key-point {
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 16px;
+        }
+        
+        .key-point h5 {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--accent-gold);
+            margin-bottom: 8px;
+        }
+        
+        .key-point p {
+            font-size: 14px;
+            color: rgba(255,255,255,0.85);
+        }
+        
+        /* 푸터 */
+        .footer {
+            background: var(--primary-dark);
+            padding: 24px 16px;
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .footer p {
+            color: rgba(255,255,255,0.6);
+            font-size: 12px;
+            line-height: 1.8;
+        }
+        
+        .footer .source-link {
+            color: var(--accent-gold);
+            text-decoration: none;
+            word-break: break-all;
+        }
+        
+        /* 차트 컨테이너 */
+        .chart-container {
+            background: var(--bg-white);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 16px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+        
+        .chart-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+            text-align: center;
+        }
+        
+        /* SVG 차트 스타일 */
+        .svg-chart {
+            width: 100%;
+            max-width: 100%;
+            overflow: visible;
+        }
+    </style>
+</head>
+<body>
+    <!-- 헤더 -->
+    <header class="header">
+        <div class="container">
+            <span class="breaking-badge">⚡ 긴급 속보</span>
+            <h1 class="header-title">파월 의장 충격 고백<br>"美 법무부로부터 형사 기소 소환장 받았다"</h1>
+            <p class="header-subtitle">연방준비제도(Fed) 독립성 붕괴 위기?<br>전례 없는 행정부의 압박 공개</p>
+            <div class="meta-info">
+                <span class="meta-item">📅 2026년 1월 12일</span>
+                <span class="meta-item">🎯 연준 정책 분석</span>
+            </div>
+        </div>
+    </header>
+    
+    <!-- 경고 배너 -->
+    <div class="alert-banner">
+        <p>⚠️ 미국 중앙은행 역사상 전례 없는 사태 발생</p>
+    </div>
+    
+    <!-- 핵심 요약 -->
+    <div class="summary-card">
+        <h2 class="summary-title">📋 3분 요약</h2>
+        <ul class="summary-list">
+            <li>
+                <span class="number">1</span>
+                <span><strong>소환장 수령:</strong> 금요일, 법무부가 연준에 <span class="strong-highlight">대배심 소환장</span> 전달 - 형사 기소 위협</span>
+            </li>
+            <li>
+                <span class="number">2</span>
+                <span><strong>명목상 이유:</strong> 작년 6월 상원 은행위원회 증언, 연준 건물 리모델링 프로젝트 관련</span>
+            </li>
+            <li>
+                <span class="number">3</span>
+                <span><strong>실제 원인(파월 주장):</strong> 대통령 의향이 아닌 <span class="highlight">경제 상황에 기반한 금리 결정</span>에 대한 보복</span>
+            </li>
+            <li>
+                <span class="number">4</span>
+                <span><strong>파월의 입장:</strong> 위협에도 불구하고 임기 동안 소신껏 직무 수행 계속하겠다고 선언</span>
+            </li>
+        </ul>
+    </div>
+    
+    <!-- 사건 개요 -->
+    <div class="section">
+        <div class="section-header">
+            <div class="section-icon">📜</div>
+            <h2 class="section-title">사건의 전말</h2>
+        </div>
+        
+        <div class="content-block">
+            <h4>무슨 일이 일어났나?</h4>
+            <p>
+                2026년 1월 금요일, <span class="strong-highlight">미국 법무부(DOJ)</span>가 연방준비제도(연준, Fed)에 <span class="strong-highlight">대배심 소환장(Grand Jury Subpoenas)</span>을 전달했습니다. 이 소환장은 파월 의장을 <span class="highlight">형사 기소(Criminal Indictment)</span>하겠다는 위협을 담고 있습니다.
+            </p>
+        </div>
+        
+        <div class="glossary-box">
+            <h5>📚 용어 쉽게 이해하기</h5>
+            <div class="glossary-item">
+                <strong>대배심(Grand Jury):</strong> 일반 시민들로 구성된 배심원단이 검찰의 증거를 검토해 "기소할 만한 이유가 있는지" 결정하는 제도. 형사 재판 전 단계입니다.
+            </div>
+            <div class="glossary-item">
+                <strong>소환장(Subpoena):</strong> 법원이 발부하는 공식 문서로, "법정에 출석하라" 또는 "자료를 제출하라"는 명령입니다. 거부하면 법적 처벌을 받을 수 있습니다.
+            </div>
+            <div class="glossary-item">
+                <strong>형사 기소(Criminal Indictment):</strong> 검찰이 공식적으로 "이 사람이 범죄를 저질렀다"고 법원에 고발하는 것. 기소되면 재판을 받게 됩니다.
+            </div>
+        </div>
+        
+        <div class="content-block">
+            <h4>법무부가 내세운 이유</h4>
+            <p>
+                법무부가 밝힌 소환장의 공식적인 이유는 두 가지입니다:
+            </p>
+            <p style="margin-top: 12px;">
+                <strong>① 상원 은행위원회 증언 관련</strong><br>
+                파월 의장이 작년 6월 상원 은행위원회에서 한 증언과 관련된 문제
+            </p>
+            <p style="margin-top: 12px;">
+                <strong>② 연준 건물 리모델링 프로젝트</strong><br>
+                역사적인 연준 사무실 건물들을 수년에 걸쳐 리모델링하는 프로젝트와 관련된 사안
+            </p>
+        </div>
+        
+        <div class="quote-box">
+            <p>"법무부는 금요일에 연방준비제도에 대배심 소환장을 전달했습니다. 작년 6월 상원 은행위원회에서의 제 증언과 관련하여 형사 기소를 위협하는 내용입니다."</p>
+            <div class="quote-source">— 제롬 파월, 연준 의장</div>
+        </div>
+    </div>
+    
+    <!-- 파월의 반박 -->
+    <div class="section">
+        <div class="section-header">
+            <div class="section-icon">⚖️</div>
+            <h2 class="section-title">파월 의장의 반박</h2>
+        </div>
+        
+        <div class="content-block">
+            <h4>"이것은 구실에 불과하다"</h4>
+            <p>
+                파월 의장은 법무부가 내세운 이유들이 <span class="strong-highlight">"구실(Pretexts)"</span>에 불과하다고 강력히 반박했습니다. 그가 말하는 진짜 이유는 다음과 같습니다:
+            </p>
+        </div>
+        
+        <div class="diagram-container">
+            <div class="diagram-title">🔍 파월이 주장하는 사건의 본질</div>
+            <div class="flow-diagram">
+                <div class="flow-box">
+                    <span>연준이 경제 데이터 기반으로<br>금리 결정</span>
+                </div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-box">
+                    <span>대통령의 금리 인하 요구와<br>다른 결정</span>
+                </div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-box highlight-box">
+                    <span>행정부의 정치적 압박 및<br>형사 기소 위협</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="quote-box">
+            <p>"형사 기소 위협은 작년 6월의 증언이나 연준 건물 리모델링에 관한 것이 아닙니다. 의회의 감독 역할에 관한 것도 아닙니다. 그것들은 구실입니다."</p>
+            <div class="quote-source">— 제롬 파월, 연준 의장</div>
+        </div>
+        
+        <div class="content-block">
+            <h4>파월이 말하는 진짜 원인</h4>
+            <p>
+                파월 의장은 이 사태의 핵심이 <span class="highlight">"연준이 대통령의 선호가 아닌, 공익을 위한 최선의 판단에 따라 금리를 설정했기 때문"</span>이라고 명확히 밝혔습니다.
+            </p>
+            <p style="margin-top: 12px;">
+                쉽게 말해, 대통령이 "금리 내려!"라고 요구했는데 연준이 경제 상황을 보고 "지금은 안 돼"라고 했더니, 그에 대한 보복으로 형사 기소를 들이대고 있다는 것입니다.
+            </p>
+        </div>
+        
+        <div class="quote-box">
+            <p>"이것은 연준이 증거와 경제 상황에 기반하여 계속 금리를 설정할 수 있을 것인지, 아니면 금융정책이 정치적 압력이나 협박에 의해 좌우될 것인지에 관한 것입니다."</p>
+            <div class="quote-source">— 제롬 파월, 연준 의장</div>
+        </div>
+    </div>
+    
+    <!-- 연준 독립성이란 -->
+    <div class="section">
+        <div class="section-header">
+            <div class="section-icon">🏛️</div>
+            <h2 class="section-title">연준 독립성이 왜 중요한가?</h2>
+        </div>
+        
+        <div class="glossary-box">
+            <h5>📚 연준(Federal Reserve)이란?</h5>
+            <div class="glossary-item">
+                <strong>연준:</strong> 미국의 중앙은행으로, 달러를 발행하고 미국의 금리를 결정합니다. 전 세계 경제에 막대한 영향을 미칩니다.
+            </div>
+            <div class="glossary-item">
+                <strong>금리:</strong> 돈을 빌릴 때 내는 이자율. 금리가 오르면 대출이 어려워지고, 내리면 쉬워집니다. 경제 전체의 속도를 조절하는 역할을 합니다.
+            </div>
+            <div class="glossary-item">
+                <strong>연준 독립성:</strong> 연준이 대통령이나 정치인의 압력 없이 오직 경제 데이터만 보고 금리를 결정할 수 있어야 한다는 원칙입니다.
+            </div>
+        </div>
+        
+        <div class="content-block">
+            <h4>왜 중앙은행은 독립적이어야 할까?</h4>
+            <p>
+                정치인들은 선거에서 이기고 싶어합니다. 금리를 낮추면 단기적으로 경제가 활발해지고 사람들이 기분 좋아지죠. 그래서 선거 전에 금리를 낮추라고 압박할 유혹이 있습니다.
+            </p>
+            <p style="margin-top: 12px;">
+                하지만 이렇게 정치적 목적으로 금리를 조작하면, 장기적으로 <span class="highlight">인플레이션(물가 상승)</span>이 통제 불능이 되고 경제가 망가집니다. 그래서 세계 대부분의 나라에서 중앙은행은 정부로부터 독립적으로 운영됩니다.
+            </p>
+        </div>
+        
+        <div class="chart-container">
+            <div class="chart-title">📊 연준 독립성 보장 vs 정치적 개입</div>
+            <svg class="svg-chart" viewBox="0 0 350 200">
+                <!-- 독립성 보장 영역 -->
+                <rect x="20" y="20" width="145" height="160" rx="8" fill="#ecfdf5" stroke="#10b981" stroke-width="2"/>
+                <text x="92" y="45" text-anchor="middle" font-size="12" font-weight="bold" fill="#047857">✓ 독립성 보장 시</text>
+                <text x="92" y="75" text-anchor="middle" font-size="10" fill="#065f46">• 물가 안정</text>
+                <text x="92" y="95" text-anchor="middle" font-size="10" fill="#065f46">• 장기 경제 성장</text>
+                <text x="92" y="115" text-anchor="middle" font-size="10" fill="#065f46">• 달러 신뢰도 유지</text>
+                <text x="92" y="135" text-anchor="middle" font-size="10" fill="#065f46">• 투자자 신뢰</text>
+                <text x="92" y="155" text-anchor="middle" font-size="10" fill="#065f46">• 일관된 정책</text>
+                
+                <!-- 정치 개입 영역 -->
+                <rect x="185" y="20" width="145" height="160" rx="8" fill="#fef2f2" stroke="#dc2626" stroke-width="2"/>
+                <text x="257" y="45" text-anchor="middle" font-size="12" font-weight="bold" fill="#b91c1c">✗ 정치적 개입 시</text>
+                <text x="257" y="75" text-anchor="middle" font-size="10" fill="#991b1b">• 인플레이션 폭발</text>
+                <text x="257" y="95" text-anchor="middle" font-size="10" fill="#991b1b">• 경제 불안정</text>
+                <text x="257" y="115" text-anchor="middle" font-size="10" fill="#991b1b">• 달러 가치 하락</text>
+                <text x="257" y="135" text-anchor="middle" font-size="10" fill="#991b1b">• 시장 혼란</text>
+                <text x="257" y="155" text-anchor="middle" font-size="10" fill="#991b1b">• 정책 일관성 상실</text>
+            </svg>
+        </div>
+    </div>
+    
+    <!-- 파월의 경력 -->
+    <div class="section">
+        <div class="section-header">
+            <div class="section-icon">👤</div>
+            <h2 class="section-title">파월의 입장과 경력</h2>
+        </div>
+        
+        <div class="content-block">
+            <h4>4개 행정부에서 근무</h4>
+            <p>
+                파월 의장은 자신이 <span class="highlight">공화당과 민주당 행정부를 포함해 4개 행정부</span>에서 연준에 근무해왔다고 강조했습니다. 어떤 대통령이 집권하든 상관없이 오직 연준의 두 가지 임무에만 집중해왔다는 것입니다.
+            </p>
+        </div>
+        
+        <div class="glossary-box">
+            <h5>📚 연준의 두 가지 임무(Dual Mandate)</h5>
+            <div class="glossary-item">
+                <strong>물가 안정(Price Stability):</strong> 인플레이션을 적정 수준(보통 2%)으로 유지해서 물가가 너무 빨리 오르지 않게 관리합니다.
+            </div>
+            <div class="glossary-item">
+                <strong>완전 고용(Maximum Employment):</strong> 일하고 싶은 사람들이 모두 일자리를 가질 수 있도록 경제를 관리합니다.
+            </div>
+        </div>
+        
+        <div class="quote-box">
+            <p>"모든 경우에 저는 정치적 두려움이나 편애 없이, 오직 물가 안정과 완전 고용이라는 우리의 임무에만 집중하여 직무를 수행해왔습니다."</p>
+            <div class="quote-source">— 제롬 파월, 연준 의장</div>
+        </div>
+        
+        <div class="content-block">
+            <h4>파월의 결연한 의지</h4>
+            <p>
+                파월 의장은 이러한 위협에도 불구하고 물러서지 않겠다는 의지를 분명히 했습니다. <span class="highlight">"공직은 때때로 위협에 맞서 굳건히 서 있을 것을 요구한다"</span>며, 상원이 자신에게 맡긴 직무를 <span class="strong-highlight">성실성과 미국 국민에 대한 헌신</span>으로 계속 수행하겠다고 선언했습니다.
+            </p>
+        </div>
+        
+        <div class="quote-box">
+            <p>"공직은 때때로 위협에 맞서 굳건히 서 있을 것을 요구합니다. 저는 상원이 저에게 확인해준 직무를 성실성과 미국 국민에 대한 봉사 헌신으로 계속 수행하겠습니다."</p>
+            <div class="quote-source">— 제롬 파월, 연준 의장</div>
+        </div>
+    </div>
+    
+    <!-- 시장 영향 분석 -->
+    <div class="section">
+        <div class="section-header">
+            <div class="section-icon">📈</div>
+            <h2 class="section-title">시장에 미치는 영향</h2>
+        </div>
+        
+        <div class="content-block">
+            <h4>투자자들이 주목해야 할 포인트</h4>
+            <p>
+                이번 사태는 단순한 정치 뉴스가 아니라 <span class="highlight">금융시장 전체에 영향을 미칠 수 있는 중대한 사안</span>입니다. 연준의 독립성이 훼손되면 투자자들의 미국 경제에 대한 신뢰가 흔들릴 수 있습니다.
+            </p>
+        </div>
+        
+        <div class="impact-grid">
+            <div class="impact-card negative">
+                <h5>🔴 부정적 시나리오</h5>
+                <p>연준 독립성 훼손 → 정치적 금리 결정 → 인플레이션 불안 → 달러 약세 → 미국 자산 신뢰도 하락</p>
+            </div>
+            <div class="impact-card neutral">
+                <h5>🟡 불확실성 증가</h5>
+                <p>법적 분쟁 장기화 → 정책 불확실성 → 시장 변동성 확대 → 투자심리 위축</p>
+            </div>
+            <div class="impact-card positive">
+                <h5>🟢 긍정적 시나리오</h5>
+                <p>파월 의장이 굳건히 버팀 → 연준 독립성 재확인 → 제도적 견제 작동 → 시장 안정</p>
+            </div>
+        </div>
+        
+        <div class="chart-container">
+            <div class="chart-title">📊 주요 자산별 예상 영향</div>
+            <table class="comparison-table">
+                <tr>
+                    <th>자산</th>
+                    <th>예상 반응</th>
+                </tr>
+                <tr>
+                    <td class="label-cell">미국 주식</td>
+                    <td>단기 변동성 ↑, 불확실성에 민감한 기술주 특히 주의</td>
+                </tr>
+                <tr>
+                    <td class="label-cell">미국 국채</td>
+                    <td>안전자산 선호 시 가격 ↑ 가능, 단 신뢰도 훼손 시 역효과</td>
+                </tr>
+                <tr>
+                    <td class="label-cell">달러</td>
+                    <td>연준 독립성 훼손 우려 시 약세 압력</td>
+                </tr>
+                <tr>
+                    <td class="label-cell">금(Gold)</td>
+                    <td>불확실성 증가로 안전자산 수요 ↑ 가능성</td>
+                </tr>
+                <tr>
+                    <td class="label-cell">신흥국 자산</td>
+                    <td>달러 변동에 따라 연동, 변동성 확대 가능</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    
+    <!-- 역사적 맥락 -->
+    <div class="section">
+        <div class="section-header">
+            <div class="section-icon">📚</div>
+            <h2 class="section-title">역사적 맥락</h2>
+        </div>
+        
+        <div class="content-block">
+            <h4>전례 없는 사태</h4>
+            <p>
+                파월 의장 스스로가 이번 사태를 <span class="strong-highlight">"전례 없는 조치(Unprecedented Action)"</span>라고 표현했습니다. 미국 역사상 현직 연준 의장이 법무부로부터 형사 기소 위협을 받은 적은 없었습니다.
+            </p>
+        </div>
+        
+        <div class="content-block">
+            <h4>과거 대통령-연준 갈등 사례</h4>
+            <p>
+                역대 대통령들이 연준에 불만을 표시한 적은 있었지만, 형사 기소 위협까지 간 적은 없습니다. 예를 들어:
+            </p>
+            <p style="margin-top: 12px;">
+                • <strong>린든 존슨 대통령(1960년대):</strong> 당시 연준 의장을 백악관에 불러 압박했지만, 법적 조치까지는 가지 않았습니다.<br><br>
+                • <strong>리처드 닉슨 대통령(1970년대):</strong> 선거 전 금리 인하를 원했고, 이것이 후에 대인플레이션의 원인 중 하나가 되었습니다.<br><br>
+                • <strong>트럼프 1기 행정부(2017-2021):</strong> 파월 의장을 공개적으로 비판했지만, 형사 고발은 하지 않았습니다.
+            </p>
+        </div>
+    </div>
+    
+    <!-- 핵심 쟁점 정리 -->
+    <div class="section">
+        <div class="section-header">
+            <div class="section-icon">🎯</div>
+            <h2 class="section-title">핵심 쟁점 정리</h2>
+        </div>
+        
+        <table class="comparison-table">
+            <tr>
+                <th>쟁점</th>
+                <th>내용</th>
+            </tr>
+            <tr>
+                <td class="label-cell">법무부 주장</td>
+                <td>상원 증언 관련 문제, 연준 건물 리모델링 프로젝트 관련 의혹</td>
+            </tr>
+            <tr>
+                <td class="label-cell">파월 반박</td>
+                <td>이는 구실일 뿐, 실제 원인은 대통령 의향과 다른 금리 정책 때문</td>
+            </tr>
+            <tr>
+                <td class="label-cell">파월의 입장</td>
+                <td>법의 지배 존중하지만, 위협에도 굴하지 않고 직무 수행 계속</td>
+            </tr>
+            <tr>
+                <td class="label-cell">핵심 질문</td>
+                <td>연준이 경제 데이터 vs 정치적 압력 중 무엇에 따라 금리 결정할 것인가?</td>
+            </tr>
+            <tr>
+                <td class="label-cell">시장 함의</td>
+                <td>연준 독립성 훼손 시 장기적 경제 불안정, 달러 신뢰도 하락 우려</td>
+            </tr>
+        </table>
+    </div>
+    
+    <!-- 결론 -->
+    <div class="conclusion-section">
+        <h2 class="section-title">💡 결론 및 시사점</h2>
+        <p>
+            이번 사태는 단순한 정치적 갈등을 넘어 <strong>미국 경제 시스템의 근간</strong>을 흔드는 중대한 사안입니다. 연준의 독립성은 1913년 연준 설립 이래 미국 경제의 안정을 지탱해온 핵심 원칙입니다.
+        </p>
+        <p style="margin-top: 12px;">
+            만약 정치적 압력에 의해 금리가 결정되기 시작한다면, 이는 1970년대 대인플레이션과 같은 경제 재앙으로 이어질 수 있습니다. 투자자들은 이 상황의 전개를 면밀히 주시하며, 변동성에 대비한 포트폴리오 관리가 필요합니다.
+        </p>
+        
+        <div class="key-point">
+            <h5>🔑 투자자 체크포인트</h5>
+            <p>
+                • 향후 법적 절차 진행 상황 모니터링<br>
+                • 연준 정책 결정의 독립성 유지 여부 관찰<br>
+                • 달러 및 미국 국채 시장 움직임 주시<br>
+                • 시장 변동성 확대에 대비한 리스크 관리
+            </p>
+        </div>
+    </div>
+    
+    <!-- 푸터 -->
+    <footer class="footer">
+        <p>
+            📺 원본 영상: <a href="https://youtu.be/BMORixVp0BU?si=BvC2I-EG41xkwzj4" class="source-link" target="_blank">YouTube 링크</a><br><br>
+            ⚠️ 본 문서는 교육 및 정보 제공 목적으로 작성되었습니다.<br>
+            투자 결정은 본인의 판단과 책임하에 이루어져야 합니다.<br><br>
+            📅 작성일: 2026년 1월 12일
+        </p>
+    </footer>
+</body>
+</html>

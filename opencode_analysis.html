@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>OpenCode - 무료 AI 코딩 도구 완벽 가이드</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Malgun Gothic', sans-serif;
+            line-height: 1.8;
+            color: #333;
+            background: #f8f9fa;
+            padding: 16px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 24px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 12px;
+            font-weight: 700;
+        }
+        
+        .meta {
+            display: flex;
+            gap: 16px;
+            font-size: 14px;
+            opacity: 0.95;
+            flex-wrap: wrap;
+        }
+        
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .section {
+            background: white;
+            padding: 20px;
+            margin-bottom: 16px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        h2 {
+            color: #667eea;
+            font-size: 20px;
+            margin-bottom: 16px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+            font-weight: 700;
+        }
+        
+        h3 {
+            color: #444;
+            font-size: 17px;
+            margin: 20px 0 12px 0;
+            font-weight: 600;
+        }
+        
+        .highlight-box {
+            background: #f0f4ff;
+            border-left: 4px solid #667eea;
+            padding: 16px;
+            margin: 16px 0;
+            border-radius: 6px;
+        }
+        
+        .warning-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 16px;
+            margin: 16px 0;
+            border-radius: 6px;
+        }
+        
+        .danger-box {
+            background: #ffe6e6;
+            border-left: 4px solid #dc3545;
+            padding: 16px;
+            margin: 16px 0;
+            border-radius: 6px;
+        }
+        
+        .success-box {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            padding: 16px;
+            margin: 16px 0;
+            border-radius: 6px;
+        }
+        
+        .chart-container {
+            margin: 20px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0;
+            background: white;
+        }
+        
+        th {
+            background: #667eea;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #e9ecef;
+            font-size: 14px;
+        }
+        
+        tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            margin: 2px;
+        }
+        
+        .badge-free {
+            background: #28a745;
+            color: white;
+        }
+        
+        .badge-paid {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .badge-safe {
+            background: #28a745;
+            color: white;
+        }
+        
+        .badge-danger {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .badge-warning {
+            background: #ffc107;
+            color: #333;
+        }
+        
+        .step-box {
+            background: #f8f9fa;
+            padding: 16px;
+            margin: 12px 0;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .step-number {
+            display: inline-block;
+            width: 28px;
+            height: 28px;
+            background: #667eea;
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 28px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        
+        code {
+            background: #f4f4f4;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            color: #e83e8c;
+        }
+        
+        .command-box {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 16px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            margin: 12px 0;
+            overflow-x: auto;
+        }
+        
+        strong {
+            color: #667eea;
+            font-weight: 600;
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            margin: 16px 0;
+        }
+        
+        .feature-card {
+            background: #f8f9fa;
+            padding: 16px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .feature-card h4 {
+            color: #667eea;
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 12px;
+            }
+            
+            .header h1 {
+                font-size: 20px;
+            }
+            
+            h2 {
+                font-size: 18px;
+            }
+            
+            table {
+                font-size: 13px;
+            }
+            
+            th, td {
+                padding: 8px;
+            }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="header">
+        <h1>🚀 OpenCode: 무료 AI 에이전트 코딩 도구 완벽 가이드</h1>
+        <div class="meta">
+            <div class="meta-item">
+                <span>📅</span>
+                <span>2026년 1월 24일</span>
+            </div>
+            <div class="meta-item">
+                <span>🔗</span>
+                <span>성공 지식 (YouTube)</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>📌 핵심 요약</h2>
+        <div class="highlight-box">
+            <strong>OpenCode는 Claude Code의 무료 오픈소스 대안입니다.</strong> AI 에이전트 코딩(Agentic Coding)을 월 $100-200 비용 없이 무료로 사용할 수 있으며, 다양한 AI 모델을 지원하여 해외 개발자 커뮤니티에서 빠르게 인기를 얻고 있습니다.
+        </div>
+        
+        <div class="feature-grid">
+            <div class="feature-card">
+                <h4>💰 비용</h4>
+                <p>완전 무료 (Claude Code: $100-200/월)</p>
+            </div>
+            <div class="feature-card">
+                <h4>🔓 오픈소스</h4>
+                <p>코드 공개로 작동 원리 확인 가능</p>
+            </div>
+            <div class="feature-card">
+                <h4>🤖 다중 모델 지원</h4>
+                <p>DeepSeek, Qwen, Brocode, MiniMax 등</p>
+            </div>
+            <div class="feature-card">
+                <h4>🔌 플랫폼 연동</h4>
+                <p>OpenAI, GitHub Copilot 공식 지원</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>💸 비용 비교: Claude Code vs OpenCode</h2>
+        
+        <div class="chart-container">
+            <canvas id="costChart"></canvas>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>항목</th>
+                    <th>Claude Code</th>
+                    <th>OpenCode</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>월 비용</strong></td>
+                    <td>$100-200 (약 30만원) <span class="badge badge-paid">유료</span></td>
+                    <td>$0 <span class="badge badge-free">무료</span></td>
+                </tr>
+                <tr>
+                    <td><strong>소스 코드</strong></td>
+                    <td>비공개</td>
+                    <td>오픈소스</td>
+                </tr>
+                <tr>
+                    <td><strong>모델 선택</strong></td>
+                    <td>Claude 모델만</td>
+                    <td>다양한 무료 모델</td>
+                </tr>
+                <tr>
+                    <td><strong>접근성</strong></td>
+                    <td>고비용 진입장벽</td>
+                    <td>누구나 즉시 시작</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="highlight-box">
+            <strong>💡 OpenCode의 장점:</strong> 일반인도 부담 없이 AI 에이전트 코딩을 경험할 수 있으며, 최근 해외 개발자들이 Claude Code에서 대거 이전하는 추세입니다.
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>🤖 AI 에이전트 코딩(Agentic Coding)이란?</h2>
+        
+        <p><strong>에이전트 코딩</strong>은 자동으로 작동하는 여러 AI 에이전트를 설정하여 코딩 작업을 수행하는 방식입니다.</p>
+        
+        <h3>🔧 주요 특징</h3>
+        <div class="feature-grid">
+            <div class="feature-card">
+                <h4>CLI 기반</h4>
+                <p>커맨드 라인 인터페이스를 통한 명령 실행</p>
+            </div>
+            <div class="feature-card">
+                <h4>자동화</h4>
+                <p>반복 작업을 AI가 자동으로 처리</p>
+            </div>
+            <div class="feature-card">
+                <h4>멀티 에이전트</h4>
+                <p>여러 AI가 협업하여 복잡한 작업 수행</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>🛠️ OpenCode 설치 방법 (Windows)</h2>
+        
+        <div class="warning-box">
+            <strong>⚠️ 사전 요구사항:</strong> Windows 사용자는 WSL(Windows Subsystem for Linux) 설치가 필수입니다.
+        </div>
+
+        <h3>1단계: WSL 환경 준비</h3>
+        
+        <div class="step-box">
+            <span class="step-number">1</span>
+            <strong>메인보드 가상화 활성화</strong>
+            <p>BIOS 설정에서 Virtualization Technology 활성화 (제조사별 상이)</p>
+        </div>
+
+        <div class="step-box">
+            <span class="step-number">2</span>
+            <strong>Windows 기능 활성화</strong>
+            <p>Windows 검색 → "Windows 기능 켜기/끄기" 실행</p>
+            <ul style="margin-top: 8px; margin-left: 20px;">
+                <li>✅ 가상 머신 플랫폼</li>
+                <li>✅ Linux용 Windows 하위 시스템</li>
+            </ul>
+        </div>
+
+        <div class="step-box">
+            <span class="step-number">3</span>
+            <strong>컴퓨터 재부팅</strong>
+            <p>설정 변경사항 적용을 위해 재부팅 필수</p>
+        </div>
+
+        <h3>2단계: WSL 및 Ubuntu 설치</h3>
+        
+        <p><strong>명령 프롬프트를 관리자 권한으로 실행</strong> (Win + X → "관리자로 실행")</p>
+        
+        <div class="command-box">wsl --install</div>
+        
+        <p>Ubuntu가 자동으로 다운로드 및 설치되며, 사용자 이름과 비밀번호를 설정합니다.</p>
+
+        <h3>3단계: Node.js 설치 (펜 거치대)</h3>
+        
+        <p>Ubuntu 터미널에서 실행:</p>
+        
+        <div class="command-box">curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
+source ~/.bashrc
+nvm install node</div>
+
+        <div class="highlight-box">
+            <strong>📝 비유로 이해하기:</strong>
+            <ul style="margin-top: 8px; margin-left: 20px;">
+                <li>WSL = 작업할 책상</li>
+                <li>Node.js = 펜 거치대</li>
+                <li>OpenCode = 펜 (실제 작업 도구)</li>
+            </ul>
+        </div>
+
+        <h3>4단계: OpenCode 설치</h3>
+        
+        <div class="command-box">mkdir opencode
+cd opencode
+npm install -g opencode-cli</div>
+
+        <h3>5단계: 실행 확인</h3>
+        
+        <div class="command-box">opencode</div>
+        
+        <div class="success-box">
+            <strong>✅ 성공!</strong> 검정 배경의 OpenCode 터미널이 나타나면 설치 완료입니다.
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>🎯 무료로 사용 가능한 AI 모델</h2>
+        
+        <p>OpenCode는 기본적으로 <strong>4개의 무료 AI 모델</strong>을 제공합니다. 추가 API 연결 없이 즉시 사용 가능합니다.</p>
+
+        <div class="chart-container">
+            <canvas id="modelChart"></canvas>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>모델명</th>
+                    <th>특징</th>
+                    <th>비용</th>
+                    <th>추천 용도</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>DeepSeek</strong></td>
+                    <td>고성능 코딩 모델</td>
+                    <td><span class="badge badge-free">무료</span></td>
+                    <td>복잡한 코드 생성</td>
+                </tr>
+                <tr>
+                    <td><strong>Qwen 2.7</strong></td>
+                    <td>빠른 응답 속도</td>
+                    <td><span class="badge badge-free">무료</span></td>
+                    <td>간단한 작업</td>
+                </tr>
+                <tr>
+                    <td><strong>Brocode Fast 1</strong></td>
+                    <td>실시간 코드 생성</td>
+                    <td><span class="badge badge-free">무료</span></td>
+                    <td>빠른 프로토타이핑</td>
+                </tr>
+                <tr>
+                    <td><strong>MiniMax 2.1</strong></td>
+                    <td>경량 모델</td>
+                    <td><span class="badge badge-free">무료</span></td>
+                    <td>리소스 절약</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>🔄 모델 선택 및 변경</h3>
+        
+        <div class="command-box">/model</div>
+        
+        <p>위 명령어로 사용 가능한 모델 목록을 확인하고 선택할 수 있습니다. 작업 중간에도 모델 변경이 가능합니다.</p>
+    </div>
+
+    <div class="section">
+        <h2>📝 주요 작동 모드</h2>
+        
+        <h3>1️⃣ Build 모드</h3>
+        <div class="highlight-box">
+            <p><strong>즉시 코드 생성:</strong> 명확한 요구사항이 있을 때 바로 코딩 시작</p>
+            <p style="margin-top: 8px;"><strong>사용 예시:</strong> "영어 학습 앱 만들어줘" → 바로 HTML/CSS/JS 코드 생성</p>
+        </div>
+
+        <h3>2️⃣ Plan 모드</h3>
+        <div class="highlight-box">
+            <p><strong>계획 수립:</strong> 구현 방법을 모를 때 단계별 계획 작성</p>
+            <p style="margin-top: 8px;"><strong>사용 예시:</strong> 기술 스택 선택, 구조 설계, 기능 세부 계획 수립</p>
+        </div>
+
+        <div class="step-box">
+            <strong>💡 모드 전환:</strong> Tab 키를 눌러 Build ↔ Plan 모드 간 전환 가능
+        </div>
+
+        <h3>📊 실시간 정보 제공</h3>
+        <ul style="margin-left: 20px; margin-top: 12px;">
+            <li><strong>Thinking 과정:</strong> AI의 사고 과정 실시간 확인</li>
+            <li><strong>토큰 사용량:</strong> 사용한 토큰 수와 비율 표시</li>
+            <li><strong>비용:</strong> $0 (무료 모델 사용 시)</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>💻 실제 사용 예시: 영어 학습 앱 제작</h2>
+        
+        <h3>초기 버전 생성</h3>
+        <div class="command-box">Make a simple English study app with one-page HTML file</div>
+        
+        <p><strong>결과물:</strong> index.html 파일 생성 (약 60줄)</p>
+        <ul style="margin-left: 20px; margin-top: 12px;">
+            <li>✅ 영어 문제 출제</li>
+            <li>✅ 정답/오답 체크</li>
+            <li>✅ 다음 문제 이동</li>
+            <li>⚠️ 문법 오류 발견 (3인칭/1인칭 동사 혼용)</li>
+        </ul>
+
+        <h3>개선 버전 (다른 모델 사용)</h3>
+        <div class="command-box">/model
+GLM 선택
+Upgrade the app with better design and features</div>
+        
+        <p><strong>개선 결과:</strong> 200줄 이상으로 확장</p>
+        <ul style="margin-left: 20px; margin-top: 12px;">
+            <li>✅ 세련된 디자인</li>
+            <li>✅ 문제 카운터 추가</li>
+            <li>✅ 정확도 표시 기능</li>
+            <li>✅ 문법 오류 수정</li>
+        </ul>
+
+        <div class="success-box">
+            <strong>💡 핵심:</strong> 초기 결과물을 계속 대화로 개선(iterate)할 수 있습니다. 드래그만으로 자동 복사되어 즉시 테스트 가능합니다.
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>⚠️ 플랫폼 연동 시 주의사항</h2>
+        
+        <div class="chart-container">
+            <canvas id="platformChart"></canvas>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>플랫폼</th>
+                    <th>연동 가능 여부</th>
+                    <th>상태</th>
+                    <th>비고</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>OpenAI (ChatGPT)</strong></td>
+                    <td>✅ 가능</td>
+                    <td><span class="badge badge-safe">공식 지원</span></td>
+                    <td>Plus/Pro 플랜 사용 가능</td>
+                </tr>
+                <tr>
+                    <td><strong>GitHub Copilot</strong></td>
+                    <td>✅ 가능</td>
+                    <td><span class="badge badge-safe">공식 지원</span></td>
+                    <td>구독 플랜 연동 가능</td>
+                </tr>
+                <tr>
+                    <td><strong>Claude (Anthropic)</strong></td>
+                    <td>❌ 불가</td>
+                    <td><span class="badge badge-danger">계정 정지 위험</span></td>
+                    <td>TOS 위반으로 밴 조치</td>
+                </tr>
+                <tr>
+                    <td><strong>Google AI</strong></td>
+                    <td>❌ 불가</td>
+                    <td><span class="badge badge-danger">계정 정지 위험</span></td>
+                    <td>Gmail, YouTube 날아갈 수 있음</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="danger-box">
+            <h4 style="margin-bottom: 12px; color: #dc3545;">🚨 절대 금지: Claude 및 Google 플랜 연동</h4>
+            
+            <p><strong>Claude Code의 대응:</strong></p>
+            <ul style="margin-left: 20px; margin-top: 8px;">
+                <li>며칠 전부터 OpenCode에서 Claude 플랜 사용 감지 시작</li>
+                <li>TOS(서비스 약관) 위반으로 계정 즉시 정지</li>
+                <li>Opus, Sonnet 등 모든 Claude 모델 사용 차단</li>
+            </ul>
+
+            <p style="margin-top: 12px;"><strong>Google의 경우:</strong></p>
+            <ul style="margin-left: 20px; margin-top: 8px;">
+                <li>아직 공식 지원 발표 없음</li>
+                <li>무단 사용 시 Gmail, YouTube 등 계정 전체 위험</li>
+                <li>공식 협업 발표 전까지 사용 금지</li>
+            </ul>
+        </div>
+
+        <div class="success-box">
+            <h4 style="margin-bottom: 12px; color: #28a745;">✅ 안전한 선택지</h4>
+            
+            <p><strong>OpenAI와 OpenCode의 공식 협업:</strong></p>
+            <ul style="margin-left: 20px; margin-top: 8px;">
+                <li>ChatGPT Plus/Pro 플랜 합법적 사용 가능</li>
+                <li>GitHub Copilot 구독자도 연동 가능</li>
+                <li>OpenCode Zen의 무료 모델로도 충분히 강력</li>
+            </ul>
+        </div>
+
+        <div class="warning-box">
+            <strong>📌 권장사항:</strong> 공식 지원이 확인될 때까지 OpenCode 기본 무료 모델, OpenAI, GitHub Copilot만 사용하세요.
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>🎓 OpenCode 활용 팁</h2>
+        
+        <div class="feature-grid">
+            <div class="feature-card">
+                <h4>1. 명령어 활용</h4>
+                <p><code>/</code> 입력 시 사용 가능한 모든 명령어 확인 가능</p>
+            </div>
+            
+            <div class="feature-card">
+                <h4>2. 자동 복사</h4>
+                <p>코드를 드래그하면 자동으로 클립보드에 복사됨</p>
+            </div>
+            
+            <div class="feature-card">
+                <h4>3. 모델 전환</h4>
+                <p>프로젝트 진행 중에도 다른 모델로 변경 가능</p>
+            </div>
+            
+            <div class="feature-card">
+                <h4>4. 반복 개선</h4>
+                <p>초기 결과물을 계속 대화로 발전시킬 수 있음</p>
+            </div>
+            
+            <div class="feature-card">
+                <h4>5. 프롬프트 작성</h4>
+                <p>구체적으로 작성할수록 더 정확한 결과 획득</p>
+            </div>
+            
+            <div class="feature-card">
+                <h4>6. 에러 대응</h4>
+                <p>AI와 대화하며 문제점을 하나씩 해결</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>📊 OpenCode vs Claude Code 종합 비교</h2>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>비교 항목</th>
+                    <th>OpenCode</th>
+                    <th>Claude Code</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>월 비용</strong></td>
+                    <td>$0</td>
+                    <td>$100-200</td>
+                </tr>
+                <tr>
+                    <td><strong>연간 비용</strong></td>
+                    <td>$0</td>
+                    <td>$1,200-2,400</td>
+                </tr>
+                <tr>
+                    <td><strong>모델 다양성</strong></td>
+                    <td>4개 무료 모델 + 연동 가능</td>
+                    <td>Claude 모델만</td>
+                </tr>
+                <tr>
+                    <td><strong>오픈소스</strong></td>
+                    <td>✅ 코드 공개</td>
+                    <td>❌ 비공개</td>
+                </tr>
+                <tr>
+                    <td><strong>커뮤니티</strong></td>
+                    <td>급성장 중</td>
+                    <td>안정적</td>
+                </tr>
+                <tr>
+                    <td><strong>진입장벽</strong></td>
+                    <td>낮음 (무료)</td>
+                    <td>높음 (고비용)</td>
+                </tr>
+                <tr>
+                    <td><strong>업데이트</strong></td>
+                    <td>활발 (최근 대규모 업데이트)</td>
+                    <td>정기적</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="highlight-box">
+            <strong>💰 비용 절감 효과:</strong> OpenCode 사용 시 연간 최대 240만원(약 $2,400) 절약 가능
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>🔮 향후 전망</h2>
+        
+        <div class="success-box">
+            <h4 style="margin-bottom: 12px;">OpenCode의 성장세</h4>
+            <ul style="margin-left: 20px;">
+                <li>✅ 해외 개발자 커뮤니티에서 가장 핫한 툴</li>
+                <li>✅ Claude Code 사용자들의 대거 이동</li>
+                <li>✅ 최근 핵심 기능 대규모 업데이트</li>
+                <li>✅ OpenAI, GitHub와 공식 협업</li>
+            </ul>
+        </div>
+
+        <div class="warning-box">
+            <h4 style="margin-bottom: 12px;">주의사항</h4>
+            <ul style="margin-left: 20px;">
+                <li>⚠️ Google AI의 공식 지원 발표 대기 중</li>
+                <li>⚠️ Claude 플랜 연동은 계정 정지 위험</li>
+                <li>⚠️ 차기 영상에서 심화 기능 다룰 예정</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>✅ 결론</h2>
+        
+        <p>OpenCode는 AI 에이전트 코딩을 <strong>누구나 무료로 시작할 수 있게</strong> 만든 혁신적인 도구입니다. Claude Code의 월 30만원 비용 부담 없이, 다양한 무료 AI 모델로 강력한 코딩 자동화를 경험할 수 있습니다.</p>
+        
+        <div class="highlight-box">
+            <h4 style="margin-bottom: 12px;">OpenCode를 선택해야 하는 이유:</h4>
+            <ul style="margin-left: 20px;">
+                <li><strong>완전 무료:</strong> 연간 240만원 절약</li>
+                <li><strong>오픈소스:</strong> 투명한 코드, 커뮤니티 기여</li>
+                <li><strong>다중 모델:</strong> 작업에 맞는 AI 선택 가능</li>
+                <li><strong>공식 지원:</strong> OpenAI, GitHub Copilot 연동</li>
+                <li><strong>낮은 진입장벽:</strong> 누구나 즉시 시작 가능</li>
+            </ul>
+        </div>
+
+        <div class="danger-box">
+            <h4 style="margin-bottom: 12px;">⚠️ 꼭 기억하세요!</h4>
+            <p><strong>Claude 플랜이나 Google 플랜 연동은 절대 금지!</strong> 계정 정지 위험이 있으니 OpenCode 기본 무료 모델, OpenAI, GitHub Copilot만 사용하세요.</p>
+        </div>
+
+        <p style="margin-top: 20px;">특히 Windows 사용자라면 WSL 설정을 통해 즉시 에이전트 코딩을 시작할 수 있습니다. 영상의 단계별 가이드를 따라하면 초보자도 쉽게 설치하고 사용할 수 있습니다.</p>
+    </div>
+
+    <script>
+        // 비용 비교 차트
+        const costCtx = document.getElementById('costChart').getContext('2d');
+        new Chart(costCtx, {
+            type: 'bar',
+            data: {
+                labels: ['월 비용', '연간 비용'],
+                datasets: [
+                    {
+                        label: 'Claude Code ($)',
+                        data: [150, 1800],
+                        backgroundColor: 'rgba(220, 53, 69, 0.7)',
+                        borderColor: 'rgba(220, 53, 69, 1)',
+                        borderWidth: 2
+                    },
+                    {
+                        label: 'OpenCode ($)',
+                        data: [0, 0],
+                        backgroundColor: 'rgba(40, 167, 69, 0.7)',
+                        borderColor: 'rgba(40, 167, 69, 1)',
+                        borderWidth: 2
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: '비용 ($)'
+                        }
+                    }
+                },
+                plugins: {
+                    title: {
+                        display: true,
+                        text: '비용 비교: Claude Code vs OpenCode',
+                        font: {
+                            size: 16,
+                            weight: 'bold'
+                        }
+                    },
+                    legend: {
+                        display: true,
+                        position: 'top'
+                    }
+                }
+            }
+        });
+
+        // 무료 모델 차트
+        const modelCtx = document.getElementById('modelChart').getContext('2d');
+        new Chart(modelCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['DeepSeek', 'Qwen 2.7', 'Brocode Fast 1', 'MiniMax 2.1'],
+                datasets: [{
+                    label: '무료 모델',
+                    data: [25, 25, 25, 25],
+                    backgroundColor: [
+                        'rgba(102, 126, 234, 0.8)',
+                        'rgba(118, 75, 162, 0.8)',
+                        'rgba(40, 167, 69, 0.8)',
+                        'rgba(255, 193, 7, 0.8)'
+                    ],
+                    borderColor: [
+                        'rgba(102, 126, 234, 1)',
+                        'rgba(118, 75, 162, 1)',
+                        'rgba(40, 167, 69, 1)',
+                        'rgba(255, 193, 7, 1)'
+                    ],
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'OpenCode 무료 제공 AI 모델',
+                        font: {
+                            size: 16,
+                            weight: 'bold'
+                        }
+                    },
+                    legend: {
+                        display: true,
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+
+        // 플랫폼 연동 차트
+        const platformCtx = document.getElementById('platformChart').getContext('2d');
+        new Chart(platformCtx, {
+            type: 'bar',
+            data: {
+                labels: ['OpenAI', 'GitHub Copilot', 'Claude', 'Google AI'],
+                datasets: [{
+                    label: '연동 가능 여부',
+                    data: [1, 1, 0, 0],
+                    backgroundColor: [
+                        'rgba(40, 167, 69, 0.7)',
+                        'rgba(40, 167, 69, 0.7)',
+                        'rgba(220, 53, 69, 0.7)',
+                        'rgba(220, 53, 69, 0.7)'
+                    ],
+                    borderColor: [
+                        'rgba(40, 167, 69, 1)',
+                        'rgba(40, 167, 69, 1)',
+                        'rgba(220, 53, 69, 1)',
+                        'rgba(220, 53, 69, 1)'
+                    ],
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 1,
+                        ticks: {
+                            stepSize: 1,
+                            callback: function(value) {
+                                return value === 1 ? '✅ 가능' : '❌ 불가';
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    title: {
+                        display: true,
+                        text: '플랫폼별 연동 가능 여부',
+                        font: {
+                            size: 16,
+                            weight: 'bold'
+                        }
+                    },
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.parsed.y === 1 ? '✅ 공식 지원' : '❌ 계정 정지 위험';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

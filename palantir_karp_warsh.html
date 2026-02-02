@@ -1,0 +1,1465 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Palantir CEO Alex Karp × Kevin Warsh 대담 분석</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #111118;
+            --bg-card: #16161f;
+            --bg-card-alt: #1a1a25;
+            --border-subtle: #2a2a3a;
+            --border-accent: #3d5afe;
+            --text-primary: #e8e8f0;
+            --text-secondary: #9898b0;
+            --text-muted: #6a6a82;
+            --accent-blue: #3d5afe;
+            --accent-cyan: #00bcd4;
+            --accent-orange: #ff6d00;
+            --accent-red: #ff1744;
+            --accent-green: #00e676;
+            --accent-purple: #7c4dff;
+            --accent-gold: #ffd740;
+            --gradient-hero: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.75;
+            font-size: 15px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 680px;
+            margin: 0 auto;
+            padding: 0 16px;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: var(--gradient-hero);
+            padding: 48px 20px 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 30% 40%, rgba(61,90,254,0.08) 0%, transparent 50%),
+                        radial-gradient(circle at 70% 60%, rgba(0,188,212,0.06) 0%, transparent 50%);
+            animation: heroGlow 15s ease-in-out infinite;
+        }
+
+        @keyframes heroGlow {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(-5%, 3%); }
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            background: rgba(61,90,254,0.15);
+            border: 1px solid rgba(61,90,254,0.3);
+            color: var(--accent-blue);
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin-bottom: 16px;
+        }
+
+        .hero h1 {
+            font-size: 24px;
+            font-weight: 800;
+            line-height: 1.35;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, #e8e8f0, #a0a0c0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .hero-meta {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .hero-meta span {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* Section Styles */
+        .section {
+            padding: 32px 0;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .section:last-child {
+            border-bottom: none;
+        }
+
+        .section-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--accent-cyan);
+            margin-bottom: 10px;
+        }
+
+        .section h2 {
+            font-size: 20px;
+            font-weight: 800;
+            margin-bottom: 16px;
+            color: var(--text-primary);
+            line-height: 1.4;
+        }
+
+        .section h3 {
+            font-size: 17px;
+            font-weight: 700;
+            margin: 24px 0 12px;
+            color: var(--text-primary);
+            padding-left: 12px;
+            border-left: 3px solid var(--accent-blue);
+        }
+
+        p {
+            margin-bottom: 14px;
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+
+        /* Card Styles */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 16px 0;
+        }
+
+        .card-alt {
+            background: var(--bg-card-alt);
+        }
+
+        .card-accent {
+            border-left: 3px solid var(--accent-blue);
+        }
+
+        .card-warn {
+            border-left: 3px solid var(--accent-orange);
+        }
+
+        .card-success {
+            border-left: 3px solid var(--accent-green);
+        }
+
+        .card h4 {
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--text-primary);
+        }
+
+        /* Profile Cards */
+        .profile-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin: 16px 0;
+        }
+
+        .profile-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            gap: 14px;
+            align-items: flex-start;
+        }
+
+        .profile-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: 800;
+            flex-shrink: 0;
+        }
+
+        .avatar-karp {
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            color: white;
+        }
+
+        .avatar-warsh {
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-green));
+            color: white;
+        }
+
+        .profile-info h4 {
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 2px;
+        }
+
+        .profile-info .role {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .profile-info .desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-top: 6px;
+            line-height: 1.6;
+        }
+
+        /* Highlight Box */
+        .highlight-box {
+            background: linear-gradient(135deg, rgba(61,90,254,0.08), rgba(0,188,212,0.05));
+            border: 1px solid rgba(61,90,254,0.2);
+            border-radius: 12px;
+            padding: 18px;
+            margin: 16px 0;
+        }
+
+        .highlight-box .hl-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--accent-blue);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .highlight-box p {
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .highlight-box p:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Quote */
+        .quote-block {
+            background: var(--bg-card);
+            border-left: 3px solid var(--accent-purple);
+            border-radius: 0 12px 12px 0;
+            padding: 16px 18px;
+            margin: 18px 0;
+            position: relative;
+        }
+
+        .quote-block::before {
+            content: '"';
+            font-size: 40px;
+            color: var(--accent-purple);
+            opacity: 0.3;
+            position: absolute;
+            top: 4px;
+            left: 12px;
+            font-family: Georgia, serif;
+        }
+
+        .quote-block p {
+            font-size: 14px;
+            font-style: italic;
+            color: var(--text-secondary);
+            padding-left: 24px;
+            margin-bottom: 6px;
+        }
+
+        .quote-block .quote-author {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-style: normal;
+            padding-left: 24px;
+        }
+
+        /* Key Points */
+        .key-points {
+            margin: 16px 0;
+        }
+
+        .key-point {
+            display: flex;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(42,42,58,0.5);
+        }
+
+        .key-point:last-child {
+            border-bottom: none;
+        }
+
+        .kp-num {
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            background: rgba(61,90,254,0.12);
+            color: var(--accent-blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 700;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .kp-content {
+            flex: 1;
+        }
+
+        .kp-content strong {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .kp-content p {
+            font-size: 14px;
+            margin-bottom: 0;
+        }
+
+        /* Comparison Table */
+        .comp-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin: 16px 0;
+            font-size: 13px;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .comp-table thead th {
+            background: var(--bg-card);
+            padding: 12px 14px;
+            text-align: left;
+            font-weight: 700;
+            color: var(--text-primary);
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .comp-table tbody td {
+            padding: 10px 14px;
+            border-bottom: 1px solid rgba(42,42,58,0.3);
+            color: var(--text-secondary);
+            vertical-align: top;
+        }
+
+        .comp-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .comp-table tbody tr:nth-child(even) {
+            background: rgba(22,22,31,0.5);
+        }
+
+        /* Tags */
+        .tag {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            margin: 2px 4px 2px 0;
+        }
+
+        .tag-blue { background: rgba(61,90,254,0.15); color: var(--accent-blue); }
+        .tag-cyan { background: rgba(0,188,212,0.15); color: var(--accent-cyan); }
+        .tag-orange { background: rgba(255,109,0,0.15); color: var(--accent-orange); }
+        .tag-green { background: rgba(0,230,118,0.15); color: var(--accent-green); }
+        .tag-red { background: rgba(255,23,68,0.15); color: var(--accent-red); }
+        .tag-purple { background: rgba(124,77,255,0.15); color: var(--accent-purple); }
+
+        /* Chart Container */
+        .chart-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 20px 16px;
+            margin: 20px 0;
+        }
+
+        .chart-container h4 {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 14px;
+            text-align: center;
+            color: var(--text-primary);
+        }
+
+        .chart-container canvas {
+            max-height: 300px;
+        }
+
+        /* Flow Diagram */
+        .flow-diagram {
+            margin: 20px 0;
+        }
+
+        .flow-step {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            padding: 14px 0;
+            position: relative;
+        }
+
+        .flow-step:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            left: 18px;
+            top: 42px;
+            bottom: -14px;
+            width: 2px;
+            background: linear-gradient(to bottom, var(--accent-blue), transparent);
+        }
+
+        .flow-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+            background: rgba(61,90,254,0.12);
+            border: 1px solid rgba(61,90,254,0.25);
+        }
+
+        .flow-text h5 {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 3px;
+        }
+
+        .flow-text p {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 0;
+        }
+
+        /* Summary Box */
+        .summary-box {
+            background: linear-gradient(135deg, rgba(255,215,64,0.06), rgba(255,109,0,0.04));
+            border: 1px solid rgba(255,215,64,0.2);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .summary-box h4 {
+            color: var(--accent-gold);
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        /* Emphasis */
+        strong {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        em.accent {
+            color: var(--accent-cyan);
+            font-style: normal;
+            font-weight: 500;
+        }
+
+        .text-blue { color: var(--accent-blue); }
+        .text-cyan { color: var(--accent-cyan); }
+        .text-orange { color: var(--accent-orange); }
+        .text-green { color: var(--accent-green); }
+        .text-red { color: var(--accent-red); }
+
+        /* Divider */
+        .divider {
+            height: 1px;
+            background: linear-gradient(to right, transparent, var(--border-subtle), transparent);
+            margin: 24px 0;
+        }
+
+        /* TOC */
+        .toc {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .toc h4 {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: var(--text-primary);
+        }
+
+        .toc-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(42,42,58,0.3);
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-size: 13px;
+            transition: color 0.2s;
+        }
+
+        .toc-item:last-child {
+            border-bottom: none;
+        }
+
+        .toc-item:hover {
+            color: var(--accent-blue);
+        }
+
+        .toc-num {
+            color: var(--accent-blue);
+            font-weight: 700;
+            font-size: 12px;
+            min-width: 24px;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 32px 20px;
+            color: var(--text-muted);
+            font-size: 12px;
+        }
+
+        .footer a {
+            color: var(--accent-blue);
+            text-decoration: none;
+        }
+
+        /* Stat Grid */
+        .stat-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 16px 0;
+        }
+
+        .stat-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            padding: 14px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--accent-blue);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        /* Versus Block */
+        .vs-block {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 12px;
+            align-items: center;
+            margin: 16px 0;
+        }
+
+        .vs-side {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+        }
+
+        .vs-divider {
+            font-size: 18px;
+            font-weight: 900;
+            color: var(--accent-orange);
+        }
+
+        .vs-side h5 {
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .vs-side p {
+            font-size: 12px;
+            margin-bottom: 0;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Hero -->
+<div class="hero">
+    <div class="hero-content">
+        <div class="hero-badge">CEO INTERVIEW ANALYSIS</div>
+        <h1>Palantir CEO Alex Karp<br>× Kevin Warsh 대담</h1>
+        <p class="hero-subtitle">
+            "세상의 혼란이 우리의 기회다"<br>
+            팔란티어의 전략적 비전과 글로벌 매크로 전망
+        </p>
+        <div class="hero-meta">
+            <span>📅 2026.02.02</span>
+            <span>🎓 Stanford University</span>
+            <span>⏱️ ~60분</span>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+
+    <!-- 대담자 소개 -->
+    <div class="section">
+        <div class="section-label">👤 대담자 소개</div>
+        <div class="profile-grid">
+            <div class="profile-card">
+                <div class="profile-avatar avatar-karp">AK</div>
+                <div class="profile-info">
+                    <h4>Alex Karp</h4>
+                    <div class="role">Palantir Technologies CEO & Co-founder</div>
+                    <div class="desc">약 20년간 CEO 직을 수행. 독일에서 박사학위 취득. 기술 철학적 관점에서 기업을 경영하며, 스스로를 "아웃사이더"로 정의</div>
+                </div>
+            </div>
+            <div class="profile-card">
+                <div class="profile-avatar avatar-warsh">KW</div>
+                <div class="profile-info">
+                    <h4>Kevin Warsh</h4>
+                    <div class="role">Stanford University, 전 Fed 이사</div>
+                    <div class="desc">전직 연준(Fed) 이사. 저명 투자자 Stan Druckenmiller와 협업. 매크로 경제 전문가. Karp과 약 10년 이상 교류</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 목차 -->
+    <div class="toc">
+        <h4>📋 목차</h4>
+        <a href="#sec1" class="toc-item"><span class="toc-num">01</span> 핵심 요약: 5가지 키워드</a>
+        <a href="#sec2" class="toc-item"><span class="toc-num">02</span> 세계는 왜 혼란스러운가 — 매크로 진단</a>
+        <a href="#sec3" class="toc-item"><span class="toc-num">03</span> Palantir의 전략적 포지셔닝</a>
+        <a href="#sec4" class="toc-item"><span class="toc-num">04</span> 제품 전략: Thick vs Thin</a>
+        <a href="#sec5" class="toc-item"><span class="toc-num">05</span> 경쟁사 대비 차별화</a>
+        <a href="#sec6" class="toc-item"><span class="toc-num">06</span> 인재 전략과 조직 문화</a>
+        <a href="#sec7" class="toc-item"><span class="toc-num">07</span> 국가안보 · 군사 분야 기여</a>
+        <a href="#sec8" class="toc-item"><span class="toc-num">08</span> 미국의 구조적 이점과 "작은 부대" 이론</a>
+        <a href="#sec9" class="toc-item"><span class="toc-num">09</span> 향후 전망과 시사점</a>
+    </div>
+
+    <!-- 1. 핵심 요약 -->
+    <div class="section" id="sec1">
+        <div class="section-label">📌 SECTION 01</div>
+        <h2>핵심 요약: 5가지 키워드</h2>
+
+        <div class="key-points">
+            <div class="key-point">
+                <div class="kp-num">1</div>
+                <div class="kp-content">
+                    <p><strong>"Hinge Point" (역사적 전환점)</strong> — 21세기 3대 충격(9/11, 금융위기, 코로나) 이후, 중앙은행의 유동성 공급으로 유지되던 "허울(veneer)"이 벗겨지고 있다. 세계는 더욱 불확실하고 복잡한 국면으로 진입 중.</p>
+                </div>
+            </div>
+            <div class="key-point">
+                <div class="kp-num">2</div>
+                <div class="kp-content">
+                    <p><strong>"Productive Oddity" (생산적 이단)</strong> — Palantir의 핵심 정체성. 아웃사이더적 문화를 의도적으로 유지하면서, 남들이 아직 필요성을 인식하지 못하는 미래형 소프트웨어를 선제적으로 개발.</p>
+                </div>
+            </div>
+            <div class="key-point">
+                <div class="kp-num">3</div>
+                <div class="kp-content">
+                    <p><strong>"Thick → Thin" 제품 전략</strong> — 세계에서 가장 복잡한 문제를 해결하는 심층(Thick) 제품을 먼저 만들고, 이를 모듈화하여 일반 기업도 부분 구매 가능한 얇은(Thin) 제품으로 분리하는 투트랙 전략.</p>
+                </div>
+            </div>
+            <div class="key-point">
+                <div class="kp-num">4</div>
+                <div class="kp-content">
+                    <p><strong>인재 = 최후의 해자</strong> — 소프트웨어는 "빌드 가능한 인재" 없이는 존재 불가. 핵심 엔지니어가 떠나면 제품이 멈추거나 사라진다. Palantir는 세계 최고 수준의 엔지니어를 유치·유지하며, 약 2,500명으로 400개 이상의 제품을 운영.</p>
+                </div>
+            </div>
+            <div class="key-point">
+                <div class="kp-num">5</div>
+                <div class="kp-content">
+                    <p><strong>국가안보에서의 실증</strong> — 아프가니스탄 철수, 유럽 테러 방지, 백신 배포, 공급망 위기 대응 등 실전에서 검증된 제품력. "위기 때 진가가 드러나는" 소프트웨어 기업.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. 매크로 진단 -->
+    <div class="section" id="sec2">
+        <div class="section-label">🌍 SECTION 02</div>
+        <h2>세계는 왜 혼란스러운가 — 매크로 진단</h2>
+
+        <h3>Kevin Warsh의 진단: 21세기 3대 충격</h3>
+        <p>Warsh는 전직 Fed 이사답게 거시경제적 프레임으로 현 상황을 분석한다. <strong>21세기가 3번의 거대한 충격</strong>에 의해 규정되었다고 진단한다.</p>
+
+        <div class="chart-container">
+            <h4>21세기 3대 충격과 중앙은행 대응</h4>
+            <canvas id="shockChart"></canvas>
+        </div>
+
+        <div class="card card-accent">
+            <h4>🏦 중앙은행의 "허울(Veneer)" 이론</h4>
+            <p>Warsh의 핵심 주장: G20 정부들은 이 3대 충격을 <strong>중앙은행의 금융자산 가격 부양</strong>으로 덮어왔다. "모든 것이 괜찮다"는 허울을 씌웠지만, 이제 그 허울이 벗겨지고 있다.</p>
+            <p style="margin-bottom:0;"><strong class="text-orange">결과:</strong> 표면 아래의 진짜 긴장이 드러나기 시작하며, 미국과 전 세계가 불안정해 보이는 것은 <em>실제로</em> 불안정하기 때문이다.</p>
+        </div>
+
+        <h3>Alex Karp의 진단: 이중 대조 효과</h3>
+        <p>Karp는 Warsh의 분석에 동의하면서도, <strong>미국 내부의 극단적 대조</strong>가 혼란을 증폭시킨다고 본다.</p>
+
+        <div class="vs-block">
+            <div class="vs-side">
+                <h5 class="text-green">✅ 잘 작동하는 영역</h5>
+                <p>엔터프라이즈 소프트웨어, 혁신 기업, 특수부대/정보기관</p>
+                <p style="margin-top:6px;"><span class="tag tag-green">세계 최고 수준</span></p>
+            </div>
+            <div class="vs-divider">VS</div>
+            <div class="vs-side">
+                <h5 class="text-red">❌ 작동하지 않는 영역</h5>
+                <p>공공 정책, 대형 기관, 외교, 기본 인프라, 교육</p>
+                <p style="margin-top:6px;"><span class="tag tag-red">심각한 기능 부전</span></p>
+            </div>
+        </div>
+
+        <div class="highlight-box">
+            <div class="hl-title">💡 Karp의 핵심 통찰</div>
+            <p>"만약 경제의 다른 부분들도 똑같이 나빴다면, 사람들은 지금처럼 공공기관의 기능부전에 냉소적이지 않았을 것이다. <strong>극소수 기업의 놀라운 성과와 공공기관의 무능 사이의 대조</strong>가 불만을 키운다."</p>
+        </div>
+
+        <h3>공유된 전망: "Unbehagen" (불안/불쾌감)</h3>
+        <p>Karp는 독일어 <strong>"Unbehagen"</strong>이라는 단어를 사용한다. 단순한 불만(malaise)보다 더 깊은, 뿌리 깊은 불안감을 뜻한다. 두 사람 모두 다음 사항에 동의한다:</p>
+
+        <div class="card">
+            <div class="key-points">
+                <div class="key-point">
+                    <div class="kp-num" style="background:rgba(255,23,68,0.12); color:var(--accent-red);">!</div>
+                    <div class="kp-content"><p>미국인 <strong>70%</strong>가 국가가 잘못된 방향으로 가고 있다고 응답</p></div>
+                </div>
+                <div class="key-point">
+                    <div class="kp-num" style="background:rgba(255,23,68,0.12); color:var(--accent-red);">!</div>
+                    <div class="kp-content"><p>기관에 대한 신뢰도 <strong>75%</strong>가 신뢰하지 않는다고 응답</p></div>
+                </div>
+                <div class="key-point">
+                    <div class="kp-num" style="background:rgba(255,23,68,0.12); color:var(--accent-red);">!</div>
+                    <div class="kp-content"><p>유사한 비율이 <strong>자신의 미래가 더 나빠질 것</strong>이라고 전망</p></div>
+                </div>
+            </div>
+            <p style="margin-bottom:0; font-size:13px; color:var(--text-muted);">→ Warsh: "객관적 경제 지표는 호황인데 체감은 1970년대 카터 시대와 유사. 대중의 상식이 하버드 교수진보다 정확할 수 있다."</p>
+        </div>
+
+        <p>Karp는 여기에 더해, 향후 충격이 <strong>"급격한 가속(step function)"</strong> 형태로 올 수 있다고 경고한다. 선형적 악화가 아니라, 소프트웨어 제품이 갑자기 폭발적으로 성장하는 것처럼 위기도 갑작스럽게 격화될 수 있다는 것이다.</p>
+    </div>
+
+    <!-- 3. Palantir 전략적 포지셔닝 -->
+    <div class="section" id="sec3">
+        <div class="section-label">🎯 SECTION 03</div>
+        <h2>Palantir의 전략적 포지셔닝</h2>
+
+        <h3>핵심 명제: "내일 필요할 것을 오늘 만든다"</h3>
+
+        <p>Karp가 이 대담에서 반복적으로 강조하는 Palantir의 핵심 차별화는 다음과 같다:</p>
+
+        <div class="card card-accent">
+            <h4>🔑 Palantir의 문제 vs 일반 기업의 문제</h4>
+            <table class="comp-table">
+                <thead>
+                    <tr>
+                        <th>구분</th>
+                        <th>일반 기업</th>
+                        <th>Palantir</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>핵심 과제</strong></td>
+                        <td>미래에 좋은 제품을 만들 수 있다고 <em>설득</em></td>
+                        <td>고객이 <em>내일 필요</em>할 것을 이미 만들었다고 설득</td>
+                    </tr>
+                    <tr>
+                        <td><strong>난이도</strong></td>
+                        <td>제품 개발 역량 증명</td>
+                        <td>아직 인식하지 못한 필요성 각성</td>
+                    </tr>
+                    <tr>
+                        <td><strong>리스크</strong></td>
+                        <td>실행 리스크</td>
+                        <td>시장 타이밍 리스크</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h3>"Productive Oddity" — 생산적 이단의 철학</h3>
+        <p>Karp는 Palantir의 본질을 <strong>"생산적 이단(Productive Oddity)"</strong>이라고 정의한다. 이것은 단순한 마케팅 슬로건이 아니라, 회사의 DNA에 대한 설명이다:</p>
+
+        <div class="flow-diagram">
+            <div class="flow-step">
+                <div class="flow-icon">🔮</div>
+                <div class="flow-text">
+                    <h5>미래 현실 예측</h5>
+                    <p>아직 존재하지 않는 시장의 니즈를 선행적으로 파악</p>
+                </div>
+            </div>
+            <div class="flow-step">
+                <div class="flow-icon">⚙️</div>
+                <div class="flow-text">
+                    <h5>제품 선제 개발</h5>
+                    <p>세상이 더 복잡하고, 분절되고, 불안정해질 것을 전제로 소프트웨어 설계</p>
+                </div>
+            </div>
+            <div class="flow-step">
+                <div class="flow-icon">🤝</div>
+                <div class="flow-text">
+                    <h5>얼리어답터 확보</h5>
+                    <p>제품의 전체 가치를 이해하기 전인 기관들에게 먼저 채택 유도</p>
+                </div>
+            </div>
+            <div class="flow-step">
+                <div class="flow-icon">🌊</div>
+                <div class="flow-text">
+                    <h5>매크로 환경이 따라옴</h5>
+                    <p>현실이 복잡해질수록 제품의 가치가 폭발적으로 인식됨</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="quote-block">
+            <p>우리 소프트웨어 제품은 내일이 오늘보다 더 복잡한 세계가 될 것이라는 전제 위에 만들어졌다. 다른 소프트웨어 제품들은 세상이 더 안정적이고, 확실하고, 단순해질 것이라는 전제로 만들어졌다.</p>
+            <div class="quote-author">— Alex Karp</div>
+        </div>
+
+        <h3>Palantir가 대비하는 미래 시나리오</h3>
+        <p>Karp는 Palantir의 제품이 구체적으로 어떤 상황에 대비하는지 열거한다:</p>
+
+        <div class="card">
+            <div class="key-points">
+                <div class="key-point">
+                    <div class="kp-num">🔗</div>
+                    <div class="kp-content"><p><strong>관할권 단절:</strong> 더 이상 연결되지 않는 국가/지역 간 데이터 관리</p></div>
+                </div>
+                <div class="key-point">
+                    <div class="kp-num">🔒</div>
+                    <div class="kp-content"><p><strong>저신뢰 환경:</strong> 소프트웨어 업데이트를 그냥 배포할 수 없고, 검증이 필요한 상황</p></div>
+                </div>
+                <div class="key-point">
+                    <div class="kp-num">💥</div>
+                    <div class="kp-content"><p><strong>물리적 인프라 변동:</strong> 의존하던 물리적 인프라가 매일 바뀌거나 무너지는 상황</p></div>
+                </div>
+                <div class="key-point">
+                    <div class="kp-num">🪞</div>
+                    <div class="kp-content"><p><strong>디지털 트윈 필요:</strong> 복잡성이 예상을 초과할 때 디지털 복제본으로 관리</p></div>
+                </div>
+                <div class="key-point">
+                    <div class="kp-num">📡</div>
+                    <div class="kp-content"><p><strong>엣지 컴퓨팅:</strong> 중앙 서버가 아닌 현장(edge)에서의 AI 운용</p></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. 제품 전략 -->
+    <div class="section" id="sec4">
+        <div class="section-label">🧩 SECTION 04</div>
+        <h2>제품 전략: Thick vs Thin</h2>
+
+        <p>이 대담에서 가장 실질적인 비즈니스 논의 중 하나가 Palantir의 <strong>"Thick → Thin" 제품 전개 전략</strong>이다.</p>
+
+        <div class="chart-container">
+            <h4>Palantir 제품 전략 스펙트럼</h4>
+            <canvas id="productChart"></canvas>
+        </div>
+
+        <h3>Thick 제품 (심층형)</h3>
+        <div class="card card-success">
+            <h4>현재 Palantir의 핵심 영역</h4>
+            <p>세계에서 가장 복잡한 문제를 해결하는 풀스택(Full-Stack) 제품군. 시장에 다른 대안이 존재하지 않는 영역에서 <strong>독보적 위치</strong>를 차지.</p>
+            <p><span class="tag tag-blue">Gotham (PG)</span> <span class="tag tag-cyan">Foundry</span> <span class="tag tag-purple">Apollo</span> <span class="tag tag-green">특수작전용 제품</span></p>
+            <p style="margin-bottom:0;">Foundry 내에만 <strong>400개 이상의 제품</strong>이 포함되어 있으며, Apollo는 소프트웨어 배포·유지보수의 완전히 새로운 패러다임을 제시.</p>
+        </div>
+
+        <h3>Thin 제품 (모듈형) — 향후 확장 방향</h3>
+        <div class="card card-warn">
+            <h4>성장 엔진으로서의 모듈화</h4>
+            <p>Karp는 이를 "문 밑으로 밀어넣기(slip it under the door)" 전략이라 표현. 풀스택 제품의 일부를 분리하여, 기존 IT 아키텍처에 쉽게 통합 가능한 형태로 제공.</p>
+            <p><strong>핵심 논리:</strong> 풀스택 제품의 각 구성요소가 독립 제품보다 열등하다는 직관은 <strong class="text-red">사실이 아니다</strong>. 오히려 전체 스택에서 나온 부분이 더 우수하다.</p>
+            <p style="margin-bottom:0;"><strong class="text-green">목표:</strong> 현재 규모의 <strong>10배~20배 성장</strong>을 위한 전략적 포석</p>
+        </div>
+
+        <div class="highlight-box">
+            <div class="hl-title">🔑 Karp의 비즈니스 빌딩 공식</div>
+            <p>"세상에서 가장 복잡한 문제에서 출발 → 그 해결책을 내일도, 모레도 계속 발전시키며 → 동시에 그 중 일부를 덜 복잡한 형태로 구매할 수 있게 한다. 이것이 현재의 Palantir가 아닌, <strong>5년 후 10~20배 더 큰 Palantir</strong>를 만드는 방법이다."</p>
+        </div>
+    </div>
+
+    <!-- 5. 경쟁사 대비 차별화 -->
+    <div class="section" id="sec5">
+        <div class="section-label">⚔️ SECTION 05</div>
+        <h2>경쟁사 대비 차별화</h2>
+
+        <p>Warsh가 Snowflake, Databricks 등 경쟁사를 직접 언급하며 질문하자, Karp는 명확한 프레이밍으로 응답한다.</p>
+
+        <div class="chart-container">
+            <h4>Palantir vs 경쟁사: 차별화 축</h4>
+            <canvas id="radarChart"></canvas>
+        </div>
+
+        <table class="comp-table">
+            <thead>
+                <tr>
+                    <th>비교 항목</th>
+                    <th>Palantir</th>
+                    <th>경쟁사군</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>제품 깊이</strong></td>
+                    <td class="text-green">시장 최고 수준, 논쟁 불가</td>
+                    <td>상대적으로 좁고 소화하기 쉬움</td>
+                </tr>
+                <tr>
+                    <td><strong>기관 검증</strong></td>
+                    <td class="text-green">국방·정보기관 실전 검증</td>
+                    <td>상업적 검증 중심</td>
+                </tr>
+                <tr>
+                    <td><strong>판매 용이성</strong></td>
+                    <td class="text-orange">복잡, 이해에 시간 필요</td>
+                    <td class="text-green">포인트 솔루션, SaaS 모델로 쉬움</td>
+                </tr>
+                <tr>
+                    <td><strong>완전 가치 포착</strong></td>
+                    <td class="text-orange">제품 두꺼움 → 전체 가치 수익화 과제</td>
+                    <td>얇은 제품 → 빠른 수익화</td>
+                </tr>
+                <tr>
+                    <td><strong>미래 적합성</strong></td>
+                    <td class="text-green">혼란 가속 시 가치 폭증</td>
+                    <td>안정적 세계 전제에 최적화</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="card card-accent">
+            <h4>양측의 정당한 질문</h4>
+            <p><strong class="text-cyan">경쟁사에 대한 질문:</strong> "제품이 충분히 두꺼워서(Thick enough) 진짜 가치를 줄 수 있는가?"</p>
+            <p style="margin-bottom:0;"><strong class="text-orange">Palantir에 대한 질문:</strong> "제품이 충분히 얇아서(Thin enough) 완전히 수익화될 수 있는가?"</p>
+        </div>
+    </div>
+
+    <!-- 6. 인재 전략 -->
+    <div class="section" id="sec6">
+        <div class="section-label">👥 SECTION 06</div>
+        <h2>인재 전략과 조직 문화</h2>
+
+        <p>Warsh가 "결국 Palantir는 HR 사업 아닌가?"라고 도발적으로 물었을 때, Karp는 이를 확장하며 소프트웨어 기업의 인재 관리가 갖는 본질적 특수성을 설명한다.</p>
+
+        <div class="stat-grid">
+            <div class="stat-item">
+                <div class="stat-value">~2,500</div>
+                <div class="stat-label">엔지니어 수</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">400+</div>
+                <div class="stat-label">Foundry 내 제품 수</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">20년+</div>
+                <div class="stat-label">소프트웨어 빌딩 경험</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">세계 최고</div>
+                <div class="stat-label">엔지니어 수준 (Karp 주장)</div>
+            </div>
+        </div>
+
+        <h3>소프트웨어 인재의 비대칭성</h3>
+        <div class="card card-accent">
+            <h4>⚠️ "소프트웨어 ≠ 변호사, ≠ 하드웨어"</h4>
+            <p>Karp가 강조하는 소프트웨어 산업의 근본적 특이성:</p>
+            <p><strong>변호사의 경우:</strong> 한 명이 떠나면 다른 변호사가 대체 가능. 심지어 더 나은 사람이 올 수도 있다.</p>
+            <p style="margin-bottom:0;"><strong class="text-red">소프트웨어의 경우:</strong> 특정 제품을 만들 수 있는 엔지니어가 떠나면, <strong>그 제품은 정체하거나 죽는다.</strong> 세계에서 그런 제품을 만들 수 있는 사람은 극소수에 불과.</p>
+        </div>
+
+        <h3>Palantir의 인재 관리 3대 과제</h3>
+        <div class="flow-diagram">
+            <div class="flow-step">
+                <div class="flow-icon">🎣</div>
+                <div class="flow-text">
+                    <h5>1. 유치 (Recruit)</h5>
+                    <p>세계 최고 수준 엔지니어를 끌어오는 문화와 트랙레코드</p>
+                </div>
+            </div>
+            <div class="flow-step">
+                <div class="flow-icon">🏠</div>
+                <div class="flow-text">
+                    <h5>2. 유지 (Retain)</h5>
+                    <p>"사실상 해고가 불가능한" 최정상급 인재들이 자발적으로 머무르게 하는 환경</p>
+                </div>
+            </div>
+            <div class="flow-step">
+                <div class="flow-icon">🧭</div>
+                <div class="flow-text">
+                    <h5>3. 방향 설정 (Lead without Dictating)</h5>
+                    <p>독재자처럼 느끼게 하지 않으면서, 엔지니어가 만들고 싶은 것이 아닌 <strong>세상을 바꿀 제품</strong>을 만들도록 설득·영감 부여</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="quote-block">
+            <p>엔지니어만을 위한 제품을 만들면, 아무도 사지 않는 매우 흥미로운 제품이 나온다. 거기서 '사지 않는다'는 것은 세상에 아무런 영향을 미치지 못한다는 의미다.</p>
+            <div class="quote-author">— Alex Karp, 엔지니어 관리의 딜레마에 대해</div>
+        </div>
+
+        <div class="highlight-box">
+            <div class="hl-title">🎯 궁극적 인재 유지 비결: "하는 일이 중요해야 한다"</div>
+            <p>Warsh의 마무리 관찰: 최고의 인재를 유치·유지하려면 결국 <strong>그들이 하는 일이 세상에 중요해야(matter) 한다</strong>는 것이 핵심이다. Palantir는 전쟁터, 팬데믹, 국가안보 등 진짜 중요한 곳에서 실질적 영향력을 행사함으로써 이를 입증.</p>
+        </div>
+    </div>
+
+    <!-- 7. 국가안보 -->
+    <div class="section" id="sec7">
+        <div class="section-label">🛡️ SECTION 07</div>
+        <h2>국가안보 · 군사 분야 기여</h2>
+
+        <p>대담의 후반부에서 Warsh는 국가안보 분야에서의 Palantir의 역할을 집중적으로 다룬다.</p>
+
+        <h3>실전 적용 사례 (Karp 언급)</h3>
+        <div class="card">
+            <div class="key-points">
+                <div class="key-point">
+                    <div class="kp-num">🇦🇫</div>
+                    <div class="kp-content"><p><strong>아프가니스탄 철수 작전:</strong> 하루아침에 정책이 바뀌어 긴급 철수가 필요할 때, 기존 시스템에서 접근하지 못했던 데이터셋 위에서 즉시 작동할 수 있는 소프트웨어 제공</p></div>
+                </div>
+                <div class="key-point">
+                    <div class="kp-num">🇪🇺</div>
+                    <div class="kp-content"><p><strong>유럽 테러 방지:</strong> 유럽의 복잡한 데이터 보호 규정을 준수하면서, <strong>대규모 테러 공격 다수를 사전 차단.</strong> 이 공격들이 성공했다면 유럽의 정치 지형이 완전히 바뀌었을 것</p></div>
+                </div>
+                <div class="key-point">
+                    <div class="kp-num">💉</div>
+                    <div class="kp-content"><p><strong>코로나 대응:</strong> 영국 600개 병원 시스템 통합, 미국 백신·PPE 배포 최적화</p></div>
+                </div>
+                <div class="key-point">
+                    <div class="kp-num">⚔️</div>
+                    <div class="kp-content"><p><strong>특수부대/정보기관 지원:</strong> 공개적으로 알려지지 않은 성과들이 다수 존재. 미국과 유럽 시민이 자랑스러워할 수준의 결과</p></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card card-warn">
+            <h4>🗡️ "비난의 역설" (Slings & Arrows Paradox)</h4>
+            <p>Karp가 지적하는 아이러니: Palantir는 유럽에서 "CIA가 투자한 데이터 플랫폼"이라는 비난을 받는다 (실제로는 거의 20년 전의 소규모 투자). 그러나 이러한 비난이 가능한 이유 자체가 <strong>상황이 충분히 안전하기 때문</strong>이다.</p>
+            <p style="margin-bottom:0;">"우리 소프트웨어가 막아낸 테러 공격들이 실제로 일어났다면, 그 비난은 존재하지 않았을 것이다. <strong>비난은 성공의 역설적 부산물</strong>이다."</p>
+        </div>
+
+        <h3>위기 = Palantir 제품의 진가 증명</h3>
+        <p>Karp의 핵심 비유: 위기 상황은 <strong>"바닷물이 빠질 때"</strong>와 같다. 물이 빠지면 누가 옷을 입고 있는지(=소프트웨어가 작동하는지) 그 벌거벗은 진실이 드러난다. Palantir의 소프트웨어는 이런 위기 상황에서 반복적으로 <strong>작동함을 증명</strong>해왔다.</p>
+    </div>
+
+    <!-- 8. 미국의 구조적 이점 -->
+    <div class="section" id="sec8">
+        <div class="section-label">🇺🇸 SECTION 08</div>
+        <h2>미국의 구조적 이점과 "작은 부대" 이론</h2>
+
+        <h3>Edmund Burke의 "Little Platoons" 프레임</h3>
+        <p>Warsh는 에드먼드 버크의 <strong>"작은 부대(Little Platoons)"</strong> 개념을 인용하여 현재 작동하는 것과 그렇지 않은 것을 구분한다.</p>
+
+        <div class="chart-container">
+            <h4>"작동하는 것" vs "작동하지 않는 것"</h4>
+            <canvas id="platoonChart"></canvas>
+        </div>
+
+        <h3>미국이 가진 결정적 이점</h3>
+        <div class="card card-success">
+            <h4>🏆 세계에서 유일한 생태계</h4>
+            <p>Karp의 핵심 관찰: 미국의 엔터프라이즈 소프트웨어 산업은 <strong>시가총액 기준으로든, 제품 품질 기준으로든 세계에서 완전히 차별화된</strong> 수준이다. 이스라엘이 유일하게 유사한 혁신을 보여주지만, 극도로 작은 국가이다.</p>
+            <p>유럽은 Karp가 독일어·프랑스어를 구사하며 오래 생활한 곳이지만, 이 수준의 소프트웨어 혁신에서는 비교가 되지 않는다고 단언한다.</p>
+            <p style="margin-bottom:0;"><strong>미국이 특별한 이유:</strong> 세계에서 가장 적응적(adaptive)인 시장. <strong>규범 밖의 사람들도 성공할 수 있는</strong>, 비록 그 규범에 편입되지 못하더라도 성공을 가능케 하는 유일한 시장.</p>
+        </div>
+
+        <h3>개혁의 메커니즘</h3>
+        <p>두 사람 모두 대형 기관의 개혁이 필요하다는 데 동의하지만, 방법론에서 미묘한 차이를 보인다:</p>
+
+        <div class="vs-block">
+            <div class="vs-side">
+                <h5>Warsh (보수적 관점)</h5>
+                <p class="text-cyan" style="font-size:12px;">"돈을 더 쏟아붓기보다 근본적 개혁이 필요"</p>
+            </div>
+            <div class="vs-divider">↔</div>
+            <div class="vs-side">
+                <h5>Karp (진보적 관점)</h5>
+                <p class="text-green" style="font-size:12px;">"돈 자체는 괜찮다. 문제는 돈이 어디로 가는지다"</p>
+            </div>
+        </div>
+
+        <p>공통 합의점: <strong>공짜 점심은 없으며, 돈을 자격 있는 곳에 직접 전달</strong>할수록 좋다.</p>
+    </div>
+
+    <!-- 9. 향후 전망 -->
+    <div class="section" id="sec9">
+        <div class="section-label">🔭 SECTION 09</div>
+        <h2>향후 전망과 시사점</h2>
+
+        <h3>Warsh의 마무리 관찰</h3>
+        <div class="quote-block">
+            <p>보통 기업이 이 수준의 성공에 도달하고 역경을 뚫고 피닉스처럼 다시 날아오르면, 어느 정도의 안주(complacency)가 생긴다. 하지만 Palantir에서는 그런 것이 전혀 보이지 않는다. 오히려 앞으로 5년이 지난 5년보다 더 유망하다.</p>
+            <div class="quote-author">— Kevin Warsh, 대담 마무리</div>
+        </div>
+
+        <h3>대담에서 도출되는 핵심 시사점</h3>
+
+        <div class="summary-box">
+            <h4>📊 투자자 관점 시사점</h4>
+            <div class="key-points">
+                <div class="key-point">
+                    <div class="kp-num">1</div>
+                    <div class="kp-content"><p><strong>매크로 환경이 Palantir에 순풍:</strong> 세계가 불안정해질수록 Palantir 제품의 가치가 기하급수적으로 증가하는 구조. "제품의 과소평가는 매크로 조건이 아직 완전히 도래하지 않았기 때문"이라는 CEO의 직접 발언.</p></div>
+                </div>
+                <div class="key-point">
+                    <div class="kp-num">2</div>
+                    <div class="kp-content"><p><strong>10~20배 성장 비전:</strong> Thick → Thin 제품 모듈화를 통해 현재 규모의 10~20배 성장이 목표. 이는 단순한 희망이 아닌, 구체적 제품 전략에 기반.</p></div>
+                </div>
+                <div class="key-point">
+                    <div class="kp-num">3</div>
+                    <div class="kp-content"><p><strong>파트너 생태계 확장:</strong> 스타트업 투자(Founders for Builders), 중간 단계 기업과의 파트너십 등을 통해 Palantir 소프트웨어뿐 아니라 "위기 대응 지식" 자체를 배포하는 전략.</p></div>
+                </div>
+                <div class="key-point">
+                    <div class="kp-num">4</div>
+                    <div class="kp-content"><p><strong>인재 해자의 지속성:</strong> 20년간 축적된 엔지니어링 문화와 세계 최고 수준 인재 풀은 타사가 단기간에 복제 불가능.</p></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card card-accent">
+            <h4>🌐 거시경제 관점 시사점</h4>
+            <p><strong>전직 Fed 이사 Warsh의 진단</strong>이 주목할 만하다: 중앙은행 주도의 유동성 공급이 만든 "허울"이 벗겨지고 있으며, 이것이 글로벌 불안정의 구조적 원인이라는 시각. 이는 <strong>향후 금융시장의 변동성 확대</strong>와 <strong>실물 경제와 금융시장 간 괴리 심화</strong>를 암시한다.</p>
+            <p style="margin-bottom:0;">두 사람 모두 <strong>"다음 12개월이 이 새로운 현실을 더 이상 숨기기 어려운 시점"</strong>이 될 것이라는 데 동의.</p>
+        </div>
+
+        <div class="card card-warn">
+            <h4>⚠️ 리스크 요인</h4>
+            <p><strong>Palantir 자체 리스크:</strong> 제품이 너무 두꺼워서 전체 가치를 수익화하는 데 시간이 걸릴 수 있다는 점을 CEO 스스로 인정. 모듈화 전략의 실행력이 관건.</p>
+            <p style="margin-bottom:0;"><strong>매크로 전제 리스크:</strong> "세계가 더 혼란해진다"는 전제가 틀릴 경우 (예상 외의 평화·안정), Palantir의 프리미엄 정당화가 약해질 수 있음. 다만 Karp와 Warsh 모두 이 가능성을 매우 낮게 봄.</p>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <p>본 분석은 Stanford University에서 진행된 Alex Karp × Kevin Warsh 대담 자막을 기반으로 작성되었습니다.</p>
+        <p>원본: <a href="https://www.youtube.com/watch?v=adobyve9ros&t=708s" target="_blank">YouTube 영상 링크</a></p>
+        <p style="margin-top:12px; color:var(--text-muted);">© 2026 분석 문서 | 투자 조언이 아닙니다</p>
+    </div>
+</div>
+
+<script>
+    // Chart.js defaults
+    Chart.defaults.color = '#9898b0';
+    Chart.defaults.borderColor = 'rgba(42,42,58,0.5)';
+    Chart.defaults.font.family = "'Noto Sans KR', sans-serif";
+
+    // 1. 21세기 3대 충격 차트
+    new Chart(document.getElementById('shockChart'), {
+        type: 'bar',
+        data: {
+            labels: ['9/11\n(2001)', '글로벌 금융위기\n(2008)', 'COVID-19\n(2020)', '현재\n(2025-26)'],
+            datasets: [{
+                label: '충격 강도 (개념적)',
+                data: [70, 85, 90, 0],
+                backgroundColor: [
+                    'rgba(255,23,68,0.6)',
+                    'rgba(255,109,0,0.6)',
+                    'rgba(124,77,255,0.6)',
+                    'rgba(61,90,254,0.2)'
+                ],
+                borderColor: [
+                    '#ff1744',
+                    '#ff6d00',
+                    '#7c4dff',
+                    '#3d5afe'
+                ],
+                borderWidth: 1,
+                borderRadius: 6,
+                barPercentage: 0.6,
+            }, {
+                label: '중앙은행 유동성 대응',
+                data: [40, 80, 95, 85],
+                backgroundColor: 'rgba(0,188,212,0.3)',
+                borderColor: '#00bcd4',
+                borderWidth: 1,
+                borderRadius: 6,
+                barPercentage: 0.6,
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: { padding: 16, usePointStyle: true, pointStyle: 'rectRounded', font: { size: 11 } }
+                },
+                tooltip: {
+                    backgroundColor: '#1a1a25',
+                    titleColor: '#e8e8f0',
+                    bodyColor: '#9898b0',
+                    borderColor: '#2a2a3a',
+                    borderWidth: 1,
+                    cornerRadius: 8,
+                    padding: 12,
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100,
+                    grid: { color: 'rgba(42,42,58,0.3)' },
+                    ticks: { font: { size: 11 } }
+                },
+                x: {
+                    grid: { display: false },
+                    ticks: { font: { size: 11 }, maxRotation: 0 }
+                }
+            }
+        }
+    });
+
+    // 2. 제품 전략 스펙트럼
+    new Chart(document.getElementById('productChart'), {
+        type: 'bar',
+        data: {
+            labels: [
+                'Gotham\n(국방·정보)',
+                'Foundry\n(엔터프라이즈)',
+                'Apollo\n(SW 배포)',
+                '특수작전용\n(비공개)',
+                'Edge AI\n(개발중)',
+                '모듈형\n(향후 확장)'
+            ],
+            datasets: [{
+                label: '제품 깊이 (Thickness)',
+                data: [95, 90, 85, 98, 80, 40],
+                backgroundColor: [
+                    'rgba(61,90,254,0.7)',
+                    'rgba(0,188,212,0.7)',
+                    'rgba(124,77,255,0.7)',
+                    'rgba(255,23,68,0.7)',
+                    'rgba(0,230,118,0.7)',
+                    'rgba(255,215,64,0.7)'
+                ],
+                borderRadius: 6,
+                barPercentage: 0.7,
+            }, {
+                label: '시장 접근성 (Thinness)',
+                data: [20, 45, 50, 10, 60, 90],
+                backgroundColor: 'rgba(255,255,255,0.1)',
+                borderColor: 'rgba(255,255,255,0.3)',
+                borderWidth: 1,
+                borderRadius: 6,
+                barPercentage: 0.7,
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: { padding: 16, usePointStyle: true, pointStyle: 'rectRounded', font: { size: 11 } }
+                }
+            },
+            scales: {
+                x: {
+                    beginAtZero: true,
+                    max: 100,
+                    grid: { color: 'rgba(42,42,58,0.3)' },
+                    ticks: { font: { size: 11 } }
+                },
+                y: {
+                    grid: { display: false },
+                    ticks: { font: { size: 11 } }
+                }
+            }
+        }
+    });
+
+    // 3. 레이더 차트: Palantir vs 경쟁사
+    new Chart(document.getElementById('radarChart'), {
+        type: 'radar',
+        data: {
+            labels: ['제품 깊이', '기관 검증', '미래 적합성', '제품 폭', '판매 용이성', '수익화 속도'],
+            datasets: [{
+                label: 'Palantir',
+                data: [95, 95, 90, 70, 40, 50],
+                backgroundColor: 'rgba(61,90,254,0.2)',
+                borderColor: '#3d5afe',
+                borderWidth: 2,
+                pointBackgroundColor: '#3d5afe',
+                pointBorderColor: '#3d5afe',
+                pointRadius: 4,
+            }, {
+                label: '경쟁사군 (Snowflake, Databricks 등)',
+                data: [50, 40, 45, 60, 85, 80],
+                backgroundColor: 'rgba(255,109,0,0.15)',
+                borderColor: '#ff6d00',
+                borderWidth: 2,
+                pointBackgroundColor: '#ff6d00',
+                pointBorderColor: '#ff6d00',
+                pointRadius: 4,
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: { padding: 16, usePointStyle: true, pointStyle: 'circle', font: { size: 11 } }
+                }
+            },
+            scales: {
+                r: {
+                    beginAtZero: true,
+                    max: 100,
+                    grid: { color: 'rgba(42,42,58,0.4)' },
+                    angleLines: { color: 'rgba(42,42,58,0.3)' },
+                    pointLabels: { font: { size: 11, family: "'Noto Sans KR'" } },
+                    ticks: { display: false }
+                }
+            }
+        }
+    });
+
+    // 4. Little Platoons 차트
+    new Chart(document.getElementById('platoonChart'), {
+        type: 'doughnut',
+        data: {
+            labels: [
+                '혁신 기업 (소프트웨어)',
+                '특수부대/정보기관',
+                '커뮤니티/가족',
+                '대형 공공기관',
+                '공공서비스/외교',
+                '기존 교육 시스템'
+            ],
+            datasets: [{
+                data: [30, 15, 15, 15, 15, 10],
+                backgroundColor: [
+                    'rgba(0,230,118,0.8)',
+                    'rgba(61,90,254,0.8)',
+                    'rgba(0,188,212,0.8)',
+                    'rgba(255,23,68,0.6)',
+                    'rgba(255,109,0,0.6)',
+                    'rgba(124,77,255,0.5)'
+                ],
+                borderColor: '#0a0a0f',
+                borderWidth: 3,
+                hoverOffset: 8,
+            }]
+        },
+        options: {
+            responsive: true,
+            cutout: '55%',
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        padding: 12,
+                        usePointStyle: true,
+                        pointStyle: 'rectRounded',
+                        font: { size: 11 },
+                        generateLabels: function(chart) {
+                            const original = Chart.overrides.doughnut.plugins.legend.labels.generateLabels(chart);
+                            original.forEach((label, i) => {
+                                if (i < 3) label.text = '✅ ' + label.text;
+                                else label.text = '❌ ' + label.text;
+                            });
+                            return original;
+                        }
+                    }
+                },
+                tooltip: {
+                    backgroundColor: '#1a1a25',
+                    titleColor: '#e8e8f0',
+                    bodyColor: '#9898b0',
+                    borderColor: '#2a2a3a',
+                    borderWidth: 1,
+                    cornerRadius: 8,
+                    callbacks: {
+                        label: function(context) {
+                            const idx = context.dataIndex;
+                            if (idx < 3) return context.label + ' — 잘 작동';
+                            return context.label + ' — 기능 부전';
+                        }
+                    }
+                }
+            }
+        }
+    });
+</script>
+
+</body>
+</html>

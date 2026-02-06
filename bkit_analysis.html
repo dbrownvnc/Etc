@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>bkit 분석 - 바이브코딩의 근본 문제를 해결하는 도구</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0f1117;
+            --bg-card: #1a1d27;
+            --bg-card-alt: #151821;
+            --bg-accent: #252836;
+            --text-primary: #e8eaf0;
+            --text-secondary: #9ca3b8;
+            --text-muted: #6b7394;
+            --accent-blue: #5b8af5;
+            --accent-cyan: #4dd4c8;
+            --accent-orange: #f5a855;
+            --accent-red: #f06e6e;
+            --accent-purple: #9b7af5;
+            --accent-green: #5cd08e;
+            --border: #2a2d3a;
+            --gradient-1: linear-gradient(135deg, #5b8af5, #4dd4c8);
+            --gradient-2: linear-gradient(135deg, #9b7af5, #5b8af5);
+            --gradient-3: linear-gradient(135deg, #f5a855, #f06e6e);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.75;
+            font-size: 15px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 640px;
+            margin: 0 auto;
+            padding: 0 16px 60px;
+        }
+
+        /* Hero Section */
+        .hero {
+            position: relative;
+            padding: 40px 20px 32px;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 28px;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--bg-accent);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 5px 14px;
+            font-size: 12px;
+            color: var(--accent-cyan);
+            margin-bottom: 16px;
+            font-weight: 500;
+        }
+
+        .hero h1 {
+            font-size: 24px;
+            font-weight: 800;
+            line-height: 1.35;
+            margin-bottom: 12px;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-sub {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .meta-row {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin-top: 16px;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .meta-row span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* Section */
+        .section {
+            margin-bottom: 32px;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 16px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .section-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .section-header h2 {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 18px;
+            margin-bottom: 12px;
+        }
+
+        .card-alt {
+            background: var(--bg-card-alt);
+        }
+
+        .card h3 {
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .card p, .card li {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        /* Highlight box */
+        .highlight-box {
+            border-left: 3px solid var(--accent-blue);
+            padding: 14px 16px;
+            background: rgba(91, 138, 245, 0.06);
+            border-radius: 0 10px 10px 0;
+            margin-bottom: 12px;
+        }
+
+        .highlight-box.warn {
+            border-left-color: var(--accent-orange);
+            background: rgba(245, 168, 85, 0.06);
+        }
+
+        .highlight-box.success {
+            border-left-color: var(--accent-green);
+            background: rgba(92, 208, 142, 0.06);
+        }
+
+        .highlight-box.purple {
+            border-left-color: var(--accent-purple);
+            background: rgba(155, 122, 245, 0.06);
+        }
+
+        .highlight-box p {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .highlight-box strong {
+            color: var(--text-primary);
+        }
+
+        /* Flow Diagram */
+        .flow-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            margin: 16px 0;
+        }
+
+        .flow-step {
+            display: flex;
+            align-items: stretch;
+            gap: 14px;
+        }
+
+        .flow-line {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 32px;
+            flex-shrink: 0;
+        }
+
+        .flow-dot {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 700;
+            color: #fff;
+            flex-shrink: 0;
+        }
+
+        .flow-connector {
+            width: 2px;
+            flex: 1;
+            min-height: 12px;
+        }
+
+        .flow-content {
+            flex: 1;
+            padding-bottom: 18px;
+        }
+
+        .flow-content h4 {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .flow-content p {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Command table */
+        .cmd-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .cmd-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 14px;
+        }
+
+        .cmd-name {
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--accent-cyan);
+            background: rgba(77, 212, 200, 0.1);
+            padding: 3px 8px;
+            border-radius: 4px;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .cmd-desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* Progress bar */
+        .progress-wrap {
+            margin: 16px 0;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            margin-bottom: 6px;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: var(--bg-accent);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s;
+        }
+
+        /* Comparison */
+        .compare-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 12px 0;
+        }
+
+        .compare-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 14px;
+            text-align: center;
+        }
+
+        .compare-box.bad {
+            border-color: rgba(240, 110, 110, 0.3);
+        }
+
+        .compare-box.good {
+            border-color: rgba(92, 208, 142, 0.3);
+        }
+
+        .compare-label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .compare-box.bad .compare-label { color: var(--accent-red); }
+        .compare-box.good .compare-label { color: var(--accent-green); }
+
+        .compare-box p {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* Tag */
+        .tag {
+            display: inline-block;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin: 2px 4px 2px 0;
+        }
+
+        .tag-blue { background: rgba(91,138,245,0.15); color: var(--accent-blue); }
+        .tag-cyan { background: rgba(77,212,200,0.15); color: var(--accent-cyan); }
+        .tag-purple { background: rgba(155,122,245,0.15); color: var(--accent-purple); }
+        .tag-orange { background: rgba(245,168,85,0.15); color: var(--accent-orange); }
+
+        /* List */
+        .styled-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .styled-list li {
+            position: relative;
+            padding-left: 18px;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.65;
+        }
+
+        .styled-list li::before {
+            content: '▸';
+            position: absolute;
+            left: 0;
+            color: var(--accent-cyan);
+            font-weight: bold;
+        }
+
+        /* PDCA Cycle Diagram */
+        .pdca-cycle {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 16px 0;
+        }
+
+        .pdca-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 14px;
+            text-align: center;
+        }
+
+        .pdca-item .pdca-letter {
+            font-size: 22px;
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+
+        .pdca-item .pdca-title {
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .pdca-item .pdca-desc {
+            font-size: 12px;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        .pdca-item:nth-child(1) .pdca-letter { color: var(--accent-blue); }
+        .pdca-item:nth-child(2) .pdca-letter { color: var(--accent-green); }
+        .pdca-item:nth-child(3) .pdca-letter { color: var(--accent-orange); }
+        .pdca-item:nth-child(4) .pdca-letter { color: var(--accent-purple); }
+
+        /* Demo section */
+        .demo-terminal {
+            background: #0d0f14;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 12px 0;
+        }
+
+        .terminal-bar {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            background: #161922;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .terminal-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .terminal-body {
+            padding: 14px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            color: var(--accent-cyan);
+            line-height: 1.7;
+        }
+
+        .terminal-body .comment { color: var(--text-muted); }
+        .terminal-body .cmd { color: var(--accent-green); }
+        .terminal-body .flag { color: var(--accent-orange); }
+
+        /* Takeaway */
+        .takeaway {
+            background: linear-gradient(135deg, rgba(91,138,245,0.08), rgba(155,122,245,0.08));
+            border: 1px solid rgba(91,138,245,0.2);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 28px;
+        }
+
+        .takeaway h3 {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: var(--accent-blue);
+        }
+
+        .takeaway p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 24px 0;
+            font-size: 12px;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border);
+            margin-top: 32px;
+        }
+
+        .footer a {
+            color: var(--accent-blue);
+            text-decoration: none;
+        }
+
+        strong { color: var(--text-primary); }
+    </style>
+</head>
+<body>
+    <div class="container">
+
+        <!-- Hero -->
+        <div class="hero">
+            <div class="hero-badge">🛠️ AI 개발도구 분석</div>
+            <h1>bkit — 바이브코딩의<br>근본 문제를 해결하는 도구</h1>
+            <p class="hero-sub">클로드 코드에 체계적 개발 프로세스를 부여하는 플러그인</p>
+            <div class="meta-row">
+                <span>📺 코드 깎는 노인</span>
+                <span>📅 2026.02.06</span>
+            </div>
+        </div>
+
+        <!-- 1. 핵심 요약 -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-icon" style="background:rgba(91,138,245,0.15);">💡</div>
+                <h2>영상 핵심 요약</h2>
+            </div>
+
+            <div class="highlight-box">
+                <p><strong>bkit</strong>은 클로드 코드(Claude Code) 같은 코딩 에이전트에 <strong>체계적인 작업 프로세스(PDCA)</strong>를 적용해주는 플러그인이다. 사용자가 대충 요청해도 AI가 알아서 계획 → 실행 → 검증 → 개선의 사이클을 돌며 높은 품질의 코드를 만들어낸다.</p>
+            </div>
+
+            <div class="card">
+                <p>영상 제작자(코드 깎는 노인)는 bkit을 사용해 <strong>MDIR/PC Tools를 오마주한 터미널 파일 관리자(코각 DIR)</strong>를 처음부터 끝까지 개발하고, 배포 준비 및 소개 웹사이트까지 만드는 전 과정을 시연한다.</p>
+            </div>
+        </div>
+
+        <!-- 2. 바이브코딩의 문제점 -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-icon" style="background:rgba(240,110,110,0.15);">⚠️</div>
+                <h2>바이브코딩의 근본 문제</h2>
+            </div>
+
+            <div class="compare-grid">
+                <div class="compare-box bad">
+                    <div class="compare-label">🚫 현실</div>
+                    <p>AI가 10분 만에 코드를 만들어주지만, 검증에 <strong>몇 배의 시간</strong>이 소요</p>
+                </div>
+                <div class="compare-box good">
+                    <div class="compare-label">✅ 이상</div>
+                    <p>체계적 프로세스로 코드 생성과 검증이 <strong>하나의 흐름</strong>으로 진행</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>주요 문제점들</h3>
+                <ul class="styled-list">
+                    <li>문법적으로 완벽하지만 <strong>논리적으로 허술한</strong> 코드</li>
+                    <li>파일마다 코드 스타일이 <strong>제각각</strong></li>
+                    <li>요청 사항을 AI가 <strong>누락하거나 잊어버림</strong></li>
+                    <li>미흡한 에러 처리, 불완전한 구현</li>
+                </ul>
+            </div>
+
+            <div class="highlight-box warn">
+                <p><strong>근본 원인:</strong> 사용자가 AI에게 너무 모호하고 체계 없이 일을 시키기 때문이다. 구체적이지 않은 요청은 AI뿐 아니라 사람에게도 좋은 결과를 만들지 못한다.</p>
+            </div>
+
+            <div class="card card-alt">
+                <h3>왜 같은 클로드 코드인데 결과가 다를까?</h3>
+                <p>같은 모델(Opus 4.5)을 사용해도 <strong>사용 방식에 따라 결과물이 천차만별</strong>이다. 엔트로픽이 사용자별로 다른 성능을 제공하는 것이 아니라, 사용자가 얼마나 체계적으로 요청하느냐의 차이다.</p>
+                <br>
+                <p style="font-size:13px; color:var(--accent-orange);">💬 "우리가 대체된다면 AI에게 대체되는 것이 아니라, AI의 가치를 나보다 더 잘 뽑아 먹는 사람에게 대체될 것"</p>
+            </div>
+        </div>
+
+        <!-- 3. bkit이란? -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-icon" style="background:rgba(77,212,200,0.15);">🧰</div>
+                <h2>bkit이란?</h2>
+            </div>
+
+            <div class="highlight-box success">
+                <p>bkit은 클로드 코드 같은 코딩 에이전트가 <strong>어떻게 일해야 하는지를 세밀하게 규정한 매뉴얼</strong>을 제공하는 플러그인이다. 수많은 마크다운(.md) 문서로 구성되어 있으며, AI 에이전트가 이 문서에 정의된 방법에 따라 행동한다.</p>
+            </div>
+
+            <div class="card">
+                <h3>핵심 가치</h3>
+                <ul class="styled-list">
+                    <li>사용자 대신 <strong>AI를 조련해주는 전문 대리자</strong> 역할</li>
+                    <li>체계를 만드는 노력을 줄이고 <strong>아이디어에 집중</strong>할 수 있게 함</li>
+                    <li>AI 에이전트의 <strong>효율성과 정확성을 극대화</strong>하는 노하우 내장</li>
+                    <li><strong>무료</strong>로 사용 가능</li>
+                </ul>
+            </div>
+
+            <!-- PDCA 다이어그램 -->
+            <div class="card">
+                <h3>bkit의 핵심 철학: PDCA 사이클</h3>
+                <div class="pdca-cycle">
+                    <div class="pdca-item">
+                        <div class="pdca-letter">P</div>
+                        <div class="pdca-title">Plan (계획)</div>
+                        <div class="pdca-desc">요구사항 문서화 및 작업 계획 수립</div>
+                    </div>
+                    <div class="pdca-item">
+                        <div class="pdca-letter">D</div>
+                        <div class="pdca-title">Do (실행)</div>
+                        <div class="pdca-desc">계획에 따른 코드 구현</div>
+                    </div>
+                    <div class="pdca-item">
+                        <div class="pdca-letter">C</div>
+                        <div class="pdca-title">Check (점검)</div>
+                        <div class="pdca-desc">요구사항 vs 구현 차이 분석 및 테스트</div>
+                    </div>
+                    <div class="pdca-item">
+                        <div class="pdca-letter">A</div>
+                        <div class="pdca-title">Act (개선)</div>
+                        <div class="pdca-desc">발견된 문제 수정 및 품질 향상</div>
+                    </div>
+                </div>
+                <p style="font-size:13px; color:var(--text-muted); text-align:center;">문서를 가드레일로 삼아, 단순 코드 생성이 아닌 검증과 개선까지 수행</p>
+            </div>
+        </div>
+
+        <!-- 4. 설치 방법 -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-icon" style="background:rgba(92,208,142,0.15);">⚡</div>
+                <h2>설치 방법</h2>
+            </div>
+
+            <div class="card">
+                <p>bkit은 클로드 코드의 <strong>플러그인 형태</strong>로 설치한다. bkit GitHub 레포지토리에서 안내하는 명령어 2개를 순서대로 클로드 코드에 붙여넣기하면 설치 완료.</p>
+            </div>
+
+            <div class="demo-terminal">
+                <div class="terminal-bar">
+                    <div class="terminal-dot" style="background:#f06e6e;"></div>
+                    <div class="terminal-dot" style="background:#f5a855;"></div>
+                    <div class="terminal-dot" style="background:#5cd08e;"></div>
+                </div>
+                <div class="terminal-body">
+                    <span class="comment"># bkit GitHub 레포에서 제공하는 설치 명령어 실행</span><br>
+                    <span class="cmd">$ </span><span class="flag">[설치 명령어 1 - 복사 후 실행]</span><br>
+                    <span class="cmd">$ </span><span class="flag">[설치 명령어 2 - 복사 후 실행]</span><br><br>
+                    <span class="comment"># 설치 확인: /키를 입력하면 bkit 명령어 목록 표시</span><br>
+                    <span class="cmd">/ </span><span style="color:var(--text-primary);">bkit 명령어들이 추가됨 ✓</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. 주요 명령어 -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-icon" style="background:rgba(155,122,245,0.15);">📋</div>
+                <h2>bkit 주요 명령어</h2>
+            </div>
+
+            <div class="cmd-grid">
+                <div class="cmd-item">
+                    <span class="cmd-name">init-dynamic</span>
+                    <span class="cmd-desc">프로젝트 초기화 (규모/특성에 따라 init-web, init-enterprise 등 구분됨)</span>
+                </div>
+                <div class="cmd-item">
+                    <span class="cmd-name">pdca-plan</span>
+                    <span class="cmd-desc">브레인스토밍 → 아이디어 확장 → 기획 문서(마크다운) 자동 생성</span>
+                </div>
+                <div class="cmd-item">
+                    <span class="cmd-name">pdca-analyze</span>
+                    <span class="cmd-desc">요구사항과 현재 구현 상태 간의 차이(Gap) 분석 및 보고서 작성</span>
+                </div>
+                <div class="cmd-item">
+                    <span class="cmd-name">pdca-iterate</span>
+                    <span class="cmd-desc">발견된 차이를 반복적으로 수정하며 완성도를 높여가는 작업 수행</span>
+                </div>
+                <div class="cmd-item">
+                    <span class="cmd-name">zero-script QA</span>
+                    <span class="cmd-desc">에이전트가 자율적으로 기능을 테스트하고, 완전 작동할 때까지 반복 수정</span>
+                </div>
+                <div class="cmd-item">
+                    <span class="cmd-name">스모크 테스트</span>
+                    <span class="cmd-desc">각 구성요소의 기본 작동 여부 확인 (회로에서 연기가 나는지 확인하는 것과 유사)</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 6. 실전 시연: 코각 DIR 만들기 -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-icon" style="background:rgba(245,168,85,0.15);">🚀</div>
+                <h2>실전 시연: 코각 DIR 개발 과정</h2>
+            </div>
+
+            <div class="card">
+                <h3>프로젝트 개요</h3>
+                <p>PC Tools / MDIR을 오마주한 <strong>터미널 기반 파일 관리자(TUI)</strong>. 바이브 코더들이 터미널 환경을 쉽게 사용하도록 돕는 프로그램.</p>
+                <div style="margin-top:10px;">
+                    <span class="tag tag-blue">Node.js</span>
+                    <span class="tag tag-cyan">React</span>
+                    <span class="tag tag-purple">Ink (TUI)</span>
+                    <span class="tag tag-orange">TypeScript</span>
+                </div>
+            </div>
+
+            <!-- 개발 플로우 -->
+            <div class="flow-container">
+                <!-- Step 1 -->
+                <div class="flow-step">
+                    <div class="flow-line">
+                        <div class="flow-dot" style="background:var(--accent-blue);">1</div>
+                        <div class="flow-connector" style="background:var(--accent-blue);"></div>
+                    </div>
+                    <div class="flow-content">
+                        <h4>초기화 (init-dynamic)</h4>
+                        <p>한 줄 아이디어 입력 → 기본 프로젝트 골격 + PDCA 문서 자동 생성. 아주 기초적인 MVP가 만들어짐.</p>
+                    </div>
+                </div>
+                <!-- Step 2 -->
+                <div class="flow-step">
+                    <div class="flow-line">
+                        <div class="flow-dot" style="background:var(--accent-green);">2</div>
+                        <div class="flow-connector" style="background:var(--accent-green);"></div>
+                    </div>
+                    <div class="flow-content">
+                        <h4>QA 테스트 (zero-script QA)</h4>
+                        <p>키 조작 문제 등 발견 → 에이전트가 자율적으로 테스트/수정 반복. 시스템 정보, 저장소 현황, 파일 탐색기 등 기본 기능 구현 완료.</p>
+                    </div>
+                </div>
+                <!-- Step 3 -->
+                <div class="flow-step">
+                    <div class="flow-line">
+                        <div class="flow-dot" style="background:var(--accent-orange);">3</div>
+                        <div class="flow-connector" style="background:var(--accent-orange);"></div>
+                    </div>
+                    <div class="flow-content">
+                        <h4>기획 확장 (pdca-plan)</h4>
+                        <p>AI와 브레인스토밍 → 질의응답으로 아이디어 다듬기 → AI 어시스턴트 기능 추가 결정 → expansion-plan.md 기획 문서 자동 생성.</p>
+                    </div>
+                </div>
+                <!-- Step 4 -->
+                <div class="flow-step">
+                    <div class="flow-line">
+                        <div class="flow-dot" style="background:var(--accent-purple);">4</div>
+                        <div class="flow-connector" style="background:var(--accent-purple);"></div>
+                    </div>
+                    <div class="flow-content">
+                        <h4>페이지별 구현</h4>
+                        <p>기획 문서 기반으로 단계별 작업 수행. 각 페이지마다 구현 → 테스트 → 수정 → 스모크 테스트 → 보고의 사이클 반복.</p>
+                    </div>
+                </div>
+                <!-- Step 5 -->
+                <div class="flow-step">
+                    <div class="flow-line">
+                        <div class="flow-dot" style="background:var(--accent-cyan);">5</div>
+                        <div class="flow-connector" style="background:var(--accent-cyan);"></div>
+                    </div>
+                    <div class="flow-content">
+                        <h4>Gap 분석 (pdca-analyze)</h4>
+                        <p>요구사항과 구현 상태 차이 분석 → 보고서 기반 수정. AI 기능 미작동 등 발견 및 수정.</p>
+                    </div>
+                </div>
+                <!-- Step 6 -->
+                <div class="flow-step">
+                    <div class="flow-line">
+                        <div class="flow-dot" style="background:var(--accent-blue);">6</div>
+                        <div class="flow-connector" style="background:var(--accent-blue);"></div>
+                    </div>
+                    <div class="flow-content">
+                        <h4>반복 개선 (pdca-iterate)</h4>
+                        <p>디자인 개선 (VS Code 다크 테마 색상 팔레트 적용), 커서 UI 수정, 파일 퍼미션 정보 표시 추가 등.</p>
+                    </div>
+                </div>
+                <!-- Step 7 -->
+                <div class="flow-step">
+                    <div class="flow-line">
+                        <div class="flow-dot" style="background:var(--accent-green);">7</div>
+                        <div class="flow-connector" style="background:transparent;"></div>
+                    </div>
+                    <div class="flow-content">
+                        <h4>최종 검증 및 배포</h4>
+                        <p>컨텍스트 초기화 후 완전히 새로운 시각으로 재검증. 보안 취약점 점검 → npm 배포 준비 → 소개 웹사이트 제작.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 달성률 -->
+            <div class="card">
+                <h3>프로젝트 달성률</h3>
+                <div class="progress-wrap">
+                    <div class="progress-label">
+                        <span style="color:var(--text-secondary);">목표: 90%</span>
+                        <span style="color:var(--accent-green); font-weight:600;">94% 달성 ✓</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width:94%; background:var(--gradient-1);"></div>
+                    </div>
+                </div>
+                <div class="highlight-box purple" style="margin-top:12px; margin-bottom:0;">
+                    <p><strong>왜 90%가 목표인가?</strong><br>나머지 10%를 완성하는 데 드는 노력이 그 10%의 가치 이상으로 크다. 실용적 완성도 관점에서 90%면 프로덕션 레디 상태로 충분하다.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 7. 구현된 기능 -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-icon" style="background:rgba(92,208,142,0.15);">✅</div>
+                <h2>구현된 주요 기능</h2>
+            </div>
+
+            <div class="card">
+                <ul class="styled-list">
+                    <li><strong>파일 탐색기</strong> — 폴더 간 이동, 파일 사이즈/퍼미션 정보 표시</li>
+                    <li><strong>파일 뷰어</strong> — 파일 내용 미리보기</li>
+                    <li><strong>파일 에디터</strong> — nano 스타일의 터미널 편집기</li>
+                    <li><strong>파일 관리</strong> — 폴더 생성, 파일 복사 등</li>
+                    <li><strong>시스템 정보</strong> — 현재 시스템 상태 표시</li>
+                    <li><strong>저장소 현황</strong> — 디스크 사용량 표시</li>
+                    <li><strong>프로세스 관리</strong> — 프로세스 목록 확인 및 종료(kill)</li>
+                    <li><strong>AI 어시스턴트</strong> — 터미널 내에서 AI에게 질문 가능</li>
+                    <li><strong>도움말</strong> — 단축키 및 사용법 안내</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- 8. 보안 검증 과정 -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-icon" style="background:rgba(240,110,110,0.15);">🔒</div>
+                <h2>보안 검증 과정</h2>
+            </div>
+
+            <div class="card">
+                <p>파일 관리 프로그램이므로 <strong>사용자 시스템 손상 여지</strong>를 면밀히 점검해야 한다.</p>
+                <ul class="styled-list" style="margin-top:10px;">
+                    <li>PDCA 프로세스를 적용하여 보안 검증 계획 수립</li>
+                    <li>취약점 분석 실행 → 취약점 발견 → 수정 완료</li>
+                    <li><strong>컨텍스트 전체 초기화 후 동일 검증 재수행</strong> — 이전과 완전히 다른 새로운 시각으로 문제를 찾기 위함</li>
+                    <li>최종 검증 보고서 작성 → "배포 가능 상태" 확인</li>
+                </ul>
+            </div>
+
+            <div class="highlight-box success">
+                <p><strong>팁:</strong> 검증 후 컨텍스트를 모두 지우고 같은 검증을 다시 요청하면, AI가 완전히 새로운 시각으로 기존에 놓쳤던 문제를 발견할 수 있다.</p>
+            </div>
+        </div>
+
+        <!-- 9. 배포 및 웹사이트 -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-icon" style="background:rgba(91,138,245,0.15);">🌐</div>
+                <h2>배포 및 소개 웹사이트 제작</h2>
+            </div>
+
+            <div class="card">
+                <h3>배포 준비</h3>
+                <ul class="styled-list">
+                    <li>개발자 정보, 앱 메타데이터 자동 설정</li>
+                    <li>README.md 자동 생성</li>
+                    <li>빌드 테스트 + 배포 준비 테스트 완료</li>
+                    <li>npm에 배포</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h3>소개 웹사이트</h3>
+                <p>bkit의 <strong>9단계 웹사이트 프로세스 + PDCA</strong>를 적용하여 제작. React + Tailwind CSS 기반. "README.md 만드는 것과 비슷한 수준의 간단한 요청"으로 디자인 어워드급 퀄리티의 웹사이트가 생성됨.</p>
+                <div style="margin-top:8px;">
+                    <span class="tag tag-blue">React</span>
+                    <span class="tag tag-cyan">Tailwind CSS</span>
+                    <span class="tag tag-purple">9단계 프로세스</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 10. 개발 방법론 인사이트 -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-icon" style="background:rgba(155,122,245,0.15);">🎯</div>
+                <h2>개발 방법론 인사이트</h2>
+            </div>
+
+            <div class="card">
+                <h3>MVP 우선 → 확장 전략</h3>
+                <p>한 줄 아이디어로 <strong>아주 간단한 MVP를 먼저 만들고</strong>, 그 후 구체적인 기획을 시작하여 확장해 나가는 방식. 이 방식의 장점:</p>
+                <ul class="styled-list" style="margin-top:8px;">
+                    <li>작은 <strong>눈덩이(snowball)</strong> 역할을 하여 확장이 용이</li>
+                    <li>AI가 기존 시스템을 참조하며 만들기 때문에 <strong>일관성 유지</strong>에 유리</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h3>AI와의 브레인스토밍</h3>
+                <p>1인 개발자에게 특히 유용. 과거에는 아이디어를 나눌 상대가 없었지만, 이제 AI와 <strong>티키타카(질의응답)</strong>를 통해 기획을 다듬어 갈 수 있다.</p>
+            </div>
+
+            <div class="card">
+                <h3>후속 고도화</h3>
+                <p>영상에서 TypeScript + React(Ink)로 만든 프로토타입은 성능 이슈가 있어, 이후 <strong>Rust로 재개발하여 배포</strong>까지 완료. 이 과정도 bkit으로 진행.</p>
+            </div>
+        </div>
+
+        <!-- Takeaway -->
+        <div class="takeaway">
+            <h3>📌 핵심 시사점</h3>
+            <p>바이브코딩의 진짜 병목은 "코드를 만드는 것"이 아니라 <strong>"AI에게 체계적으로 일을 시키는 것"</strong>이다. bkit 같은 도구는 이 격차를 해소해, 사용자가 아이디어에만 집중할 수 있게 해준다.</p>
+            <br>
+            <p>AI 시대의 개발 역량은 코딩 실력 자체보다 <strong>AI의 가치를 최대한 끌어내는 능력</strong> — 즉 체계적 요청, 계획 수립, 검증 프로세스를 설계하는 능력에 달려 있으며, bkit은 이를 자동화해주는 도구다.</p>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>출처: <a href="https://youtu.be/EZwffHVx05U?si=_boq1dn9fYqBqvmh" target="_blank">코드 깎는 노인 — 바이브코딩의 근본 문제들을 해결해주는 도구 bkit</a></p>
+            <p style="margin-top:4px;">2026.02.06</p>
+        </div>
+
+    </div>
+</body>
+</html>

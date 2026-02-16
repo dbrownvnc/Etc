@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>바이트댄스 AI칩 × 삼성 파운드리 - 미국 증시 분석</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&display=swap');
+
+  :root {
+    --bg: #0c0f14;
+    --surface: #161a22;
+    --surface2: #1e232d;
+    --border: #2a3040;
+    --text: #e0e4ec;
+    --text-dim: #8892a4;
+    --accent: #4a9eff;
+    --accent2: #6c5ce7;
+    --green: #00d68f;
+    --red: #ff6b6b;
+    --orange: #ffa94d;
+    --yellow: #ffd43b;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.75;
+    font-size: 15px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .container {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 0 16px 60px;
+  }
+
+  /* Hero */
+  .hero {
+    padding: 32px 0 24px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 28px;
+  }
+  .hero-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 4px;
+    letter-spacing: 0.5px;
+    margin-bottom: 14px;
+  }
+  .hero h1 {
+    font-size: 22px;
+    font-weight: 800;
+    line-height: 1.4;
+    margin-bottom: 10px;
+    word-break: keep-all;
+  }
+  .hero h1 .highlight {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .hero-meta {
+    font-size: 12px;
+    color: var(--text-dim);
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .hero-meta span::before {
+    content: '';
+    display: inline-block;
+    width: 4px; height: 4px;
+    background: var(--accent);
+    border-radius: 50%;
+    margin-right: 6px;
+    vertical-align: middle;
+  }
+
+  /* Section */
+  .section {
+    margin-bottom: 32px;
+  }
+  .section-title {
+    font-size: 17px;
+    font-weight: 700;
+    margin-bottom: 14px;
+    padding-left: 12px;
+    border-left: 3px solid var(--accent);
+    line-height: 1.3;
+  }
+  .section-title .num {
+    color: var(--accent);
+    margin-right: 4px;
+  }
+
+  p {
+    margin-bottom: 12px;
+    color: var(--text);
+    word-break: keep-all;
+  }
+
+  /* Key point box */
+  .key-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    margin: 16px 0;
+  }
+  .key-box.accent {
+    border-left: 3px solid var(--accent);
+  }
+  .key-box.green {
+    border-left: 3px solid var(--green);
+  }
+  .key-box.orange {
+    border-left: 3px solid var(--orange);
+  }
+  .key-box.red {
+    border-left: 3px solid var(--red);
+  }
+  .key-box-title {
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  strong { color: #fff; font-weight: 600; }
+  em { color: var(--accent); font-style: normal; font-weight: 500; }
+
+  /* Chart container */
+  .chart-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 12px;
+    margin: 20px 0;
+    overflow-x: auto;
+  }
+  .chart-title {
+    font-size: 13px;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 12px;
+    color: var(--text-dim);
+  }
+
+  /* Table */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin: 0;
+  }
+  th {
+    background: var(--surface2);
+    padding: 10px 8px;
+    text-align: left;
+    font-weight: 600;
+    color: var(--text-dim);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid var(--border);
+  }
+  td {
+    padding: 10px 8px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  tr:last-child td { border-bottom: none; }
+  .tag {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 7px;
+    border-radius: 3px;
+    white-space: nowrap;
+  }
+  .tag-up { background: rgba(0,214,143,0.15); color: var(--green); }
+  .tag-down { background: rgba(255,107,107,0.15); color: var(--red); }
+  .tag-neutral { background: rgba(136,146,164,0.15); color: var(--text-dim); }
+  .tag-watch { background: rgba(255,169,77,0.15); color: var(--orange); }
+
+  /* SVG Charts */
+  svg { display: block; margin: 0 auto; }
+  svg text { font-family: 'Noto Sans KR', sans-serif; }
+
+  /* Flow diagram */
+  .flow-diagram {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    align-items: center;
+    padding: 8px 0;
+  }
+  .flow-node {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 16px;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 500;
+    width: 90%;
+    max-width: 320px;
+  }
+  .flow-node.primary {
+    border-color: var(--accent);
+    background: rgba(74,158,255,0.08);
+  }
+  .flow-node.success {
+    border-color: var(--green);
+    background: rgba(0,214,143,0.08);
+  }
+  .flow-arrow {
+    color: var(--text-dim);
+    font-size: 18px;
+    line-height: 1;
+    padding: 4px 0;
+  }
+
+  /* Bullet style */
+  .item-list {
+    list-style: none;
+    padding: 0;
+    margin: 8px 0;
+  }
+  .item-list li {
+    padding: 6px 0 6px 20px;
+    position: relative;
+    font-size: 14px;
+  }
+  .item-list li::before {
+    content: '▸';
+    position: absolute;
+    left: 0;
+    color: var(--accent);
+    font-weight: 700;
+  }
+
+  /* Verdict */
+  .verdict {
+    background: linear-gradient(135deg, rgba(74,158,255,0.08), rgba(108,92,231,0.08));
+    border: 1px solid var(--accent);
+    border-radius: 12px;
+    padding: 20px 16px;
+    margin: 24px 0;
+  }
+  .verdict-title {
+    font-size: 15px;
+    font-weight: 800;
+    margin-bottom: 10px;
+    color: var(--accent);
+  }
+
+  /* Footer */
+  .footer {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    font-size: 11px;
+    color: var(--text-dim);
+    text-align: center;
+  }
+
+  /* Responsive fine-tune */
+  @media (max-width: 400px) {
+    .hero h1 { font-size: 19px; }
+    .section-title { font-size: 15px; }
+    body { font-size: 14px; }
+    td, th { padding: 8px 6px; font-size: 12px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-badge">US MARKET ANALYSIS</div>
+  <h1>바이트댄스 AI칩 × 삼성 파운드리<br><span class="highlight">미국 반도체 생태계에 미치는 영향</span></h1>
+  <div class="hero-meta">
+    <span>2026.02.16</span>
+    <span>NOVA Real Invest 분석</span>
+    <span>미국 증시 관점</span>
+  </div>
+</div>
+
+<!-- 1. 핵심 요약 -->
+<div class="section">
+  <div class="section-title"><span class="num">01</span> 핵심 요약 — 3줄 브리핑</div>
+  <div class="key-box accent">
+    <p style="margin-bottom:8px;">❶ <strong>바이트댄스</strong>가 자체 AI 추론칩 <em>'시드(Seed) 칩'</em>을 설계, <strong>삼성 파운드리</strong>에 위탁 생산을 협상 중 (로이터 보도)</p>
+    <p style="margin-bottom:8px;">❷ 최소 <em>10만 개</em> 이상 양산 목표 → 삼성 성숙 공정(4nm 등) 활용 가능성</p>
+    <p style="margin-bottom:0;">❸ 미국의 대중 반도체 수출통제가 만든 <em>공급망 재편</em> 속에서, 삼성이 '메모리+파운드리' 패키지 협상력을 확보할 수 있는 시나리오</p>
+  </div>
+</div>
+
+<!-- 2. 배경: 시댄스 2.0 -->
+<div class="section">
+  <div class="section-title"><span class="num">02</span> 시댄스(Seedance) 2.0과 영상 AI 컴퓨팅 수요 폭발</div>
+  <p>바이트댄스가 공개한 영상 생성 AI <strong>시댄스 2.0</strong>은 텍스트·이미지·비디오·오디오 입력을 기반으로 <em>최대 15초 영상</em>을 생성하며, 실사화 품질이 크게 화제가 되었습니다. 이미 <strong>시댄스 3.0</strong>이 10분 이상 영상 생성이 가능하다는 루머까지 나오고 있습니다.</p>
+
+  <div class="key-box orange">
+    <div class="key-box-title">🔥 왜 중요한가 — 컴퓨팅 수요 차원</div>
+    <p style="margin:0;">텍스트 대비 <strong>비디오 생성</strong>은 연산·메모리·전력 소비가 기하급수적으로 증가합니다. 틱톡·캡컷 등 바이트댄스 플랫폼의 수억 사용자가 이 기능을 활용하면, <em>추론(Inference) 비용</em>이 핵심 경쟁력 요소가 되며 자체 칩 개발의 경제적 동기가 매우 강해집니다.</p>
+  </div>
+
+  <!-- 연산량 비교 차트 -->
+  <div class="chart-wrap">
+    <div class="chart-title">AI 작업별 상대적 컴퓨팅 요구량 비교</div>
+    <svg viewBox="0 0 360 200" width="100%" xmlns="http://www.w3.org/2000/svg">
+      <!-- bars -->
+      <rect x="40" y="30" width="40" height="20" rx="3" fill="#4a9eff" opacity="0.3"/>
+      <rect x="40" y="65" width="100" height="20" rx="3" fill="#4a9eff" opacity="0.5"/>
+      <rect x="40" y="100" width="220" height="20" rx="3" fill="#4a9eff" opacity="0.7"/>
+      <rect x="40" y="135" width="300" height="20" rx="3" fill="#4a9eff"/>
+      <!-- labels -->
+      <text x="36" y="44" fill="#8892a4" font-size="11" text-anchor="end" font-weight="500">텍스트 생성</text>
+      <text x="36" y="79" fill="#8892a4" font-size="11" text-anchor="end" font-weight="500">이미지 생성</text>
+      <text x="36" y="114" fill="#8892a4" font-size="11" text-anchor="end" font-weight="500">15초 영상</text>
+      <text x="36" y="149" fill="#8892a4" font-size="11" text-anchor="end" font-weight="500">10분+ 영상</text>
+      <!-- values -->
+      <text x="85" y="44" fill="#fff" font-size="10" font-weight="600">1x</text>
+      <text x="145" y="79" fill="#fff" font-size="10" font-weight="600">~10x</text>
+      <text x="265" y="114" fill="#fff" font-size="10" font-weight="600">~50-100x</text>
+      <text x="344" y="149" fill="#fff" font-size="10" font-weight="600">~500x+</text>
+      <text x="180" y="178" fill="#8892a4" font-size="9" text-anchor="middle">* 상대적 추정치 (텍스트 생성 기준)</text>
+    </svg>
+  </div>
+</div>
+
+<!-- 3. 바이트댄스 = 중국의 구글 -->
+<div class="section">
+  <div class="section-title"><span class="num">03</span> 바이트댄스의 '풀스택 AI' 전략 — 중국판 구글</div>
+  <p>바이트댄스는 단순 AI 모델 회사에서 <strong>AI 인프라 기업</strong>으로 진화하고 있습니다. 구글이 Gemini → YouTube·검색·워크스페이스로 연결하듯, 바이트댄스도 <strong>AI 모델 → 틱톡·캡컷 → 자체 칩</strong>의 수직 통합(풀스택)을 구축 중입니다.</p>
+
+  <div class="chart-wrap">
+    <div class="chart-title">바이트댄스 풀스택 AI 전략 구조</div>
+    <div class="flow-diagram">
+      <div class="flow-node">🧠 AI 모델 (시댄스 2.0/3.0, 두보 등)</div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-node">📱 서비스 플랫폼 (틱톡, 캡컷, 라크 등)</div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-node">👥 수억 명 글로벌 사용자 (추론 트래픽)</div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-node primary">⚡ 추론 비용 절감 필요 → 자체 칩 설계</div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-node success">🏭 삼성 파운드리 위탁 생산 (Seed 칩)</div>
+    </div>
+  </div>
+
+  <div class="key-box accent">
+    <div class="key-box-title">💡 미국 시장 시사점</div>
+    <p style="margin:0;">구글(TPU), AWS(Inferentia/Trainium), Meta(MTIA) 등 미국 빅테크의 <strong>커스텀 실리콘</strong> 전략과 동일한 흐름입니다. 바이트댄스의 자체 칩이 성공하면, 이는 <em>NVIDIA의 추론 시장 점유율</em>에 대한 추가적 압력 요인이 됩니다.</p>
+  </div>
+</div>
+
+<!-- 4. 왜 삼성 파운드리인가 -->
+<div class="section">
+  <div class="section-title"><span class="num">04</span> 왜 삼성 파운드리인가 — 지정학적 소거법</div>
+
+  <div class="chart-wrap">
+    <div class="chart-title">중국 AI 기업의 파운드리 선택지 분석</div>
+    <table>
+      <tr>
+        <th>파운드리</th>
+        <th>기술력</th>
+        <th>중국 접근성</th>
+        <th>판정</th>
+      </tr>
+      <tr>
+        <td><strong>TSMC</strong></td>
+        <td>최고 (3nm~)</td>
+        <td>미국 영향권 → 제한적</td>
+        <td><span class="tag tag-down">차단 리스크</span></td>
+      </tr>
+      <tr>
+        <td><strong>인텔 파운드리</strong></td>
+        <td>회복 중</td>
+        <td>미국 기업 → 사실상 불가</td>
+        <td><span class="tag tag-down">불가</span></td>
+      </tr>
+      <tr>
+        <td><strong>SMIC</strong></td>
+        <td>7nm(DUV 멀티패터닝)</td>
+        <td>국내 → 자유</td>
+        <td><span class="tag tag-watch">비용↑ 수율↓</span></td>
+      </tr>
+      <tr>
+        <td><strong>삼성 파운드리</strong></td>
+        <td>4nm 성숙 공정 보유</td>
+        <td>한국 → 상대적 유연</td>
+        <td><span class="tag tag-up">유력 후보</span></td>
+      </tr>
+    </table>
+  </div>
+
+  <p><strong>핵심 논리:</strong> TSMC는 미국과 너무 긴밀히 얽혀 있어 중국 기업 입장에서 <em>공급 지속성 리스크</em>가 큽니다. 트럼프 행정부가 언제든 차단 명령을 내릴 수 있기 때문입니다. SMIC는 EUV 장비 없이 DUV 멀티패터닝으로 미세화하지만 비용 과다·수율 저하 문제가 있습니다. 삼성은 미국 동맹국이지만 TSMC만큼 미국 산업정책에 직접 묶여 있지 않아, 중국에 <strong>상대적으로 유연한 포지션</strong>을 가집니다.</p>
+</div>
+
+<!-- 5. 삼성의 차별화 -->
+<div class="section">
+  <div class="section-title"><span class="num">05</span> 삼성의 비밀 무기 — 메모리 × 파운드리 패키지 딜</div>
+
+  <p>삼성전자의 진정한 협상력은 <strong>파운드리 단독이 아닌, 메모리(DRAM·HBM)와의 패키지 딜</strong>에 있습니다.</p>
+
+  <div class="chart-wrap">
+    <div class="chart-title">삼성 vs TSMC — 역량 비교</div>
+    <svg viewBox="0 0 360 260" width="100%" xmlns="http://www.w3.org/2000/svg">
+      <!-- Category labels -->
+      <text x="180" y="20" fill="#8892a4" font-size="10" text-anchor="middle" font-weight="600">삼성 (왼) vs TSMC (오)</text>
+      
+      <!-- Bars - Samsung (left) -->
+      <rect x="30" y="40" width="130" height="28" rx="4" fill="#4a9eff" opacity="0.8"/>
+      <text x="35" y="58" fill="#fff" font-size="10" font-weight="600">파운드리 ★★★☆</text>
+      
+      <rect x="30" y="78" width="145" height="28" rx="4" fill="#00d68f" opacity="0.8"/>
+      <text x="35" y="96" fill="#fff" font-size="10" font-weight="600">DRAM/낸드 ★★★★★</text>
+      
+      <rect x="30" y="116" width="140" height="28" rx="4" fill="#6c5ce7" opacity="0.8"/>
+      <text x="35" y="134" fill="#fff" font-size="10" font-weight="600">HBM ★★★★☆</text>
+
+      <rect x="30" y="154" width="135" height="28" rx="4" fill="#ffa94d" opacity="0.8"/>
+      <text x="35" y="172" fill="#fff" font-size="10" font-weight="600">패키징(CoWoS 등) ★★★☆</text>
+
+      <rect x="30" y="192" width="145" height="28" rx="4" fill="#ff6b6b" opacity="0.8"/>
+      <text x="35" y="210" fill="#fff" font-size="10" font-weight="600">턴키 솔루션 ★★★★★</text>
+
+      <!-- Bars - TSMC (right) -->
+      <rect x="190" y="40" width="150" height="28" rx="4" fill="#4a9eff"/>
+      <text x="195" y="58" fill="#fff" font-size="10" font-weight="600">파운드리 ★★★★★</text>
+      
+      <rect x="190" y="78" width="30" height="28" rx="4" fill="#00d68f" opacity="0.3"/>
+      <text x="195" y="96" fill="#8892a4" font-size="10" font-weight="600">—</text>
+      
+      <rect x="190" y="116" width="30" height="28" rx="4" fill="#6c5ce7" opacity="0.3"/>
+      <text x="195" y="134" fill="#8892a4" font-size="10" font-weight="600">—</text>
+
+      <rect x="190" y="154" width="145" height="28" rx="4" fill="#ffa94d"/>
+      <text x="195" y="172" fill="#fff" font-size="10" font-weight="600">패키징 ★★★★★</text>
+
+      <rect x="190" y="192" width="80" height="28" rx="4" fill="#ff6b6b" opacity="0.4"/>
+      <text x="195" y="210" fill="#8892a4" font-size="10" font-weight="600">파운드리 Only</text>
+
+      <!-- Divider -->
+      <line x1="180" y1="35" x2="180" y2="225" stroke="#2a3040" stroke-width="1" stroke-dasharray="4"/>
+      
+      <text x="180" y="248" fill="#8892a4" font-size="9" text-anchor="middle">* 삼성은 메모리+파운드리+패키징 '턴키 솔루션' 제공 가능</text>
+    </svg>
+  </div>
+
+  <div class="key-box green">
+    <div class="key-box-title">💰 삼성의 패키지 딜 시나리오</div>
+    <p style="margin:0;"><strong>"파운드리 계약하면, 메모리(HBM·DRAM) 물량도 우선 배정"</strong> — 현재 레거시 DRAM과 HBM 모두 쇼티지 상황에서, 중국 기업에게 메모리 물량 확보는 매우 큰 인센티브입니다. TSMC는 이런 패키지 딜이 불가능합니다.</p>
+  </div>
+
+  <p>또한 바이트댄스의 서버용 AI칩은 <strong>모바일칩보다 물리적으로 큰 칩</strong>(Large Die)으로, 삼성이 대형 서버칩 제조 경험을 축적할 수 있는 기회이기도 합니다. 이는 TSMC의 대형 다이(die) 제조 독점을 깨는 계기가 될 수 있습니다.</p>
+</div>
+
+<!-- 6. 미국 증시 영향 분석 -->
+<div class="section">
+  <div class="section-title"><span class="num">06</span> 미국 증시 · 관련 종목 영향 분석</div>
+
+  <div class="chart-wrap">
+    <div class="chart-title">관련 종목별 영향도 평가</div>
+    <table>
+      <tr>
+        <th>종목/섹터</th>
+        <th>영향</th>
+        <th>근거</th>
+      </tr>
+      <tr>
+        <td><strong>NVIDIA</strong><br>(NVDA)</td>
+        <td><span class="tag tag-watch">중립~부정</span></td>
+        <td>자체 추론칩 확산 → 엔비디아 추론용 GPU 수요 일부 대체. 단, 학습용 GPU 독점은 유지</td>
+      </tr>
+      <tr>
+        <td><strong>Broadcom</strong><br>(AVGO)</td>
+        <td><span class="tag tag-up">수혜</span></td>
+        <td>커스텀 ASIC 설계 수요 확대. 구글·메타·바이트댄스 등 빅테크의 자체칩 트렌드 가속</td>
+      </tr>
+      <tr>
+        <td><strong>AMD</strong><br>(AMD)</td>
+        <td><span class="tag tag-down">부정적</span></td>
+        <td>추론시장 경쟁 심화. MI300X 등 데이터센터 GPU 시장 잠식 압력</td>
+      </tr>
+      <tr>
+        <td><strong>TSMC</strong><br>(TSM)</td>
+        <td><span class="tag tag-neutral">제한적 영향</span></td>
+        <td>이미 풀 캐파. 중국 물량 이탈은 대기 수요로 대체 가능. 단기 영향 미미</td>
+      </tr>
+      <tr>
+        <td><strong>삼성전자</strong><br>(005930.KS)</td>
+        <td><span class="tag tag-up">잠재적 수혜</span></td>
+        <td>파운드리 가동률 회복 + 메모리 패키지딜 기대. 미국 규제 리스크는 변수</td>
+      </tr>
+      <tr>
+        <td><strong>SK하이닉스</strong><br>(000660.KS)</td>
+        <td><span class="tag tag-up">수혜</span></td>
+        <td>영상 AI 확산 → HBM·고대역폭 메모리 수요 폭증의 직접 수혜</td>
+      </tr>
+      <tr>
+        <td><strong>Micron</strong><br>(MU)</td>
+        <td><span class="tag tag-up">수혜</span></td>
+        <td>DRAM·HBM 수요 확대의 글로벌 수혜. 메모리 업사이클 가속</td>
+      </tr>
+      <tr>
+        <td><strong>ASML</strong><br>(ASML)</td>
+        <td><span class="tag tag-neutral">중립</span></td>
+        <td>삼성 성숙공정 활용 시 EUV 추가 수요는 제한적. 장기적으로는 긍정</td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<!-- 7. 구조적 시사점 -->
+<div class="section">
+  <div class="section-title"><span class="num">07</span> 구조적 시사점 — AI 인프라의 미·중 이원화</div>
+
+  <p>이번 사안의 가장 큰 시사점은 <strong>AI 인프라가 미국 중심 단일 체계에서 미·중 이원 체계로 분화</strong>되고 있다는 점입니다.</p>
+
+  <div class="chart-wrap">
+    <div class="chart-title">AI 반도체 공급망 이원화 구조</div>
+    <svg viewBox="0 0 360 280" width="100%" xmlns="http://www.w3.org/2000/svg">
+      <!-- US Side -->
+      <rect x="10" y="15" width="160" height="245" rx="8" fill="none" stroke="#4a9eff" stroke-width="1.5" stroke-dasharray="4"/>
+      <text x="90" y="35" fill="#4a9eff" font-size="12" text-anchor="middle" font-weight="700">🇺🇸 미국 진영</text>
+      
+      <rect x="25" y="50" width="130" height="24" rx="4" fill="rgba(74,158,255,0.15)"/>
+      <text x="90" y="66" fill="#e0e4ec" font-size="10" text-anchor="middle" font-weight="500">NVIDIA · AMD (설계)</text>
+      
+      <rect x="25" y="82" width="130" height="24" rx="4" fill="rgba(74,158,255,0.15)"/>
+      <text x="90" y="98" fill="#e0e4ec" font-size="10" text-anchor="middle" font-weight="500">TSMC (제조 · 주력)</text>
+
+      <rect x="25" y="114" width="130" height="24" rx="4" fill="rgba(74,158,255,0.15)"/>
+      <text x="90" y="130" fill="#e0e4ec" font-size="10" text-anchor="middle" font-weight="500">빅테크 자체칩 (TPU 등)</text>
+
+      <rect x="25" y="146" width="130" height="24" rx="4" fill="rgba(74,158,255,0.15)"/>
+      <text x="90" y="162" fill="#e0e4ec" font-size="10" text-anchor="middle" font-weight="500">Broadcom ASIC 설계</text>
+
+      <rect x="25" y="178" width="130" height="24" rx="4" fill="rgba(74,158,255,0.15)"/>
+      <text x="90" y="194" fill="#e0e4ec" font-size="10" text-anchor="middle" font-weight="500">Micron · SK하이닉스 (HBM)</text>
+
+      <!-- China Side -->
+      <rect x="190" y="15" width="160" height="245" rx="8" fill="none" stroke="#ff6b6b" stroke-width="1.5" stroke-dasharray="4"/>
+      <text x="270" y="35" fill="#ff6b6b" font-size="12" text-anchor="middle" font-weight="700">🇨🇳 중국 진영</text>
+      
+      <rect x="205" y="50" width="130" height="24" rx="4" fill="rgba(255,107,107,0.15)"/>
+      <text x="270" y="66" fill="#e0e4ec" font-size="10" text-anchor="middle" font-weight="500">바이트댄스 Seed칩 (설계)</text>
+      
+      <rect x="205" y="82" width="130" height="24" rx="4" fill="rgba(255,107,107,0.15)"/>
+      <text x="270" y="98" fill="#e0e4ec" font-size="10" text-anchor="middle" font-weight="500">딥시크 · 알리바바 (모델)</text>
+
+      <rect x="205" y="114" width="130" height="24" rx="4" fill="rgba(255,107,107,0.15)"/>
+      <text x="270" y="130" fill="#e0e4ec" font-size="10" text-anchor="middle" font-weight="500">SMIC (자국 제조)</text>
+
+      <rect x="205" y="146" width="130" height="24" rx="4" fill="rgba(255,107,107,0.15)"/>
+      <text x="270" y="162" fill="#e0e4ec" font-size="10" text-anchor="middle" font-weight="500">화웨이 어센드 (GPU 대체)</text>
+
+      <rect x="205" y="178" width="130" height="24" rx="4" fill="rgba(255,107,107,0.15)"/>
+      <text x="270" y="194" fill="#e0e4ec" font-size="10" text-anchor="middle" font-weight="500">CXMT (메모리)</text>
+
+      <!-- Samsung in the middle -->
+      <rect x="110" y="225" width="140" height="28" rx="6" fill="rgba(0,214,143,0.2)" stroke="#00d68f" stroke-width="1.5"/>
+      <text x="180" y="243" fill="#00d68f" font-size="11" text-anchor="middle" font-weight="700">🇰🇷 삼성 — 양쪽 거래 가능</text>
+
+      <!-- Arrows -->
+      <line x1="130" y1="220" x2="155" y2="225" stroke="#00d68f" stroke-width="1" opacity="0.6"/>
+      <line x1="230" y1="220" x2="205" y2="225" stroke="#00d68f" stroke-width="1" opacity="0.6"/>
+    </svg>
+  </div>
+
+  <p>삼성전자는 미국·중국 <strong>양쪽 모두와 거래 가능한 독특한 포지션</strong>에 있습니다. 이것이 TSMC 대비 삼성의 지정학적 프리미엄이 될 수 있지만, 동시에 미국의 추가 규제 리스크이기도 합니다.</p>
+</div>
+
+<!-- 8. 리스크 요인 -->
+<div class="section">
+  <div class="section-title"><span class="num">08</span> 주요 리스크 요인</div>
+
+  <div class="key-box red">
+    <div class="key-box-title">⚠️ 리스크 점검</div>
+    <ul class="item-list">
+      <li><strong>미국 규제 확대:</strong> 트럼프 행정부가 삼성에 "중국향 첨단칩 제조 금지"를 요구할 가능성. 한국이 우방국으로 분류되어 있어 압박 경로 존재</li>
+      <li><strong>프로젝트 지연:</strong> 미·중 갈등 격화 시 협상 자체가 중단되거나, 생산 후 납품 과정에서 차단될 위험</li>
+      <li><strong>삼성 수율 문제:</strong> 삼성 파운드리의 첨단 공정(3nm GAA 등) 수율 이슈가 여전히 존재. 성숙 공정에서도 TSMC 대비 경쟁력 입증 필요</li>
+      <li><strong>중국 자립화 가속:</strong> 장기적으로 중국이 SMIC 역량 강화에 성공하면, 삼성향 물량이 줄어들 가능성</li>
+    </ul>
+  </div>
+</div>
+
+<!-- 9. 투자 시사점 -->
+<div class="section">
+  <div class="section-title"><span class="num">09</span> 투자 시사점 정리</div>
+
+  <div class="verdict">
+    <div class="verdict-title">📌 핵심 투자 포인트</div>
+
+    <p><strong>① 영상 AI = 메모리 슈퍼사이클 가속 엔진</strong><br>
+    시댄스 2.0 같은 영상 생성 AI의 확산은 HBM·고대역폭 DRAM 수요를 폭발적으로 늘립니다. <em>SK하이닉스, Micron, 삼성전자 메모리</em> 사업부 모두 수혜권입니다.</p>
+
+    <p><strong>② 커스텀 실리콘 트렌드 = Broadcom의 기회</strong><br>
+    바이트댄스의 자체칩 설계는 구글·AWS·메타에 이은 '빅테크 자체칩' 물결의 일부입니다. ASIC 설계를 돕는 <em>Broadcom</em>은 이 트렌드의 가장 직접적인 수혜주입니다.</p>
+
+    <p><strong>③ NVIDIA는 학습 독점, 추론 경쟁 심화</strong><br>
+    NVIDIA의 <em>학습(Training) 시장 지배력</em>은 여전하지만, 추론(Inference) 시장에서는 자체칩·ASIC과의 경쟁이 갈수록 치열해지고 있습니다. NVIDIA의 소프트웨어 생태계(CUDA) 락인이 방어선입니다.</p>
+
+    <p style="margin-bottom:0;"><strong>④ 지정학 = 투자 변수</strong><br>
+    미·중 반도체 갈등은 삼성·SK하이닉스에 <em>기회이자 리스크</em>입니다. 트럼프 행정부의 대중 정책 변화를 지속적으로 모니터링해야 합니다.</p>
+  </div>
+
+  <div class="chart-wrap">
+    <div class="chart-title">테마별 관심 종목 요약</div>
+    <table>
+      <tr>
+        <th>투자 테마</th>
+        <th>관련 종목</th>
+        <th>비고</th>
+      </tr>
+      <tr>
+        <td>영상 AI → 메모리 수요</td>
+        <td><strong>MU, SK하이닉스</strong></td>
+        <td>HBM/DRAM 슈퍼사이클</td>
+      </tr>
+      <tr>
+        <td>커스텀 실리콘 ASIC</td>
+        <td><strong>AVGO, MRVL</strong></td>
+        <td>빅테크 자체칩 설계 수혜</td>
+      </tr>
+      <tr>
+        <td>반도체 제조 재편</td>
+        <td><strong>삼성전자, TSM</strong></td>
+        <td>파운드리 경쟁 구도 변화</td>
+      </tr>
+      <tr>
+        <td>AI GPU 경쟁 심화</td>
+        <td><strong>NVDA</strong></td>
+        <td>추론시장 경쟁 모니터링</td>
+      </tr>
+      <tr>
+        <td>인프라/전력</td>
+        <td><strong>ANET, VRT, ETN</strong></td>
+        <td>영상 AI 데이터센터 전력 수요</td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<!-- Footer -->
+<div class="footer">
+  <p>본 분석은 NOVA Real Invest 채널 콘텐츠(2026.02.16)를 기반으로<br>미국 증시 관점에서 재구성한 것입니다.</p>
+  <p style="margin-top:6px;">투자 판단의 최종 책임은 투자자 본인에게 있습니다.</p>
+</div>
+
+</div>
+</body>
+</html>

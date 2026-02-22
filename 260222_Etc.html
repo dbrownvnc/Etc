@@ -1,0 +1,1155 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>AI 버블 붕괴 분석 – 아직 시작도 안 한 게 더 무섭다</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+    <style>
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #181825;
+            --accent-red: #ff3b5c;
+            --accent-orange: #ff8c42;
+            --accent-blue: #4a9eff;
+            --accent-cyan: #00d4aa;
+            --accent-purple: #a78bfa;
+            --text-primary: #e8e8ed;
+            --text-secondary: #9898a6;
+            --text-dim: #5a5a6e;
+            --border: #2a2a3a;
+            --gradient-fire: linear-gradient(135deg, #ff3b5c, #ff8c42);
+            --gradient-ice: linear-gradient(135deg, #4a9eff, #00d4aa);
+            --gradient-purple: linear-gradient(135deg, #a78bfa, #4a9eff);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.75;
+            font-size: 15px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .hero {
+            position: relative;
+            padding: 60px 20px 40px;
+            text-align: center;
+            overflow: hidden;
+            background: radial-gradient(ellipse at 50% 0%, rgba(255,59,92,0.12) 0%, transparent 60%),
+                        radial-gradient(ellipse at 80% 100%, rgba(74,158,255,0.08) 0%, transparent 50%),
+                        var(--bg-primary);
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: var(--gradient-fire);
+        }
+
+        .hero-badge {
+            display: inline-block;
+            padding: 4px 14px;
+            background: rgba(255,59,92,0.12);
+            border: 1px solid rgba(255,59,92,0.25);
+            border-radius: 20px;
+            font-size: 12px;
+            color: var(--accent-red);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+            font-weight: 500;
+        }
+
+        .hero h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 28px;
+            font-weight: 900;
+            line-height: 1.3;
+            margin-bottom: 12px;
+            background: var(--gradient-fire);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-sub {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .hero-meta {
+            font-size: 12px;
+            color: var(--text-dim);
+        }
+
+        .hero-meta a {
+            color: var(--accent-blue);
+            text-decoration: none;
+        }
+
+        .container {
+            max-width: 640px;
+            margin: 0 auto;
+            padding: 0 16px 60px;
+        }
+
+        /* Executive Summary */
+        .exec-summary {
+            background: linear-gradient(135deg, rgba(255,59,92,0.06), rgba(74,158,255,0.06));
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px 20px;
+            margin: 24px 0;
+        }
+
+        .exec-summary h2 {
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--accent-orange);
+            margin-bottom: 14px;
+        }
+
+        .exec-summary p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+
+        .key-points {
+            margin-top: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .key-point {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 10px 14px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 10px;
+            border-left: 3px solid var(--accent-red);
+        }
+
+        .key-point .icon {
+            font-size: 16px;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .key-point p {
+            font-size: 13.5px;
+            margin: 0;
+        }
+
+        /* Section Styling */
+        .section {
+            margin: 36px 0;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 18px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .section-num {
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .section-num.red { background: rgba(255,59,92,0.15); color: var(--accent-red); }
+        .section-num.blue { background: rgba(74,158,255,0.15); color: var(--accent-blue); }
+        .section-num.cyan { background: rgba(0,212,170,0.15); color: var(--accent-cyan); }
+        .section-num.orange { background: rgba(255,140,66,0.15); color: var(--accent-orange); }
+        .section-num.purple { background: rgba(167,139,250,0.15); color: var(--accent-purple); }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .section p {
+            color: var(--text-secondary);
+            margin-bottom: 14px;
+            font-size: 14.5px;
+        }
+
+        .highlight {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .accent-red { color: var(--accent-red); font-weight: 700; }
+        .accent-blue { color: var(--accent-blue); font-weight: 600; }
+        .accent-cyan { color: var(--accent-cyan); font-weight: 600; }
+        .accent-orange { color: var(--accent-orange); font-weight: 600; }
+
+        /* Comparison Cards */
+        .compare-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin: 18px 0;
+        }
+
+        .compare-card {
+            padding: 16px 14px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        .compare-card.negative {
+            background: rgba(255,59,92,0.05);
+            border-color: rgba(255,59,92,0.2);
+        }
+
+        .compare-card.positive {
+            background: rgba(0,212,170,0.05);
+            border-color: rgba(0,212,170,0.2);
+        }
+
+        .compare-card h4 {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .compare-card.negative h4 { color: var(--accent-red); }
+        .compare-card.positive h4 { color: var(--accent-cyan); }
+
+        .compare-card p {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 0;
+        }
+
+        /* Quote Block */
+        .quote-block {
+            position: relative;
+            padding: 20px 20px 20px 24px;
+            margin: 20px 0;
+            background: var(--bg-card-alt);
+            border-radius: 12px;
+            border-left: 3px solid var(--accent-orange);
+        }
+
+        .quote-block p {
+            font-size: 14.5px;
+            color: var(--text-primary);
+            font-weight: 400;
+            margin-bottom: 0;
+            font-style: italic;
+        }
+
+        .quote-block .source {
+            font-size: 12px;
+            color: var(--text-dim);
+            margin-top: 8px;
+            font-style: normal;
+        }
+
+        /* Info Cards */
+        .info-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 20px;
+            margin: 18px 0;
+        }
+
+        .info-card h4 {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .info-card p {
+            font-size: 13.5px;
+        }
+
+        /* Analogy Box */
+        .analogy-box {
+            background: linear-gradient(135deg, rgba(167,139,250,0.08), rgba(74,158,255,0.08));
+            border: 1px solid rgba(167,139,250,0.2);
+            border-radius: 14px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .analogy-box h4 {
+            font-size: 13px;
+            color: var(--accent-purple);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+
+        .analogy-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            font-size: 13.5px;
+        }
+
+        .analogy-row:last-child { border-bottom: none; }
+
+        .analogy-label {
+            color: var(--text-dim);
+            min-width: 80px;
+            font-size: 12px;
+        }
+
+        .analogy-arrow {
+            color: var(--accent-purple);
+            font-size: 12px;
+        }
+
+        .analogy-value {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        /* Chart Container */
+        .chart-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 20px 16px;
+            margin: 20px 0;
+        }
+
+        .chart-title {
+            font-size: 13px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 14px;
+            text-align: center;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            width: 100%;
+            max-height: 280px;
+        }
+
+        /* Flow Diagram */
+        .flow-diagram {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            margin: 18px 0;
+            align-items: center;
+        }
+
+        .flow-step {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 12px 18px;
+            font-size: 13.5px;
+            text-align: center;
+            width: 90%;
+            color: var(--text-secondary);
+        }
+
+        .flow-step strong {
+            color: var(--text-primary);
+        }
+
+        .flow-arrow {
+            font-size: 18px;
+            color: var(--text-dim);
+            padding: 4px 0;
+        }
+
+        /* Timeline */
+        .timeline {
+            position: relative;
+            padding-left: 24px;
+            margin: 18px 0;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 6px;
+            top: 8px;
+            bottom: 8px;
+            width: 2px;
+            background: var(--border);
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 18px;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -21px;
+            top: 8px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent-blue);
+        }
+
+        .timeline-item h4 {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: var(--text-primary);
+        }
+
+        .timeline-item p {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 0;
+        }
+
+        /* Warning Box */
+        .warning-box {
+            background: rgba(255,59,92,0.06);
+            border: 1px solid rgba(255,59,92,0.2);
+            border-radius: 12px;
+            padding: 18px;
+            margin: 18px 0;
+        }
+
+        .warning-box h4 {
+            color: var(--accent-red);
+            font-size: 14px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .warning-box p {
+            font-size: 13.5px;
+        }
+
+        /* Insight Box */
+        .insight-box {
+            background: rgba(0,212,170,0.06);
+            border: 1px solid rgba(0,212,170,0.2);
+            border-radius: 12px;
+            padding: 18px;
+            margin: 18px 0;
+        }
+
+        .insight-box h4 {
+            color: var(--accent-cyan);
+            font-size: 14px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .insight-box p {
+            font-size: 13.5px;
+        }
+
+        /* Table */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0;
+            font-size: 13px;
+        }
+
+        .data-table th {
+            background: var(--bg-card-alt);
+            padding: 10px 12px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-secondary);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .data-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            color: var(--text-secondary);
+        }
+
+        .data-table tr:hover td {
+            background: rgba(255,255,255,0.02);
+        }
+
+        /* Bottom Section */
+        .bottom-line {
+            margin-top: 40px;
+            padding: 28px 20px;
+            background: linear-gradient(135deg, rgba(255,59,92,0.06), rgba(255,140,66,0.06));
+            border: 1px solid rgba(255,59,92,0.15);
+            border-radius: 16px;
+            text-align: center;
+        }
+
+        .bottom-line h3 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 14px;
+            background: var(--gradient-fire);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .bottom-line p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 30px 20px;
+            font-size: 11px;
+            color: var(--text-dim);
+            border-top: 1px solid var(--border);
+            margin-top: 40px;
+        }
+
+        .footer a {
+            color: var(--accent-blue);
+            text-decoration: none;
+        }
+
+        /* Pill tags */
+        .pill {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .pill-red { background: rgba(255,59,92,0.12); color: var(--accent-red); }
+        .pill-blue { background: rgba(74,158,255,0.12); color: var(--accent-blue); }
+        .pill-cyan { background: rgba(0,212,170,0.12); color: var(--accent-cyan); }
+
+        /* Stat row */
+        .stat-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin: 16px 0;
+        }
+
+        .stat-box {
+            text-align: center;
+            padding: 16px 10px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+        }
+
+        .stat-value {
+            font-family: 'Playfair Display', serif;
+            font-size: 26px;
+            font-weight: 900;
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        @media (max-width: 400px) {
+            .hero h1 { font-size: 24px; }
+            .compare-grid { grid-template-columns: 1fr; }
+            .stat-row { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+    <div class="hero-badge">⚡ Market Analysis</div>
+    <h1>AI 버블 붕괴,<br>아직 시작도 안 한 게<br>더 무섭다</h1>
+    <p class="hero-sub">AI 버블 논쟁의 본질과 빅테크 생존 경쟁의 실체</p>
+    <p class="hero-meta">2026.02.22 · 원본: <a href="https://youtu.be/k4rQUSVH0Nw?si=q4hvtlkp0uwHLUbB" target="_blank">YouTube 영상 보기</a></p>
+</div>
+
+<div class="container">
+
+    <!-- EXECUTIVE SUMMARY -->
+    <div class="exec-summary">
+        <h2>📋 핵심 요약</h2>
+        <p>"AI 버블이 터지느냐 마느냐"는 잘못된 질문이다. 진짜 질문은 <strong class="accent-red">"누가 끝까지 살아남느냐"</strong>다. AI 혁명은 이미 진행 중이며, 빅테크의 AI 투자는 기술 경쟁이 아닌 <strong class="accent-orange">생존 경쟁</strong>의 성격을 띤다.</p>
+        <div class="key-points">
+            <div class="key-point">
+                <span class="icon">🔴</span>
+                <p>AI 인프라에 투입된 <strong class="highlight">6,000억 달러 이상</strong> — 투입 대비 회수는 아직 미지수</p>
+            </div>
+            <div class="key-point">
+                <span class="icon">🔵</span>
+                <p>닷컴 버블과 AI는 <strong class="highlight">근본적으로 다르다</strong> — AI는 이미 매출이 증명된 실체</p>
+            </div>
+            <div class="key-point">
+                <span class="icon">🟢</span>
+                <p>스마트폰·인터넷 시장 포화 → 빅테크에게 AI는 <strong class="highlight">유일한 성장 출구</strong></p>
+            </div>
+            <div class="key-point">
+                <span class="icon">🟣</span>
+                <p>앰비언트 컴퓨팅과 AI OS — 스마트폰 이후의 <strong class="highlight">새로운 패러다임</strong> 도래 예고</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECTION 1 -->
+    <div class="section">
+        <div class="section-header">
+            <span class="section-num red">1</span>
+            <h3 class="section-title">닷컴 버블 vs AI — 비교 자체가 잘못됐다</h3>
+        </div>
+
+        <p>AI 회의론이 나올 때마다 반복되는 닷컴 버블 비교. 하지만 영상은 이 비교 자체가 <span class="accent-red">잘못된 출발점</span>이라고 지적한다.</p>
+
+        <div class="compare-grid">
+            <div class="compare-card negative">
+                <h4>🟠 닷컴 버블 (2000)</h4>
+                <p>실체 없음, 매출 없음. 도메인 하나로 주가 폭등. 순수한 기대감에 기반한 버블.</p>
+            </div>
+            <div class="compare-card positive">
+                <h4>🟢 AI 시대 (현재)</h4>
+                <p>빅테크 실적 검증 완료. 클라우드·소프트웨어 구독 매출 실현 중. 팔란티어 등 실적 지속.</p>
+            </div>
+        </div>
+
+        <p>핵심 차이: 닷컴은 <span class="highlight">"기대"만 있었지만</span>, AI는 <span class="highlight">"실체"가 이미 증명</span>되었다. 다만 시장의 기대치가 과도하게 높은 것은 사실이다.</p>
+
+        <div class="stat-row">
+            <div class="stat-box">
+                <div class="stat-value" style="color: var(--accent-red);">$6,000억+</div>
+                <div class="stat-label">AI 인프라 누적 투자</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value" style="color: var(--accent-orange);">~5%</div>
+                <div class="stat-label">전문가 추정 AI 자동화 범위</div>
+            </div>
+        </div>
+
+        <div class="quote-block">
+            <p>"투입은 원자탄급인데 회수는 소총탄급"</p>
+            <div class="source">— 시장의 AI 투자 비유</div>
+        </div>
+
+        <p>전문가들의 회의론: AI가 자동화할 수 있는 전체 산업은 약 <span class="accent-red">5% 수준</span>에 불과하며, 소프트웨어 시장에서만 성과가 제한될 수 있다는 전망. 이런 여론 속에서 빅테크 주가는 저평가 압력을 받고 있다.</p>
+    </div>
+
+    <!-- CHART: AI Investment vs Revenue -->
+    <div class="chart-container">
+        <div class="chart-title">AI 투자 구조 — 투입 vs 회수 불균형</div>
+        <div class="chart-wrapper">
+            <canvas id="investmentChart"></canvas>
+        </div>
+    </div>
+
+    <!-- SECTION 2 -->
+    <div class="section">
+        <div class="section-header">
+            <span class="section-num blue">2</span>
+            <h3 class="section-title">애플의 양면적 포지션</h3>
+        </div>
+
+        <p>영상은 애플에 대해 <span class="accent-cyan">긍정론</span>과 <span class="accent-red">부정론</span>을 모두 제시한다. 단기적으로는 유리하지만, 장기적으로는 구조적 한계가 있다는 분석.</p>
+
+        <div class="info-card">
+            <h4>🛡️ 애플 긍정론 — "골드러시의 청바지 장수"</h4>
+            <p>AI 인프라에 직접 투자를 적게 해 버블 붕괴 시 상대적 안전. AI 기술이 성공하더라도 결국 <span class="highlight">아이폰이라는 디바이스를 거쳐야</span> 하므로 어떤 시나리오에서든 이익을 얻는 <span class="accent-cyan">헤징 포지션</span>.</p>
+        </div>
+
+        <div class="analogy-box">
+            <h4>🤠 골드러시 비유</h4>
+            <div class="analogy-row">
+                <span class="analogy-label">금(Gold)</span>
+                <span class="analogy-arrow">→</span>
+                <span class="analogy-value">AI 기술·서비스</span>
+            </div>
+            <div class="analogy-row">
+                <span class="analogy-label">청바지(Levi's)</span>
+                <span class="analogy-arrow">→</span>
+                <span class="analogy-value">애플 (디바이스·플랫폼)</span>
+            </div>
+            <div class="analogy-row">
+                <span class="analogy-label">핵심 논리</span>
+                <span class="analogy-arrow">→</span>
+                <span class="analogy-value">금이 없어도 청바지 판 사람은 남는다</span>
+            </div>
+        </div>
+
+        <div class="warning-box">
+            <h4>⚠️ 애플 부정론 — 장기적 구조 한계</h4>
+            <p>애플의 수익 모델은 <span class="highlight">사용자가 아이폰에 머무는 시간</span>에 의존 — 앱 내 광고, 결제 수수료 등. 하지만 AI 시대에는 스크린을 안 보게 만드는 <span class="accent-blue">앰비언트 컴퓨팅</span>이 핵심. 이는 애플의 수익 구조와 <span class="accent-red">정면 충돌</span>한다.</p>
+        </div>
+
+        <p>또한 애플의 하드웨어 기준은 아직 <span class="highlight">"터치 스크린의 편의성"</span>(클릭, 스크롤)에 맞춰져 있다. AI OS 시대에는 이런 행위 자체가 사라질 가능성이 높아, 기존 강점이 약점으로 전환될 수 있다.</p>
+    </div>
+
+    <!-- SECTION 3 -->
+    <div class="section">
+        <div class="section-header">
+            <span class="section-num cyan">3</span>
+            <h3 class="section-title">앰비언트 컴퓨팅 — 스마트폰 이후의 세계</h3>
+        </div>
+
+        <p>영상이 제시하는 가장 핵심적인 개념. 현재 스마트폰의 <span class="highlight">수동 입력 → 결과 확인</span> 방식은 AI의 잠재력을 구조적으로 제한한다.</p>
+
+        <div class="compare-grid">
+            <div class="compare-card negative">
+                <h4>현재: 스마트폰</h4>
+                <p>앱 열기 → 입력 → 검색 → 스크롤 → 선택. 모든 과정이 수동.</p>
+            </div>
+            <div class="compare-card positive">
+                <h4>미래: 앰비언트 AI</h4>
+                <p>"저번에 먹었던 거 찾아줘" 한마디로 맥락·의도 파악해 자동 처리.</p>
+            </div>
+        </div>
+
+        <div class="info-card">
+            <h4>💡 앰비언트 컴퓨팅이란?</h4>
+            <p>AI가 <span class="highlight">공기처럼 존재</span>하며, 사용자의 시각·청각·위치·과거 행동을 종합해 <span class="accent-cyan">먼저 판단하고 제안</span>하는 컴퓨팅 방식. 스마트폰 화면을 가능한 <span class="highlight">안 보게 만드는 것</span>이 목표.</p>
+        </div>
+
+        <p><strong>구체적 예시:</strong> 기존 스마트폰은 "오늘 기온 24도"라는 정보만 제공. 사용자가 직접 해석해야 한다. 반면 앰비언트 AI는 사용자의 현재 옷차림을 관찰하고, <span class="accent-cyan">"지금 입은 옷은 더울 수 있다, 얇은 반팔이 낫다"</span>고 능동적으로 제안한다.</p>
+
+        <p>현재 AI 기술은 이미 말투, 숨소리, 눈빛, 위치, 과거 기록 등을 종합해 맥락을 파악하는 수준이다. 하지만 이런 잠재력이 <span class="accent-red">채팅 인터페이스에 갇혀</span> 있다는 것이 문제.</p>
+
+        <div class="flow-diagram">
+            <div class="flow-step"><strong>현재 AI</strong> — 채팅창에 갇힌 상태</div>
+            <div class="flow-arrow">↓</div>
+            <div class="flow-step"><strong>AI 전용 OS</strong> 필요 — 기존 Windows/iOS는 구조적 불일치</div>
+            <div class="flow-arrow">↓</div>
+            <div class="flow-step"><strong>새로운 디바이스</strong> — 형태 미정 (AR? 뇌 임플란트? 복합?)</div>
+            <div class="flow-arrow">↓</div>
+            <div class="flow-step"><strong>앰비언트 컴퓨팅</strong> — 스크린 없는 AI 시대</div>
+        </div>
+    </div>
+
+    <!-- SECTION 4 -->
+    <div class="section">
+        <div class="section-header">
+            <span class="section-num orange">4</span>
+            <h3 class="section-title">증기기관 비유 — AI 인프라의 본질</h3>
+        </div>
+
+        <p>영상은 현재 AI 발전 단계를 <span class="accent-orange">증기기관의 등장</span>에 비유한다. 이 비유가 현재의 빅테크 AI 군비 경쟁을 정확히 설명한다.</p>
+
+        <div class="analogy-box">
+            <h4>🚂 증기기관 → AI 비유</h4>
+            <div class="analogy-row">
+                <span class="analogy-label">증기기관</span>
+                <span class="analogy-arrow">→</span>
+                <span class="analogy-value">AI (핵심 기술)</span>
+            </div>
+            <div class="analogy-row">
+                <span class="analogy-label">석탄 (연료)</span>
+                <span class="analogy-arrow">→</span>
+                <span class="analogy-value">전기 (에너지)</span>
+            </div>
+            <div class="analogy-row">
+                <span class="analogy-label">철도 (인프라)</span>
+                <span class="analogy-arrow">→</span>
+                <span class="analogy-value">데이터 센터</span>
+            </div>
+            <div class="analogy-row">
+                <span class="analogy-label">기차 (응용)</span>
+                <span class="analogy-arrow">→</span>
+                <span class="analogy-value">AI OS · 새로운 디바이스 · 서비스</span>
+            </div>
+        </div>
+
+        <p>핵심: 증기기관 자체는 <span class="highlight">고정된 펌프</span>에 불과했다. 진짜 혁명은 바퀴를 달고, 그 바퀴가 달릴 철도를 깔았을 때 폭발했다. 현재 빅테크는 <span class="accent-orange">"철도를 까는 단계"</span>에 있다. 기차(AI OS, 디바이스)가 어떤 형태가 될지는 아직 모르지만, <span class="highlight">일단 발전소부터 짓고 보자</span>는 전략.</p>
+
+        <div class="warning-box">
+            <h4>❓ 리스크 포인트</h4>
+            <p>만약 "기차"가 나오지 않거나, 성능이 기대 이하라면? AI 경쟁이 <span class="accent-red">불확실성에 배팅</span>하는 것은 사실이다. 증기기관 시대에 기차가 나올 것이라는 보장은 없었다.</p>
+        </div>
+    </div>
+
+    <!-- CHART: Market Saturation -->
+    <div class="chart-container">
+        <div class="chart-title">스마트폰 교체 주기 변화 (연도별)</div>
+        <div class="chart-wrapper">
+            <canvas id="replacementChart"></canvas>
+        </div>
+    </div>
+
+    <!-- SECTION 5 -->
+    <div class="section">
+        <div class="section-header">
+            <span class="section-num purple">5</span>
+            <h3 class="section-title">빅테크가 AI에 목숨 거는 진짜 이유</h3>
+        </div>
+
+        <p>영상의 가장 설득력 있는 파트. AI 투자는 <span class="accent-red">기술 경쟁이 아니라 생존 경쟁</span>이라는 분석.</p>
+
+        <div class="info-card">
+            <h4>📱 이유 1: 시장 포화</h4>
+            <p>스마트폰과 인터넷 시장이 물리적 한계에 봉착. 하드웨어 교체 주기는 2년 → <span class="highlight">3~4년</span>으로 늘어남. 광고 시장도 더 이상 성장하지 않고, 빅테크끼리 서로 뺏고 뺏기는 <span class="accent-red">제로섬 경쟁</span>. 전 세계인에게 스마트폰·PC를 다 팔았다 — 더 이상 팔 곳이 없다.</p>
+        </div>
+
+        <div class="info-card">
+            <h4>👷 이유 2: 인건비 폭등</h4>
+            <p>저출산·고령화로 노동력 감소, 인건비 상승. 복지·보험·보너스 등 고정비용 증가. 결과적으로 <span class="accent-red">저효율·고비용</span>의 악순환. 반면 AI는 24시간 365일, 전기세만으로 가동 가능.</p>
+        </div>
+
+        <div class="chart-container">
+            <div class="chart-title">인간 노동 vs AI 비용 구조 비교</div>
+            <div class="chart-wrapper">
+                <canvas id="costChart"></canvas>
+            </div>
+        </div>
+
+        <div class="quote-block">
+            <p>"전 세계인에게 스마트폰, PC 다 팔았습니다. 이제 더 이상 팔 곳이 없다."</p>
+        </div>
+
+        <p>결론: 빅테크가 AI에 "몰빵"하는 것은 <span class="highlight">합리적 선택이 아닌 생존 본능</span>이다. 새로운 시장을 개척하지 않으면 기존 시장에서 경쟁만 심화되고 수익성은 악화된다.</p>
+    </div>
+
+    <!-- SECTION 6 -->
+    <div class="section">
+        <div class="section-header">
+            <span class="section-num red">6</span>
+            <h3 class="section-title">AI 시대의 승자 — 생태계가 핵심</h3>
+        </div>
+
+        <p>영상은 AI 시대의 최종 승자를 기술력이 아닌 <span class="accent-blue">생태계 장악력</span>으로 판단한다.</p>
+
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>생존 조건</th>
+                    <th>설명</th>
+                    <th>유리한 기업</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>독점 데이터</strong></td>
+                    <td>인스타, 유튜브 등 고유 데이터 보유</td>
+                    <td><span class="pill pill-blue">Meta · Google</span></td>
+                </tr>
+                <tr>
+                    <td><strong>고객 기반</strong></td>
+                    <td>AI OS/디바이스를 써줄 사용자 확보</td>
+                    <td><span class="pill pill-cyan">MS · Google</span></td>
+                </tr>
+                <tr>
+                    <td><strong>상용화 능력</strong></td>
+                    <td>기업 고객에게 즉시 판매 가능</td>
+                    <td><span class="pill pill-blue">Microsoft</span></td>
+                </tr>
+                <tr>
+                    <td><strong>에너지 인프라</strong></td>
+                    <td>AI 구동에 필요한 막대한 전력</td>
+                    <td><span class="pill pill-cyan">Big Tech 전체</span></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <p>영상은 <span class="accent-blue">마이크로소프트</span>가 상용화 측면에서 유리하며, <span class="accent-red">애플은 장기적으로 뒤처질</span> 가능성을 제기한다. AI OS가 하드웨어 가치를 압도하게 되면, OS를 가진 쪽이 갑이 되고 하드웨어 업체는 과거 Dell·HP처럼 종속될 수 있다.</p>
+
+        <div class="insight-box">
+            <h4>💡 역사적 교훈</h4>
+            <p>Windows OS가 등장하자 PC 업체는 마이크로소프트에 종속됐다. AI OS 시대에 동일한 패턴이 반복될 경우, 현재의 하드웨어 강자(애플)가 <span class="accent-red">과거의 Dell, HP</span>로 전락할 가능성이 있다.</p>
+        </div>
+    </div>
+
+    <!-- SECTION 7 -->
+    <div class="section">
+        <div class="section-header">
+            <span class="section-num blue">7</span>
+            <h3 class="section-title">"기술의 역설" — AI 혁명은 이미 시작됐다</h3>
+        </div>
+
+        <p>영상의 핵심 메시지. AI 혁명이 <span class="highlight">"언제 오느냐"</span>가 아니라, <span class="accent-cyan">이미 와 있다</span>는 것.</p>
+
+        <div class="timeline">
+            <div class="timeline-item">
+                <h4>ChatGPT 등장 시</h4>
+                <p>"기적이다, 신기하다" — 대중이 AI를 경이롭게 바라봄</p>
+            </div>
+            <div class="timeline-item">
+                <h4>현재</h4>
+                <p>AI를 너무 당연하게 사용. 검색보다 AI에게 물어보는 것이 일상. 글쓰기 작업은 AI 없이 거의 불가능한 수준</p>
+            </div>
+            <div class="timeline-item">
+                <h4>기술의 역설</h4>
+                <p>기술이 완벽하게 작동할수록 무덤덤해짐 — <strong>신기함이 사라지는 순간이 혁명</strong></p>
+            </div>
+            <div class="timeline-item">
+                <h4>다음 단계</h4>
+                <p>일상 속 AI가 물리 세계(밖)로 튀어나오는 것은 시간 문제</p>
+            </div>
+        </div>
+
+        <div class="quote-block">
+            <p>"AI 시대가 언제 오느냐고 묻지만, 이미 AI 없으면 점점 생활이 어려워지고 있다."</p>
+        </div>
+
+        <p>올바른 질문은 <span class="highlight">"AI 시대가 언제 오는가"</span>가 아니라 <span class="accent-cyan">"항해할 수 있느냐"</span>이다. AI 기업의 적정 밸류에이션이란 것도 의미가 없다. 어디까지 발전할지 아무도 모르는 상태에서 적절한 값을 매기는 것 자체가 불가능하다.</p>
+    </div>
+
+    <!-- BOTTOM LINE -->
+    <div class="bottom-line">
+        <h3>🎯 최종 결론</h3>
+        <p>
+            <strong>"AI 버블이냐 아니냐"는 질문이 잘못됐다.</strong><br><br>
+            비가 이미 내리고 있는데 "내일 비 오냐 마냐"를 논쟁하는 것과 같다. 전기도, 인터넷도, 스마트폰도 같은 과정을 거쳤다.<br><br>
+            핵심은 <span style="color: var(--accent-orange); font-weight:700;">누가 끝까지 살아남느냐</span>, 그리고 <span style="color: var(--accent-cyan); font-weight:700;">파도를 타고 새 대륙을 개척할 기업이 어디냐</span>이다.<br><br>
+            지금의 흔들림은 혁명 전의 파도일 뿐이다.
+        </p>
+    </div>
+
+    <!-- US MARKET PERSPECTIVE -->
+    <div class="section" style="margin-top: 36px;">
+        <div class="section-header">
+            <span class="section-num orange">★</span>
+            <h3 class="section-title">미국 증시 관점 시사점</h3>
+        </div>
+
+        <div class="info-card">
+            <h4>🇺🇸 투자자 관점 정리</h4>
+            <p><strong class="accent-blue">단기:</strong> AI 회의론 확산과 시장 불안정 지속. 빅테크 주가 변동성 확대 가능. 시장은 하락 명분을 찾고 있는 상태.</p>
+            <p><strong class="accent-cyan">중기:</strong> AI 인프라 투자의 회수율이 관건. 실적으로 증명하는 기업(클라우드 매출, 구독 수익)과 아닌 기업의 차별화 시작.</p>
+            <p><strong class="accent-orange">장기:</strong> AI OS·AI 디바이스를 선점하는 기업이 차세대 플랫폼 지배. 데이터 독점력 + 고객 기반 + 상용화 능력이 있는 기업이 승자.</p>
+        </div>
+
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>기업</th>
+                    <th>강점</th>
+                    <th>리스크</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Microsoft</strong></td>
+                    <td>상용화·고객 기반·Copilot 생태계</td>
+                    <td>OpenAI 의존도</td>
+                </tr>
+                <tr>
+                    <td><strong>Google</strong></td>
+                    <td>데이터·검색·클라우드·자체 AI 모델</td>
+                    <td>광고 수익 의존 구조 변화</td>
+                </tr>
+                <tr>
+                    <td><strong>Meta</strong></td>
+                    <td>소셜 데이터·Llama 오픈소스·메타버스</td>
+                    <td>플랫폼 전환 불확실성</td>
+                </tr>
+                <tr>
+                    <td><strong>Apple</strong></td>
+                    <td>디바이스 에코시스템·브랜드·헤징 포지션</td>
+                    <td style="color: var(--accent-red);">AI OS 시대 구조적 약점</td>
+                </tr>
+                <tr>
+                    <td><strong>NVIDIA</strong></td>
+                    <td>AI 인프라 핵심 공급자</td>
+                    <td>투자 사이클 의존, 경쟁 심화</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="footer">
+        원본 영상: <a href="https://youtu.be/k4rQUSVH0Nw?si=q4hvtlkp0uwHLUbB" target="_blank">AI버블 붕괴, 아직 시작도 안 한 게 더 무섭다</a> · 2026.02.22<br>
+        본 문서는 영상 내용을 기반으로 한 분석 정리이며, 투자 권유가 아닙니다.
+    </div>
+</div>
+
+<script>
+    // Chart defaults
+    Chart.defaults.color = '#9898a6';
+    Chart.defaults.borderColor = 'rgba(255,255,255,0.06)';
+    Chart.defaults.font.family = "'Noto Sans KR', sans-serif";
+    Chart.defaults.font.size = 11;
+
+    // Chart 1: AI Investment vs Revenue Gap
+    new Chart(document.getElementById('investmentChart'), {
+        type: 'bar',
+        data: {
+            labels: ['AI 인프라 투자\n(누적)', 'AI 관련 매출\n(현재)', '회수 갭\n(미확정)'],
+            datasets: [{
+                data: [6000, 800, 5200],
+                backgroundColor: [
+                    'rgba(255,59,92,0.7)',
+                    'rgba(0,212,170,0.7)',
+                    'rgba(255,140,66,0.35)'
+                ],
+                borderColor: [
+                    'rgba(255,59,92,1)',
+                    'rgba(0,212,170,1)',
+                    'rgba(255,140,66,0.6)'
+                ],
+                borderWidth: 1,
+                borderRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            aspectRatio: 1.6,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: ctx => `$${ctx.raw.toLocaleString()}억`
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: v => `$${v.toLocaleString()}억`
+                    },
+                    grid: { color: 'rgba(255,255,255,0.04)' }
+                },
+                x: {
+                    grid: { display: false }
+                }
+            }
+        }
+    });
+
+    // Chart 2: Smartphone Replacement Cycle
+    new Chart(document.getElementById('replacementChart'), {
+        type: 'line',
+        data: {
+            labels: ['2016', '2018', '2020', '2022', '2024', '2026E'],
+            datasets: [{
+                label: '교체 주기 (년)',
+                data: [2.0, 2.3, 2.8, 3.2, 3.6, 4.0],
+                borderColor: '#ff8c42',
+                backgroundColor: 'rgba(255,140,66,0.1)',
+                fill: true,
+                tension: 0.4,
+                pointBackgroundColor: '#ff8c42',
+                pointRadius: 5,
+                pointHoverRadius: 7,
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            aspectRatio: 1.8,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: ctx => `${ctx.raw}년`
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    min: 1.5,
+                    max: 4.5,
+                    ticks: {
+                        callback: v => `${v}년`
+                    },
+                    grid: { color: 'rgba(255,255,255,0.04)' }
+                },
+                x: {
+                    grid: { display: false }
+                }
+            }
+        }
+    });
+
+    // Chart 3: Human vs AI Cost
+    new Chart(document.getElementById('costChart'), {
+        type: 'radar',
+        data: {
+            labels: ['인건비', '가동 시간', '복지 비용', '생산성 안정', '확장성', '유연성'],
+            datasets: [{
+                label: '인간 노동',
+                data: [20, 40, 20, 50, 30, 60],
+                backgroundColor: 'rgba(255,59,92,0.15)',
+                borderColor: 'rgba(255,59,92,0.8)',
+                borderWidth: 2,
+                pointBackgroundColor: 'rgba(255,59,92,1)',
+                pointRadius: 3
+            }, {
+                label: 'AI',
+                data: [75, 95, 95, 85, 90, 70],
+                backgroundColor: 'rgba(0,212,170,0.15)',
+                borderColor: 'rgba(0,212,170,0.8)',
+                borderWidth: 2,
+                pointBackgroundColor: 'rgba(0,212,170,1)',
+                pointRadius: 3
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            aspectRatio: 1.3,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: { padding: 16, usePointStyle: true, pointStyle: 'circle' }
+                }
+            },
+            scales: {
+                r: {
+                    beginAtZero: true,
+                    max: 100,
+                    ticks: { display: false },
+                    grid: { color: 'rgba(255,255,255,0.06)' },
+                    pointLabels: { font: { size: 11 } },
+                    angleLines: { color: 'rgba(255,255,255,0.06)' }
+                }
+            }
+        }
+    });
+</script>
+
+</body>
+</html>

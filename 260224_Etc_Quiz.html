@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>미국의 이란 집게작전 - 시험문제</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700;900&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f5f0e8;
+  --bg-alt: #efe8db;
+  --text: #1a1a1a;
+  --text-sub: #555555;
+  --accent: #1a1a1a;
+  --accent-sub: #333333;
+  --chart4: #2563eb;
+  --table-bg: #efe8db;
+  --table-header: #d4cbb8;
+  --table-border: #c4b8a0;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 15px;
+  line-height: 1.85;
+}
+.wrapper {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 0 18px 60px;
+}
+.paper-header {
+  text-align: center;
+  padding: 32px 0 18px;
+  border-bottom: 4px double var(--accent);
+  margin-bottom: 20px;
+}
+.paper-header .masthead {
+  font-family: 'Noto Serif KR', serif;
+  font-size: 13px;
+  color: var(--text-sub);
+  letter-spacing: 6px;
+  margin-bottom: 10px;
+}
+.paper-header h1 {
+  font-family: 'Noto Serif KR', serif;
+  font-size: 24px;
+  font-weight: 900;
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+.paper-header .subtitle {
+  font-size: 13px;
+  color: var(--text-sub);
+}
+.section-divider {
+  text-align: center;
+  font-family: 'Noto Serif KR', serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--accent);
+  border-top: 3px double var(--accent);
+  border-bottom: 3px double var(--accent);
+  padding: 12px 0;
+  margin: 28px 0 20px;
+  letter-spacing: 2px;
+}
+.question-block {
+  background: var(--bg-alt);
+  border: 1px solid var(--table-border);
+  padding: 16px 18px;
+  margin-bottom: 18px;
+  border-left: 4px solid var(--accent);
+}
+.question-block.medium {
+  border-left-color: var(--chart4);
+}
+.question-block.hard {
+  border-left-color: #b91c1c;
+}
+.q-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.q-number {
+  font-family: 'Noto Serif KR', serif;
+  font-weight: 700;
+  font-size: 15px;
+}
+.q-meta {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.q-difficulty {
+  font-size: 12px;
+  color: var(--text-sub);
+}
+.q-type {
+  display: inline-block;
+  background: var(--accent);
+  color: var(--bg);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  letter-spacing: 1px;
+}
+.q-type.blue { background: var(--chart4); }
+.q-type.red { background: #b91c1c; }
+.q-text {
+  font-size: 14.5px;
+  font-weight: 500;
+  line-height: 1.7;
+  margin-bottom: 10px;
+}
+.q-options {
+  font-size: 14px;
+  line-height: 2;
+  padding-left: 4px;
+}
+.q-options div {
+  padding: 2px 0;
+}
+/* Answer section */
+.answer-block {
+  background: var(--bg-alt);
+  border: 1px solid var(--table-border);
+  padding: 14px 18px;
+  margin-bottom: 14px;
+}
+.a-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.a-number {
+  font-family: 'Noto Serif KR', serif;
+  font-weight: 700;
+  font-size: 14px;
+}
+.a-answer {
+  background: var(--accent);
+  color: var(--bg);
+  font-weight: 700;
+  font-size: 13px;
+  padding: 2px 10px;
+}
+.a-answer.blue { background: var(--chart4); }
+.a-explain {
+  font-size: 13.5px;
+  color: var(--text-sub);
+  line-height: 1.7;
+}
+.paper-footer {
+  text-align: center;
+  padding: 20px 0;
+  border-top: 3px double var(--accent);
+  margin-top: 30px;
+  font-size: 11px;
+  color: var(--text-sub);
+  letter-spacing: 1px;
+}
+.fade-in {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.fade-in.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+<header class="paper-header fade-in">
+  <div class="masthead">QUIZ PAPER</div>
+  <h1>미국의 이란 집게작전 — 시험문제</h1>
+  <p class="subtitle">총 10문제 · 난이도: ⭐쉬움 30% / ⭐⭐보통 50% / ⭐⭐⭐어려움 20%</p>
+</header>
+
+<!-- ━━━━━━━━ 문제지 ━━━━━━━━ -->
+<div class="section-divider fade-in">📋 시험문제 (총 10문제)</div>
+
+<!-- 문제 1 -->
+<div class="question-block fade-in">
+  <div class="q-header">
+    <span class="q-number">[문제 1]</span>
+    <div class="q-meta">
+      <span class="q-difficulty">⭐ 쉬움</span>
+      <span class="q-type">객관식</span>
+    </div>
+  </div>
+  <div class="q-text">집게작전(Double Envelopment)의 정식 군사 용어 명칭은?</div>
+  <div class="q-options">
+    <div>① 포위작전</div>
+    <div>② 양동작전</div>
+    <div>③ 기동작전</div>
+    <div>④ 섬멸작전</div>
+  </div>
+</div>
+
+<!-- 문제 2 -->
+<div class="question-block fade-in">
+  <div class="q-header">
+    <span class="q-number">[문제 2]</span>
+    <div class="q-meta">
+      <span class="q-difficulty">⭐ 쉬움</span>
+      <span class="q-type">OX</span>
+    </div>
+  </div>
+  <div class="q-text">제럴드 포드 항모전단은 오만해에 배치되어 있고, 에이브러햄 링컨 항모전단은 지중해에 배치되어 있다. (O / X)</div>
+</div>
+
+<!-- 문제 3 -->
+<div class="question-block medium fade-in">
+  <div class="q-header">
+    <span class="q-number">[문제 3]</span>
+    <div class="q-meta">
+      <span class="q-difficulty">⭐⭐ 보통</span>
+      <span class="q-type blue">객관식</span>
+    </div>
+  </div>
+  <div class="q-text">2026년 2월 23일, 포드 항모전단이 보급을 받기 위해 정박한 위치는?</div>
+  <div class="q-options">
+    <div>① 키프로스 리마솔</div>
+    <div>② 그리스 크레타섬 수다만(Souda Bay)</div>
+    <div>③ 이탈리아 나폴리</div>
+    <div>④ 터키 인지를릭</div>
+  </div>
+</div>
+
+<!-- 문제 4 -->
+<div class="question-block medium fade-in">
+  <div class="q-header">
+    <span class="q-number">[문제 4]</span>
+    <div class="q-meta">
+      <span class="q-difficulty">⭐⭐ 보통</span>
+      <span class="q-type blue">빈칸채우기</span>
+    </div>
+  </div>
+  <div class="q-text">예상 공격 시나리오의 1단계에서 두 항모전단의 ( ______ )가 출격하여 이란의 방공 레이더를 전자전으로 교란한다.</div>
+</div>
+
+<!-- 문제 5 -->
+<div class="question-block fade-in">
+  <div class="q-header">
+    <span class="q-number">[문제 5]</span>
+    <div class="q-meta">
+      <span class="q-difficulty">⭐ 쉬움</span>
+      <span class="q-type">단답형</span>
+    </div>
+  </div>
+  <div class="q-text">수다만(Souda Bay) 마라티부두에서 작전 예상 지역(이스라엘 근해)까지의 거리는 약 몇 km인가?</div>
+</div>
+
+<!-- 문제 6 -->
+<div class="question-block medium fade-in">
+  <div class="q-header">
+    <span class="q-number">[문제 6]</span>
+    <div class="q-meta">
+      <span class="q-difficulty">⭐⭐ 보통</span>
+      <span class="q-type blue">객관식</span>
+    </div>
+  </div>
+  <div class="q-text">집게작전에서 남동축(오만해) 공격의 전략적 이점으로 올바른 것은?</div>
+  <div class="q-options">
+    <div>① 이스라엘 방공망과 연계 가능</div>
+    <div>② 영국 등 우방국의 직접 지원이 용이</div>
+    <div>③ 공해에서 타국 영공을 거치지 않고 이란 영공 직진입 가능</div>
+    <div>④ 이란 수도 테헤란과의 근접성</div>
+  </div>
+</div>
+
+<!-- 문제 7 -->
+<div class="question-block medium fade-in">
+  <div class="q-header">
+    <span class="q-number">[문제 7]</span>
+    <div class="q-meta">
+      <span class="q-difficulty">⭐⭐ 보통</span>
+      <span class="q-type blue">객관식</span>
+    </div>
+  </div>
+  <div class="q-text">이란이 준비하고 있는 대응 전략인 '메두사 작전'의 핵심 내용으로 가장 적절한 것은?</div>
+  <div class="q-options">
+    <div>① 핵무기를 이용한 선제공격</div>
+    <div>② 지휘관 사망 시 4번째까지 지휘권 승계 지정, 통신 두절 시 사전 목표 자율 공격</div>
+    <div>③ 러시아군과의 합동 작전 수행</div>
+    <div>④ 호르무즈 해협의 완전 봉쇄</div>
+  </div>
+</div>
+
+<!-- 문제 8 -->
+<div class="question-block hard fade-in">
+  <div class="q-header">
+    <span class="q-number">[문제 8]</span>
+    <div class="q-meta">
+      <span class="q-difficulty">⭐⭐⭐ 어려움</span>
+      <span class="q-type red">서술형</span>
+    </div>
+  </div>
+  <div class="q-text">집게작전이 이란의 방공 시스템에 미치는 영향을 '방공망 분산'과 '감시 체계'의 두 가지 관점에서 설명하시오.</div>
+</div>
+
+<!-- 문제 9 -->
+<div class="question-block medium fade-in">
+  <div class="q-header">
+    <span class="q-number">[문제 9]</span>
+    <div class="q-meta">
+      <span class="q-difficulty">⭐⭐ 보통</span>
+      <span class="q-type blue">빈칸채우기</span>
+    </div>
+  </div>
+  <div class="q-text">예상 공격 시나리오 3단계에서, 포드함의 ( ______ )가 내륙 깊숙한 지휘소를 타격하고, 링컨함의 ( ______ )이 해안 방공망을 타격하는 분담 구조를 이룬다.</div>
+</div>
+
+<!-- 문제 10 -->
+<div class="question-block hard fade-in">
+  <div class="q-header">
+    <span class="q-number">[문제 10]</span>
+    <div class="q-meta">
+      <span class="q-difficulty">⭐⭐⭐ 어려움</span>
+      <span class="q-type red">서술형</span>
+    </div>
+  </div>
+  <div class="q-text">2026년 2월 현재, 미국과 이란의 외교적 입장 차이를 정리하고, 포드 항모전단의 수다만 기항이 군사적으로 어떤 의미를 가지는지 서술하시오.</div>
+</div>
+
+<!-- ━━━━━━━━ 정답지 ━━━━━━━━ -->
+<div class="section-divider fade-in">📝 정답 및 해설</div>
+
+<!-- 정답 1 -->
+<div class="answer-block fade-in">
+  <div class="a-header">
+    <span class="a-number">[문제 1]</span>
+    <span class="a-answer">정답: ②</span>
+  </div>
+  <div class="a-explain">집게작전(Double Envelopment)의 정식 군사 명칭은 <strong>양동작전(兩動作戰)</strong>이다. 두 개 이상의 축으로 적을 양쪽에서 동시에 공격하는 전술을 의미한다.</div>
+</div>
+
+<!-- 정답 2 -->
+<div class="answer-block fade-in">
+  <div class="a-header">
+    <span class="a-number">[문제 2]</span>
+    <span class="a-answer">정답: X</span>
+  </div>
+  <div class="a-explain">반대이다. <strong>제럴드 포드 항모전단은 지중해</strong>(북서축)에, <strong>에이브러햄 링컨 항모전단은 오만해</strong>(남동축)에 배치되어 있다.</div>
+</div>
+
+<!-- 정답 3 -->
+<div class="answer-block fade-in">
+  <div class="a-header">
+    <span class="a-number">[문제 3]</span>
+    <span class="a-answer blue">정답: ②</span>
+  </div>
+  <div class="a-explain">포드 항모전단은 <strong>그리스 크레타섬의 수다만(Souda Bay)</strong>에서 포착되었으며, NATO가 관리하는 마라티부두에서 보급을 받고 있다.</div>
+</div>
+
+<!-- 정답 4 -->
+<div class="answer-block fade-in">
+  <div class="a-header">
+    <span class="a-number">[문제 4]</span>
+    <span class="a-answer blue">정답: EA-18G 그라울러</span>
+  </div>
+  <div class="a-explain">공격 1단계에서 <strong>EA-18G 그라울러</strong> 전자전기가 출격하여 이란의 방공 레이더를 교란하는 것이 첫 번째 단계이다.</div>
+</div>
+
+<!-- 정답 5 -->
+<div class="answer-block fade-in">
+  <div class="a-header">
+    <span class="a-number">[문제 5]</span>
+    <span class="a-answer">정답: 약 1,100km</span>
+  </div>
+  <div class="a-explain">마라티부두에서 이스라엘 근해까지 약 <strong>1,100km</strong> 거리이며, 항모전단 속도로 약 <strong>19시간</strong>이면 도달 가능한 거리이다.</div>
+</div>
+
+<!-- 정답 6 -->
+<div class="answer-block fade-in">
+  <div class="a-header">
+    <span class="a-number">[문제 6]</span>
+    <span class="a-answer blue">정답: ③</span>
+  </div>
+  <div class="a-explain">남동축(오만해)의 핵심 이점은 <strong>공해상에서 타국의 영공을 거치지 않고 이란 영공으로 직접 진입</strong>할 수 있다는 것이다. ①과 ②는 북서축(지중해)의 이점에 해당한다.</div>
+</div>
+
+<!-- 정답 7 -->
+<div class="answer-block fade-in">
+  <div class="a-header">
+    <span class="a-number">[문제 7]</span>
+    <span class="a-answer blue">정답: ②</span>
+  </div>
+  <div class="a-explain">이란의 메두사 작전은 <strong>지휘관 사망 시 4번째까지 지휘권 승계를 지정</strong>하고, 전자전으로 통신이 두절될 경우 <strong>사전에 정해놓은 표적을 자율적으로 공격</strong>하는 지휘체계 복원력(Resilience) 강화 전략이다.</div>
+</div>
+
+<!-- 정답 8 -->
+<div class="answer-block fade-in">
+  <div class="a-header">
+    <span class="a-number">[문제 8]</span>
+    <span class="a-answer" style="background:#b91c1c;">모범답안</span>
+  </div>
+  <div class="a-explain">
+    <strong>① 방공망 분산:</strong> 양쪽에서 동시 공격 시 이란은 방공 자산을 지중해 방면과 오만해 방면 두 곳으로 분산 배치해야 하므로, 각 방향의 방어 효율이 사실상 반감된다. 이란이 러시아제 방공 시스템을 보강했더라도, 양쪽을 모두 대비해야 하기 때문에 전체적인 방어 효율이 크게 저하된다.<br><br>
+    <strong>② 감시 체계:</strong> 두 항모전단에 사우디·카타르 등의 지상기지와 조기경보기가 협력하면 이란 전역을 광범위하게 감시할 수 있다. 이를 통해 이란의 탄도미사일 발사 위치를 신속하게 파악하여, 첫 번째 발사 이후 빠른 보복공격으로 두 번째 미사일 발사를 억제하는 효과를 얻을 수 있다.
+  </div>
+</div>
+
+<!-- 정답 9 -->
+<div class="answer-block fade-in">
+  <div class="a-header">
+    <span class="a-number">[문제 9]</span>
+    <span class="a-answer blue">정답: F-35C / 슈퍼호넷(F/A-18E/F)</span>
+  </div>
+  <div class="a-explain">3단계에서 포드함의 <strong>F-35C 스텔스기</strong>가 내륙 깊숙한 지휘소를 타격하고, 링컨함의 <strong>슈퍼호넷(F/A-18E/F)</strong>이 해안 방공망을 타격하는 역할 분담 구조이다.</div>
+</div>
+
+<!-- 정답 10 -->
+<div class="answer-block fade-in">
+  <div class="a-header">
+    <span class="a-number">[문제 10]</span>
+    <span class="a-answer" style="background:#b91c1c;">모범답안</span>
+  </div>
+  <div class="a-explain">
+    <strong>외교적 입장 차이:</strong> 이란은 2월 26일 스위스 제네바에서 진행될 핵 협상의 타결 가능성을 시사하며 대화를 통한 해결을 모색하고 있다. 반면 트럼프 측은 "협상이 아닌 항복"을 요구하며 최대 압박 노선을 유지하고 있어 양측의 입장 차가 매우 크다.<br><br>
+    <strong>포드 항모전단의 수다만 기항 의미:</strong> 수다만 마라티부두는 NATO가 관리하는 심해 군사 부두로, 작전 예상 지역(이스라엘 근해)까지 약 1,100km(19시간) 거리에 위치한다. 이란의 직접적인 탄도미사일 사거리 밖에서 안전하게 보급받으면서도, 필요시 하루 안에 작전구역에 진입할 수 있는 전략적 대기 위치를 확보한 것으로 분석된다. 이는 협상 결렬 시 즉각적인 군사적 전환이 가능한 태세를 갖추고 있음을 시사한다.
+  </div>
+</div>
+
+<footer class="paper-footer">
+  <p>미국의 이란 집게작전(Double Envelopment) 분석 — 시험문제</p>
+  <p>QUIZ PAPER · FEB 2026</p>
+</footer>
+
+</div>
+
+<script>
+const fadeObs = new IntersectionObserver((entries) => {
+  entries.forEach((e, i) => {
+    if (e.isIntersecting) {
+      setTimeout(() => e.target.classList.add('visible'), i * 80);
+      fadeObs.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.12 });
+document.querySelectorAll('.fade-in').forEach(el => fadeObs.observe(el));
+</script>
+</body>
+</html>

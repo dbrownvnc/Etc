@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>미국의 이란 집게작전(Double Envelopment) 분석</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700;900&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f5f0e8;
+  --bg-alt: #efe8db;
+  --text: #1a1a1a;
+  --text-sub: #555555;
+  --accent: #1a1a1a;
+  --accent-sub: #333333;
+  --chart1: #1a1a1a;
+  --chart2: #4a4a4a;
+  --chart3: #7a7a7a;
+  --chart4: #2563eb;
+  --table-bg: #efe8db;
+  --table-header: #d4cbb8;
+  --table-border: #c4b8a0;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 15px;
+  line-height: 1.85;
+  -webkit-font-smoothing: antialiased;
+}
+.wrapper {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 0 18px 60px;
+}
+/* Header */
+.paper-header {
+  text-align: center;
+  padding: 32px 0 18px;
+  border-bottom: 4px double var(--accent);
+  margin-bottom: 6px;
+}
+.paper-header .dateline {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 11px;
+  color: var(--text-sub);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.paper-header .masthead {
+  font-family: 'Noto Serif KR', serif;
+  font-size: 13px;
+  color: var(--text-sub);
+  letter-spacing: 6px;
+  margin-bottom: 12px;
+}
+.paper-header h1 {
+  font-family: 'Noto Serif KR', serif;
+  font-size: 26px;
+  font-weight: 900;
+  line-height: 1.35;
+  color: var(--accent);
+  margin-bottom: 10px;
+}
+.paper-header .subtitle {
+  font-size: 14px;
+  color: var(--text-sub);
+  font-weight: 400;
+}
+.thin-rule {
+  border: none;
+  border-top: 1px solid var(--table-border);
+  margin: 6px 0;
+}
+.double-rule {
+  border: none;
+  border-top: 3px double var(--accent);
+  margin: 24px 0;
+}
+/* Sections */
+.section {
+  margin-bottom: 28px;
+}
+.section-title {
+  font-family: 'Noto Serif KR', serif;
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--accent);
+  border-bottom: 2px solid var(--accent);
+  padding-bottom: 6px;
+  margin-bottom: 14px;
+}
+.section-subtitle {
+  font-family: 'Noto Serif KR', serif;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--accent-sub);
+  margin: 18px 0 8px;
+}
+p { margin-bottom: 12px; }
+strong { font-weight: 700; color: var(--accent); }
+/* Highlight box */
+.highlight-box {
+  background: var(--bg-alt);
+  border-left: 4px solid var(--accent);
+  padding: 14px 16px;
+  margin: 16px 0;
+  font-size: 14px;
+}
+.highlight-box.blue {
+  border-left-color: var(--chart4);
+}
+/* Key figure */
+.key-figure {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--bg-alt);
+  padding: 12px 16px;
+  margin: 10px 0;
+  border: 1px solid var(--table-border);
+}
+.key-figure .num {
+  font-family: 'Noto Serif KR', serif;
+  font-size: 28px;
+  font-weight: 900;
+  color: var(--chart4);
+  white-space: nowrap;
+}
+.key-figure .desc {
+  font-size: 13px;
+  color: var(--text-sub);
+  line-height: 1.5;
+}
+/* Tables */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 14px 0;
+  font-size: 13.5px;
+}
+th {
+  background: var(--table-header);
+  color: var(--accent);
+  font-weight: 700;
+  padding: 10px 12px;
+  text-align: left;
+  border: 1px solid var(--table-border);
+  font-size: 13px;
+}
+td {
+  background: var(--table-bg);
+  padding: 9px 12px;
+  border: 1px solid var(--table-border);
+  vertical-align: top;
+}
+/* Chart */
+.chart-container {
+  background: var(--bg-alt);
+  border: 1px solid var(--table-border);
+  padding: 16px 12px;
+  margin: 16px 0;
+  position: relative;
+  max-height: 320px;
+}
+.chart-container canvas {
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+.chart-container.chart-ready canvas {
+  opacity: 1;
+}
+.chart-label {
+  font-family: 'Noto Serif KR', serif;
+  font-size: 13px;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 8px;
+  color: var(--accent-sub);
+}
+/* Flow diagram */
+.flow-diagram {
+  background: var(--bg-alt);
+  border: 1px solid var(--table-border);
+  padding: 18px 14px;
+  margin: 16px 0;
+}
+.flow-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 14px;
+  position: relative;
+}
+.flow-step:last-child { margin-bottom: 0; }
+.flow-step::after {
+  content: '▼';
+  position: absolute;
+  left: 16px;
+  bottom: -14px;
+  font-size: 10px;
+  color: var(--chart4);
+}
+.flow-step:last-child::after { display: none; }
+.flow-num {
+  min-width: 36px;
+  height: 36px;
+  background: var(--accent);
+  color: var(--bg);
+  font-family: 'Noto Serif KR', serif;
+  font-weight: 700;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.flow-text {
+  font-size: 13.5px;
+  line-height: 1.6;
+  padding-top: 6px;
+}
+/* Tag */
+.tag {
+  display: inline-block;
+  background: var(--accent);
+  color: var(--bg);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  margin-right: 6px;
+  letter-spacing: 1px;
+}
+.tag.blue {
+  background: var(--chart4);
+}
+/* Commentary */
+.commentary {
+  background: var(--accent);
+  color: var(--bg);
+  padding: 18px 16px;
+  margin: 24px 0;
+  font-size: 14px;
+  line-height: 1.8;
+}
+.commentary .label {
+  font-family: 'Noto Serif KR', serif;
+  font-size: 12px;
+  letter-spacing: 3px;
+  opacity: 0.7;
+  margin-bottom: 6px;
+}
+/* Footer */
+.paper-footer {
+  text-align: center;
+  padding: 20px 0;
+  border-top: 3px double var(--accent);
+  margin-top: 30px;
+  font-size: 11px;
+  color: var(--text-sub);
+  letter-spacing: 1px;
+}
+/* Fade animation */
+.fade-in {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.fade-in.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+/* Responsive */
+@media (max-width: 400px) {
+  .paper-header h1 { font-size: 22px; }
+  .section-title { font-size: 17px; }
+  .key-figure .num { font-size: 24px; }
+}
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+<!-- HEADER -->
+<header class="paper-header fade-in">
+  <div class="masthead">GEOPOLITICAL ANALYSIS</div>
+  <div class="dateline">2026년 2월 24일 · 군사·외교 분석</div>
+  <h1>미국의 이란 집게작전<br>(Double Envelopment) 전략 분석</h1>
+  <p class="subtitle">제럴드 포드 · 에이브러햄 링컨 항모전단의 양면 공격 시나리오</p>
+</header>
+<hr class="thin-rule">
+
+<!-- 핵심 요약 -->
+<section class="section fade-in">
+  <h2 class="section-title">■ 핵심 요약</h2>
+  <p>미국이 이란에 대해 <strong>'집게작전(Double Envelopment)'</strong>, 즉 양동작전을 실행할 수 있다는 군사 분석이 제기되고 있다. <strong>지중해의 제럴드 포드(Gerald R. Ford) 항모전단</strong>과 <strong>오만해의 에이브러햄 링컨(Abraham Lincoln) 항모전단</strong>이 각각 이란 북부와 남부를 동시에 타격하는 시나리오다.</p>
+  <p>2026년 2월 23일 현재, 포드 항모전단은 <strong>그리스 크레타섬 수다만(Souda Bay)</strong>에서 보급 중이며, 작전지역(이스라엘 근해)까지 <strong>약 19시간</strong> 거리에 대기 중인 상태다.</p>
+
+  <div class="highlight-box blue">
+    <strong>⚡ 최신 상황:</strong> 이란은 2월 26일 스위스 제네바에서의 핵 협상 타결 가능성을 시사하고 있으나, 트럼프 측은 "협상이 아닌 항복"을 요구하는 입장이어서 군사적 긴장이 고조되고 있다.
+  </div>
+</section>
+<hr class="thin-rule">
+
+<!-- 집게작전 개념 -->
+<section class="section fade-in">
+  <h2 class="section-title">■ 집게작전(Double Envelopment)이란?</h2>
+  <p><strong>집게작전</strong>은 군사 용어로 <strong>양동작전(兩動作戰)</strong>이 정식 명칭이다. 두 개 이상의 공격 축을 통해 적국을 양쪽에서 동시에 압박하는 전술로, 적의 방어 자원을 분산시켜 방어 효율을 크게 떨어뜨리는 것이 핵심이다.</p>
+
+  <div class="key-figure fade-in">
+    <div class="num">2축</div>
+    <div class="desc">북서축(지중해 → 이란 북부)과 남동축(오만해 → 이란 남부)의 <strong>동시 공격</strong> 구조</div>
+  </div>
+
+  <div class="key-figure fade-in">
+    <div class="num">½</div>
+    <div class="desc">이란 방공망이 두 방향으로 분산되어 <strong>방어 효율이 반감</strong>되는 효과</div>
+  </div>
+</section>
+
+<!-- 양축 공격 비교 -->
+<section class="section fade-in">
+  <h2 class="section-title">■ 양축 공격 편성 비교</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>구분</th>
+        <th>북서축 (지중해)</th>
+        <th>남동축 (오만해)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>항모전단</strong></td>
+        <td>제럴드 포드(CVN-78)</td>
+        <td>에이브러햄 링컨(CVN-72)</td>
+      </tr>
+      <tr>
+        <td><strong>주요 타격 대상</strong></td>
+        <td>이란 수도 테헤란, 북부 핵시설, 내륙 지휘소</td>
+        <td>이란 남부 군사시설, 호르무즈 해협 봉쇄 저지</td>
+      </tr>
+      <tr>
+        <td><strong>주력 항공기</strong></td>
+        <td>F-35C 스텔스기 + 공중급유기</td>
+        <td>F/A-18E/F 슈퍼호넷</td>
+      </tr>
+      <tr>
+        <td><strong>미사일</strong></td>
+        <td>토마호크 순항미사일</td>
+        <td>토마호크 순항미사일</td>
+      </tr>
+      <tr>
+        <td><strong>경유 경로</strong></td>
+        <td>이스라엘·요르단 상공</td>
+        <td>공해 → 이란 영공 직진입</td>
+      </tr>
+      <tr>
+        <td><strong>전략적 이점</strong></td>
+        <td>이스라엘 방공망 연계, 우방국(영국 등) 지원</td>
+        <td>타국 영공 미경유, 해안 방공망 직접 타격</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- 차트: 거리/도달 시간 비교 -->
+<section class="section fade-in">
+  <h2 class="section-title">■ 전략적 거리와 배치 현황</h2>
+  <p>포드 항모전단은 현재 크레타섬 수다만에 정박 중이며, 작전 예상 지역인 이스라엘 근해까지 약 <strong>1,100km(약 19시간)</strong> 거리에 위치해 있다. 이 위치는 이란의 직접적인 탄도미사일 공격 사거리 밖이면서도, 하루 안에 작전구역 진입이 가능한 전략적 대기 지점이다.</p>
+
+  <div class="chart-container fade-in">
+    <div class="chart-label">포드 항모전단 작전지역 도달 분석</div>
+    <canvas id="distChart" height="180"></canvas>
+  </div>
+
+  <div class="highlight-box">
+    <strong>수다만(Souda Bay) 마라티부두:</strong> NATO가 관리하는 심해(Deep-water) 군사 부두로, 초대형 항공모함도 직접 접안 가능한 전략항. 포드함은 2025년 6월부터 장기 작전 중이며, 연료·식료품·군수품·탄약을 보급받는 중이다.
+  </div>
+</section>
+
+<!-- 공격 시나리오 3단계 -->
+<section class="section fade-in">
+  <h2 class="section-title">■ 예상 공격 시나리오 (3단계)</h2>
+  <div class="flow-diagram">
+    <div class="flow-step">
+      <div class="flow-num">1</div>
+      <div class="flow-text">
+        <span class="tag">전자전</span>
+        <strong>EA-18G 그라울러 출격</strong> — 두 항모전단에서 동시 출격하여 이란의 방공 레이더를 전자전으로 교란·무력화
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-num">2</div>
+      <div class="flow-text">
+        <span class="tag blue">미사일</span>
+        <strong>토마호크 미사일 수백 발 발사</strong> — 두 항모전단 + 핵잠수함에서 발사, 주요 방공기지를 집중 타격
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-num">3</div>
+      <div class="flow-text">
+        <span class="tag">항공타격</span>
+        <strong>전투기 분담 공격</strong> — 포드함 F-35C가 내륙 깊숙한 지휘소 타격 / 링컨함 슈퍼호넷이 해안 방공망 타격
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 차트: 3단계 공격 무기체계 -->
+<section class="section fade-in">
+  <div class="chart-container fade-in">
+    <div class="chart-label">공격 단계별 투입 전력 개요</div>
+    <canvas id="phaseChart" height="200"></canvas>
+  </div>
+</section>
+
+<!-- 집게작전의 전략적 이점 -->
+<section class="section fade-in">
+  <h2 class="section-title">■ 집게작전의 전략적 이점</h2>
+
+  <h3 class="section-subtitle">1. 방공망 분산 효과</h3>
+  <p>이란은 이스라엘 공격 이후 <strong>러시아제 방공 시스템을 보강</strong>한 것으로 알려져 있다. 그러나 양측에서 동시에 공격받을 경우, 방공 자산을 두 방향으로 나눠야 하므로 <strong>방어 효율이 사실상 반감</strong>된다.</p>
+
+  <div class="chart-container fade-in">
+    <div class="chart-label">단일축 vs 양축 공격 시 이란 방공 효율 비교</div>
+    <canvas id="defenseChart" height="170"></canvas>
+  </div>
+
+  <h3 class="section-subtitle">2. 광역 감시 체계 구축</h3>
+  <p>포드함·링컨함에 <strong>사우디·카타르 등의 지상기지</strong>와 <strong>조기경보기</strong>가 협력하면, 이란 전역을 폭넓게 감시할 수 있다. 이란의 탄도미사일 발사 위치를 신속히 파악하여, 첫 번째 미사일은 발사할 수 있어도 <strong>빠른 보복공격으로 두 번째 미사일 발사를 억제</strong>하는 효과가 있다.</p>
+
+  <h3 class="section-subtitle">3. 지리적 이점 활용</h3>
+  <p>북서축은 이스라엘·요르단 상공을 경유해 이란 수도와 핵시설에 접근하기 용이하며, 이스라엘 방공망과 연계 가능하다. 남동축은 공해에서 직접 이란 영공으로 진입할 수 있어 타국의 영공 통과 부담이 없다.</p>
+</section>
+<hr class="thin-rule">
+
+<!-- 이란의 대비: 메두사 작전 -->
+<section class="section fade-in">
+  <h2 class="section-title">■ 이란의 대응: '메두사 작전'</h2>
+  <p>이란도 미국의 공격에 대비한 <strong>'메두사 작전'</strong>을 준비하고 있는 것으로 분석된다. '수많은 머리를 가진 메두사'라는 비유처럼, 지휘체계의 복원력(Resilience)을 극대화하는 전략이다.</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>대비 요소</th>
+        <th>내용</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>지휘권 연속성</strong></td>
+        <td>지휘관 사망 시 <strong>4번째 지휘관까지 지휘권 승계</strong> 미리 지정 (A→B→C→D)</td>
+      </tr>
+      <tr>
+        <td><strong>사전 목표 지정</strong></td>
+        <td>각 지휘관별 공격 목표를 사전에 지정하여, 통신 두절 시에도 <strong>미리 정해진 표적을 자율 공격</strong></td>
+      </tr>
+      <tr>
+        <td><strong>전자전 대비</strong></td>
+        <td>통신 불능 상황을 가정한 <strong>독립적 작전 수행 능력</strong> 확보</td>
+      </tr>
+      <tr>
+        <td><strong>방공 보강</strong></td>
+        <td>이스라엘 공격 이후 <strong>러시아제 방공 시스템 추가 도입</strong></td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- 차트: 이란 대응 역량 평가 -->
+<section class="section fade-in">
+  <div class="chart-container fade-in">
+    <div class="chart-label">이란의 군사 대비 역량 평가 (상대적)</div>
+    <canvas id="radarChart" height="220"></canvas>
+  </div>
+</section>
+
+<!-- 포드 항모전단 현재 위치 -->
+<section class="section fade-in">
+  <h2 class="section-title">■ 현재 전력 배치 상황</h2>
+  <p><strong>2026년 2월 23일 기준</strong>, 주요 전력의 배치 현황은 다음과 같다.</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>전력</th>
+        <th>현재 위치</th>
+        <th>비고</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>제럴드 포드 항모전단</strong></td>
+        <td>그리스 크레타섬 수다만 (Souda Bay)</td>
+        <td>마라티부두에서 보급 중. 작전지역까지 ~19시간</td>
+      </tr>
+      <tr>
+        <td><strong>에이브러햄 링컨 항모전단</strong></td>
+        <td>오만해(아라비아해)</td>
+        <td>이란 남부·호르무즈 해협 대비</td>
+      </tr>
+      <tr>
+        <td><strong>핵잠수함</strong></td>
+        <td>비공개</td>
+        <td>토마호크 미사일 탑재, 양 전단과 연계</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="highlight-box">
+    <strong>📌 포드함 장기 작전:</strong> 2025년 6월부터 해외 장기 작전 수행 중. 크레타섬 기항은 연료·식료품·군수품 보급 및 탄약 재보급이 목적으로 분석된다.
+  </div>
+</section>
+
+<!-- 외교 상황 -->
+<section class="section fade-in">
+  <h2 class="section-title">■ 외교 상황과 전망</h2>
+
+  <div class="chart-container fade-in">
+    <div class="chart-label">미국-이란 협상 입장 대비</div>
+    <canvas id="negotiationChart" height="180"></canvas>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>구분</th>
+        <th>이란 입장</th>
+        <th>미국(트럼프) 입장</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>핵 협상</strong></td>
+        <td>2월 26일 제네바 협상 타결 가능성 시사</td>
+        <td>"협상이 아닌 항복"을 요구</td>
+      </tr>
+      <tr>
+        <td><strong>기본 방향</strong></td>
+        <td>대화를 통한 해결 선호</td>
+        <td>최대 압박 + 군사 옵션 유지</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- 결론 -->
+<section class="section fade-in">
+  <div class="commentary">
+    <div class="label">CONCLUSION</div>
+    <p>미국의 이란에 대한 집게작전은 군사적으로 매우 체계적인 시나리오를 갖추고 있으며, 현재 전력 배치도 이를 뒷받침하는 방향으로 진행되고 있다. 그러나 <strong>"전쟁은 결국 터져봐야 안다"</strong>는 분석처럼, 양측 모두 계획을 갖추고 있으나 실전에서의 변수는 예측 불가능하다.</p>
+    <p style="margin-top:10px;">군사적 긴장 속에서 2월 26일 제네바 핵 협상이 마지막 외교적 기회가 될 수 있으며, 협상 결렬 시 <strong>군사적 옵션의 현실화 가능성이 한층 높아질 것</strong>으로 전망된다.</p>
+  </div>
+</section>
+
+<footer class="paper-footer">
+  <p>본 문서는 유튜브 영상 자막 기반 분석 자료입니다</p>
+  <p>GEOPOLITICAL ANALYSIS · FEB 2026</p>
+</footer>
+
+</div>
+
+<script>
+// Observer 1: 일반 섹션 fade-in
+const fadeObs = new IntersectionObserver((entries) => {
+  entries.forEach((e, i) => {
+    if (e.isIntersecting) {
+      setTimeout(() => e.target.classList.add('visible'), i * 80);
+      fadeObs.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.12 });
+document.querySelectorAll('.fade-in').forEach(el => fadeObs.observe(el));
+
+// 차트 생성 함수를 딕셔너리에 저장
+const chartConfigs = {};
+
+// 거리/도달 시간 차트
+chartConfigs['distChart'] = () => {
+  new Chart(document.getElementById('distChart'), {
+    type: 'bar',
+    data: {
+      labels: ['수다만 → 이스라엘 근해', '이스라엘 근해 → 이란 국경', '오만해 → 이란 남부'],
+      datasets: [{
+        label: '거리 (km)',
+        data: [1100, 1500, 600],
+        backgroundColor: ['#1a1a1a', '#4a4a4a', '#2563eb'],
+        borderColor: ['#1a1a1a', '#4a4a4a', '#2563eb'],
+        borderWidth: 1,
+        borderRadius: 4
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      maintainAspectRatio: true,
+      aspectRatio: 2,
+      animation: { duration: 1500, easing: 'easeInOutQuart', delay: (ctx) => ctx.dataIndex * 150 },
+      animations: { x: { from: 0 } },
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: ctx => ctx.parsed.x.toLocaleString() + ' km' } }
+      },
+      scales: {
+        x: { ticks: { color: '#555', callback: v => v.toLocaleString() + ' km' }, grid: { color: '#c4b8a0' } },
+        y: { ticks: { color: '#1a1a1a', font: { size: 11 } }, grid: { display: false } }
+      }
+    }
+  });
+};
+
+// 공격 단계별 전력 차트
+chartConfigs['phaseChart'] = () => {
+  new Chart(document.getElementById('phaseChart'), {
+    type: 'bar',
+    data: {
+      labels: ['1단계: 전자전', '2단계: 미사일 타격', '3단계: 항공 타격'],
+      datasets: [
+        {
+          label: '포드 전단 (북서)',
+          data: [40, 50, 45],
+          backgroundColor: '#1a1a1a',
+          borderRadius: 3
+        },
+        {
+          label: '링컨 전단 (남동)',
+          data: [35, 45, 40],
+          backgroundColor: '#7a7a7a',
+          borderRadius: 3
+        },
+        {
+          label: '핵잠수함·지상기지',
+          data: [0, 30, 10],
+          backgroundColor: '#2563eb',
+          borderRadius: 3
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true, aspectRatio: 1.6,
+      animation: { duration: 1500, easing: 'easeInOutQuart', delay: (ctx) => ctx.dataIndex * 150 },
+      animations: { y: { from: 0 } },
+      plugins: {
+        legend: { labels: { color: '#1a1a1a', font: { size: 11 }, boxWidth: 12 } },
+        tooltip: { callbacks: { label: ctx => ctx.dataset.label + ': ' + ctx.parsed.y + '%' } }
+      },
+      scales: {
+        x: { ticks: { color: '#555', font: { size: 11 } }, grid: { display: false } },
+        y: { ticks: { color: '#555', callback: v => v + '%' }, grid: { color: '#c4b8a0' }, max: 60 }
+      }
+    }
+  });
+};
+
+// 방공 효율 비교 차트
+chartConfigs['defenseChart'] = () => {
+  new Chart(document.getElementById('defenseChart'), {
+    type: 'bar',
+    data: {
+      labels: ['단일축 공격 대비', '양축(집게) 공격 대비'],
+      datasets: [{
+        label: '방공 효율',
+        data: [100, 50],
+        backgroundColor: ['#4a4a4a', '#2563eb'],
+        borderRadius: 4,
+        barThickness: 50
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true, aspectRatio: 2,
+      animation: { duration: 1500, easing: 'easeInOutQuart', delay: (ctx) => ctx.dataIndex * 150 },
+      animations: { y: { from: 0 } },
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: ctx => '방공 효율: ' + ctx.parsed.y + '%' } }
+      },
+      scales: {
+        x: { ticks: { color: '#1a1a1a', font: { size: 12, weight: 'bold' } }, grid: { display: false } },
+        y: { ticks: { color: '#555', callback: v => v + '%' }, grid: { color: '#c4b8a0' }, max: 120 }
+      }
+    }
+  });
+};
+
+// 이란 대비 레이더 차트
+chartConfigs['radarChart'] = () => {
+  new Chart(document.getElementById('radarChart'), {
+    type: 'radar',
+    data: {
+      labels: ['지휘체계 복원력', '방공 시스템', '탄도미사일 역량', '전자전 대비', '통신 두절 대응', '반격 지속력'],
+      datasets: [{
+        label: '이란 대비 수준',
+        data: [85, 60, 75, 45, 80, 55],
+        backgroundColor: 'rgba(37, 99, 235, 0.15)',
+        borderColor: '#2563eb',
+        pointBackgroundColor: '#2563eb',
+        pointBorderColor: '#fff',
+        pointRadius: 5,
+        borderWidth: 2
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true, aspectRatio: 1.2,
+      animation: { duration: 1800, easing: 'easeInOutQuart', delay: (ctx) => ctx.dataIndex * 120 },
+      plugins: {
+        legend: { labels: { color: '#1a1a1a', font: { size: 11 } } }
+      },
+      scales: {
+        r: {
+          beginAtZero: true,
+          max: 100,
+          ticks: { color: '#555', stepSize: 25, backdropColor: 'transparent', font: { size: 10 } },
+          grid: { color: '#c4b8a0' },
+          pointLabels: { color: '#1a1a1a', font: { size: 11 } },
+          angleLines: { color: '#c4b8a0' }
+        }
+      }
+    }
+  });
+};
+
+// 미이란 협상 입장 비교 차트
+chartConfigs['negotiationChart'] = () => {
+  new Chart(document.getElementById('negotiationChart'), {
+    type: 'bar',
+    data: {
+      labels: ['협상 의지', '군사적 압박 수준', '양보 가능성'],
+      datasets: [
+        {
+          label: '이란',
+          data: [75, 40, 55],
+          backgroundColor: '#4a4a4a',
+          borderRadius: 3
+        },
+        {
+          label: '미국 (트럼프)',
+          data: [25, 90, 10],
+          backgroundColor: '#2563eb',
+          borderRadius: 3
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true, aspectRatio: 1.6,
+      animation: { duration: 1500, easing: 'easeInOutQuart', delay: (ctx) => ctx.dataIndex * 150 },
+      animations: { y: { from: 0 } },
+      plugins: {
+        legend: { labels: { color: '#1a1a1a', font: { size: 11 }, boxWidth: 12 } }
+      },
+      scales: {
+        x: { ticks: { color: '#1a1a1a', font: { size: 11 } }, grid: { display: false } },
+        y: { ticks: { color: '#555', callback: v => v }, grid: { color: '#c4b8a0' }, max: 100 }
+      }
+    }
+  });
+};
+
+// Observer 2: 차트 전용
+const chartObs = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const canvas = entry.target.querySelector('canvas');
+      if (canvas && chartConfigs[canvas.id]) {
+        setTimeout(() => {
+          chartConfigs[canvas.id]();
+          entry.target.classList.add('chart-ready');
+          delete chartConfigs[canvas.id];
+        }, 200);
+      }
+      chartObs.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.25 });
+
+document.querySelectorAll('.chart-container').forEach(el => chartObs.observe(el));
+</script>
+</body>
+</html>

@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NVDL 수급 심층 분석 보고서</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-primary: #0a0e17;
+  --bg-secondary: #111827;
+  --bg-card: #1a2236;
+  --bg-card-hover: #1f2a42;
+  --accent-red: #ef4444;
+  --accent-red-dim: rgba(239,68,68,0.15);
+  --accent-orange: #f59e0b;
+  --accent-orange-dim: rgba(245,158,11,0.12);
+  --accent-green: #10b981;
+  --accent-green-dim: rgba(16,185,129,0.12);
+  --accent-blue: #3b82f6;
+  --accent-blue-dim: rgba(59,130,246,0.12);
+  --accent-cyan: #06b6d4;
+  --accent-purple: #8b5cf6;
+  --text-primary: #f1f5f9;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --border: rgba(148,163,184,0.08);
+  --border-strong: rgba(148,163,184,0.15);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Noto Sans KR', sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.7;
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 24px 16px 60px;
+}
+
+/* Header */
+.report-header {
+  position: relative;
+  padding: 40px 32px 36px;
+  margin-bottom: 28px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #1a0a2e 100%);
+  border: 1px solid rgba(139,92,246,0.2);
+  overflow: hidden;
+}
+
+.report-header::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -20%;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(239,68,68,0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.report-header::after {
+  content: '';
+  position: absolute;
+  bottom: -30%;
+  left: -10%;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(59,130,246,0.06) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.header-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 14px;
+  border-radius: 20px;
+  background: var(--accent-red-dim);
+  border: 1px solid rgba(239,68,68,0.3);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent-red);
+  letter-spacing: 0.5px;
+  margin-bottom: 16px;
+  text-transform: uppercase;
+}
+
+.header-badge .pulse {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--accent-red);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.header-ticker {
+  font-size: 38px;
+  font-weight: 900;
+  letter-spacing: -1px;
+  margin-bottom: 4px;
+  position: relative;
+  z-index: 1;
+}
+
+.header-ticker .symbol { color: var(--accent-red); }
+
+.header-sub {
+  font-size: 14px;
+  color: var(--text-secondary);
+  font-weight: 400;
+  margin-bottom: 20px;
+  position: relative;
+  z-index: 1;
+}
+
+.header-stats {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 1;
+}
+
+.header-stat {
+  display: flex;
+  flex-direction: column;
+}
+
+.header-stat .label {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-bottom: 2px;
+}
+
+.header-stat .value {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.header-stat .value.negative { color: var(--accent-red); }
+.header-stat .value.neutral { color: var(--accent-orange); }
+
+/* Verdict Banner */
+.verdict-banner {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 24px;
+  border-radius: 12px;
+  margin-bottom: 28px;
+  border: 1px solid;
+}
+
+.verdict-banner.caution {
+  background: linear-gradient(135deg, rgba(245,158,11,0.08), rgba(239,68,68,0.06));
+  border-color: rgba(245,158,11,0.25);
+}
+
+.verdict-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.verdict-banner.caution .verdict-icon {
+  background: var(--accent-orange-dim);
+}
+
+.verdict-text h3 {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--accent-orange);
+  margin-bottom: 2px;
+}
+
+.verdict-text p {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* Section */
+.section {
+  margin-bottom: 28px;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-strong);
+}
+
+.section-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: var(--accent-blue-dim);
+  color: var(--accent-blue);
+  font-size: 13px;
+  font-weight: 700;
+  font-family: 'JetBrains Mono', monospace;
+  flex-shrink: 0;
+}
+
+/* Cards */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px 22px;
+  margin-bottom: 14px;
+  transition: border-color 0.2s;
+}
+
+.card:hover { border-color: var(--border-strong); }
+
+.card-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.card p, .card li {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.8;
+}
+
+.card strong { color: var(--text-primary); font-weight: 600; }
+
+/* Signal Grid */
+.signal-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.signal-item {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px 18px;
+  position: relative;
+  overflow: hidden;
+}
+
+.signal-item::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 3px;
+  height: 100%;
+}
+
+.signal-item.bearish::before { background: var(--accent-red); }
+.signal-item.neutral::before { background: var(--accent-orange); }
+.signal-item.bullish::before { background: var(--accent-green); }
+
+.signal-label {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin-bottom: 6px;
+}
+
+.signal-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.signal-item.bearish .signal-value { color: var(--accent-red); }
+.signal-item.neutral .signal-value { color: var(--accent-orange); }
+.signal-item.bullish .signal-value { color: var(--accent-green); }
+
+.signal-desc {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+/* Chart Container */
+.chart-wrap {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 14px;
+}
+
+.chart-wrap h4 {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 14px;
+}
+
+.chart-wrap canvas {
+  max-height: 240px;
+}
+
+/* Insight Box */
+.insight-box {
+  padding: 16px 20px;
+  border-radius: 10px;
+  margin-bottom: 14px;
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+.insight-box.warning {
+  background: var(--accent-red-dim);
+  border-left: 3px solid var(--accent-red);
+  color: #fca5a5;
+}
+
+.insight-box.info {
+  background: var(--accent-blue-dim);
+  border-left: 3px solid var(--accent-blue);
+  color: #93c5fd;
+}
+
+.insight-box.tip {
+  background: var(--accent-green-dim);
+  border-left: 3px solid var(--accent-green);
+  color: #6ee7b7;
+}
+
+.insight-box.caution {
+  background: var(--accent-orange-dim);
+  border-left: 3px solid var(--accent-orange);
+  color: #fcd34d;
+}
+
+/* Strategy Table */
+.strategy-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.strategy-table th {
+  text-align: left;
+  padding: 10px 14px;
+  background: rgba(59,130,246,0.08);
+  color: var(--accent-blue);
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid var(--border-strong);
+}
+
+.strategy-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-secondary);
+  vertical-align: top;
+}
+
+.strategy-table td:first-child {
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+/* Checklist */
+.checklist {
+  list-style: none;
+  padding: 0;
+}
+
+.checklist li {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.checklist li:last-child { border-bottom: none; }
+
+.check-icon {
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.check-icon.red { background: var(--accent-red-dim); color: var(--accent-red); }
+.check-icon.orange { background: var(--accent-orange-dim); color: var(--accent-orange); }
+.check-icon.blue { background: var(--accent-blue-dim); color: var(--accent-blue); }
+
+/* Footer */
+.report-footer {
+  text-align: center;
+  padding: 28px 0 0;
+  border-top: 1px solid var(--border);
+  margin-top: 32px;
+}
+
+.report-footer p {
+  font-size: 11px;
+  color: var(--text-muted);
+  line-height: 1.8;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .container { padding: 16px 12px 40px; }
+  .report-header { padding: 28px 20px; }
+  .header-ticker { font-size: 28px; }
+  .header-stats { gap: 16px; }
+  .signal-grid { grid-template-columns: 1fr 1fr; }
+  .strategy-table { font-size: 12px; }
+  .strategy-table th, .strategy-table td { padding: 8px 10px; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Header -->
+  <header class="report-header">
+    <div class="header-badge"><span class="pulse"></span> 실시간 수급 분석</div>
+    <div class="header-ticker"><span class="symbol">NVDL</span> 수급 심층 분석</div>
+    <div class="header-sub">GraniteShares 2x Long NVDA Daily ETF · 2x 레버리지 · 분석일: 2026.02.27</div>
+    <div class="header-stats">
+      <div class="header-stat">
+        <span class="label">현재가</span>
+        <span class="value negative">$77.48</span>
+      </div>
+      <div class="header-stat">
+        <span class="label">VWAP 괴리</span>
+        <span class="value negative">-9.54%</span>
+      </div>
+      <div class="header-stat">
+        <span class="label">RSI</span>
+        <span class="value neutral">40.2</span>
+      </div>
+      <div class="header-stat">
+        <span class="label">MFI</span>
+        <span class="value neutral">49.3</span>
+      </div>
+      <div class="header-stat">
+        <span class="label">BB 위치</span>
+        <span class="value negative">14%</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Verdict -->
+  <div class="verdict-banner caution">
+    <div class="verdict-icon">⚠️</div>
+    <div class="verdict-text">
+      <h3>투자 의견: 관망 (Wait & See)</h3>
+      <p>실적 서프라이즈에도 불구하고 매도 압력이 우세합니다. 2x 레버리지 특성상 하방 리스크가 증폭되는 구간이며, 수급 전환 신호가 확인될 때까지 신규 진입을 보류하는 것이 바람직합니다.</p>
+    </div>
+  </div>
+
+  <!-- Section 1: 수급 흐름 종합 해석 -->
+  <div class="section">
+    <h2 class="section-title"><span class="section-num">01</span> 수급 흐름 종합 해석</h2>
+
+    <div class="signal-grid">
+      <div class="signal-item bearish">
+        <div class="signal-label">OBV 추세</div>
+        <div class="signal-value">▼ 하락</div>
+        <div class="signal-desc">5일·20일 동반 하락</div>
+      </div>
+      <div class="signal-item bearish">
+        <div class="signal-label">PVT 추세</div>
+        <div class="signal-value">▼ 하락</div>
+        <div class="signal-desc">OBV와 방향 일치</div>
+      </div>
+      <div class="signal-item neutral">
+        <div class="signal-label">MFI</div>
+        <div class="signal-value">49.3</div>
+        <div class="signal-desc">중립 구간 (매수≈매도)</div>
+      </div>
+      <div class="signal-item bearish">
+        <div class="signal-label">VWAP 괴리</div>
+        <div class="signal-value">-9.5%</div>
+        <div class="signal-desc">매도 우위 확인</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📊 핵심 해석</div>
+      <p>
+        현재 NVDL의 수급 구조는 <strong>명확한 매도 압력 우위</strong>를 보이고 있습니다. OBV와 PVT가 5일·20일 기준 모두 하락세이며, 두 지표의 방향이 일치한다는 것은 단순한 일시적 조정이 아닌 <strong>구조적 자금 이탈</strong>이 진행 중임을 시사합니다.
+      </p>
+      <br>
+      <p>
+        특히 주목할 점은 <strong>거래량이 20일 평균 대비 1.25배로 증가</strong>한 상태에서 가격이 하락하고 있다는 것입니다. 이는 "높은 거래량 + 하락"의 전형적인 <strong>분배(Distribution) 패턴</strong>으로, 기관 및 대형 트레이더가 물량을 시장에 내놓고 있는 것으로 해석됩니다.
+      </p>
+      <br>
+      <p>
+        반면, MFI가 49.3으로 정확히 중립 부근에 위치하고 있어 <strong>자금 흐름 자체는 아직 극단적 매도 구간에 진입하지 않았습니다</strong>. 이는 현재의 하락이 공황적 투매(Panic Selling)보다는 <strong>실적 발표 후 차익 실현과 실망 매물</strong>이 순차적으로 나오는 단계임을 의미합니다.
+      </p>
+    </div>
+
+    <div class="insight-box warning">
+      <strong>🔑 핵심 포인트:</strong> NVIDIA가 Q4 매출 $68.1B(+73% YoY)로 시장 예상치를 상회했음에도 불구하고 발표 당일 5.5% 급락하면서 약 $2,600억의 시총이 증발했습니다. NVDL은 2배 레버리지 특성상 이 충격을 약 11% 수준으로 증폭 체감하고 있으며, VWAP 대비 -9.54% 괴리는 최근 매수 참여자 대다수가 평균 손실 상태임을 보여줍니다.
+    </div>
+
+    <!-- Chart: Volume vs Price -->
+    <div class="chart-wrap">
+      <h4>📈 거래량 대비 가격 흐름 시각화</h4>
+      <canvas id="volumeChart"></canvas>
+    </div>
+  </div>
+
+  <!-- Section 2: 추세 강도 판단 -->
+  <div class="section">
+    <h2 class="section-title"><span class="section-num">02</span> 추세 강도 판단</h2>
+
+    <div class="card">
+      <div class="card-title">📉 하락 추세의 지속 가능성 평가</div>
+      <p>
+        현재의 매도 추세는 <strong>중기적으로 지속될 가능성이 높습니다</strong>. 그 근거는 다음과 같습니다.
+      </p>
+      <br>
+      <p>
+        <strong>첫째, 볼린저 밴드 14% 위치.</strong> 현재가($77.48)가 볼린저 하단($74.47)에 근접해 있어 단기 반등 가능성은 존재하나, 밴드 전체 범위($74.47~$96.34)에서 극단적 하단에 위치한 것은 추세 자체가 약세로 전환되었음을 의미합니다. 밴드가 확장(expanding) 중이라면 하락 모멘텀은 추가 지속될 수 있습니다.
+      </p>
+      <br>
+      <p>
+        <strong>둘째, RSI 40.2의 의미.</strong> 아직 과매도 구간(30 이하)에 진입하지 않았다는 것은 추가 하락 여력이 남아있음을 시사합니다. 특히 2배 레버리지 ETF에서 RSI 40은 기초자산(NVDA) 기준으로 약 RSI 45~48 수준에 해당하므로, <strong>기초자산 자체의 조정도 아직 마무리되지 않았다</strong>는 판독이 가능합니다.
+      </p>
+      <br>
+      <p>
+        <strong>셋째, 거래대금 비율의 비대칭.</strong> 최근 거래대금이 20일 평균 대비 1.13배인 반면 거래량은 1.25배입니다. 이는 <strong>거래가 상대적으로 낮은 가격대에서 집중 체결</strong>되고 있음을 뜻하며, 매도자가 가격을 낮춰가며 적극적으로 물량을 처분하고 있는 패턴입니다.
+      </p>
+    </div>
+
+    <!-- Chart: Indicator Dashboard -->
+    <div class="chart-wrap">
+      <h4>🎯 기술적 지표 종합 대시보드</h4>
+      <canvas id="indicatorChart"></canvas>
+    </div>
+
+    <div class="insight-box info">
+      <strong>💡 추세 전환 조건:</strong> OBV의 5일 추세가 상승 반전하고, 동시에 가격이 VWAP($85.66) 위로 복귀할 경우 수급 전환 신호로 판단할 수 있습니다. 현재 VWAP 대비 괴리가 -9.54%이므로, 이 갭이 -5% 이내로 축소되는 것이 첫 번째 관찰 포인트입니다.
+    </div>
+  </div>
+
+  <!-- Section 3: 리스크 요인 -->
+  <div class="section">
+    <h2 class="section-title"><span class="section-num">03</span> 리스크 요인</h2>
+
+    <div class="card">
+      <div class="card-title">🔴 수급 관점 핵심 리스크</div>
+      <ul class="checklist">
+        <li>
+          <span class="check-icon red">!</span>
+          <div>
+            <strong>2배 레버리지 변동성 감쇠(Volatility Decay) 리스크:</strong>
+            NVDL은 일별 2배 수익률을 추종하는 구조입니다. 현재와 같이 NVDA가 ±5% 이상의 일간 변동을 반복하는 환경에서는 장기 보유 시 <strong>음의 복리 효과(negative compounding)</strong>가 발생하여 기초자산 대비 수익률이 크게 훼손됩니다. 52주 최고가 $118.50 대비 현재 -34.6% 하락한 상태에서 원금 회복에 필요한 상승폭은 +53%에 달합니다.
+          </div>
+        </li>
+        <li>
+          <span class="check-icon red">!</span>
+          <div>
+            <strong>NVIDIA 고객 집중도 리스크 부각:</strong>
+            Q4 실적에서 데이터센터 매출 비중이 91%이며, 상위 5개 하이퍼스케일러가 전체 매출의 약 36%를 차지하는 것으로 드러났습니다. 시장은 이 집중도를 "single point of failure"로 인식하기 시작했으며, 이는 향후 NVDA 주가의 구조적 할인 요인으로 작용할 수 있습니다.
+          </div>
+        </li>
+        <li>
+          <span class="check-icon orange">⚡</span>
+          <div>
+            <strong>"Sell the News" 패턴 장기화 가능성:</strong>
+            OBV 20일 추세가 하락 중이라는 것은 실적 발표 이전부터 이미 매도 포지션이 구축되고 있었음을 시사합니다. 이는 단기 이벤트 반응이 아닌 중기적 포지션 재편의 신호이며, 수급 정상화까지 2~3주 이상 소요될 수 있습니다.
+          </div>
+        </li>
+        <li>
+          <span class="check-icon orange">⚡</span>
+          <div>
+            <strong>AI 투자 ROI 의구심 확산:</strong>
+            시장의 내러티브가 "성장이면 충분"에서 "수익성을 증명하라"로 전환되고 있습니다. 하이퍼스케일러들의 2026년 예상 Capex $7,000억 규모에 대한 회수 가능성 우려는 AI 반도체 섹터 전반의 밸류에이션 재평가를 촉발할 수 있습니다.
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <div class="insight-box warning">
+      <strong>⚠️ 최대 리스크 시나리오:</strong> NVDA가 $170 지지선을 하회할 경우, NVDL은 2배 레버리지로 인해 $65~$68 구간까지 급락할 수 있습니다. 이는 현재가 대비 약 -12~-16%의 추가 하락에 해당하며, 볼린저 밴드 하단($74.47) 이탈과 함께 기술적 투매가 발생할 수 있는 구간입니다.
+    </div>
+  </div>
+
+  <!-- Section 4: 매매 전략 제안 -->
+  <div class="section">
+    <h2 class="section-title"><span class="section-num">04</span> 매매 전략 제안</h2>
+
+    <div class="card" style="padding: 0; overflow: hidden;">
+      <table class="strategy-table">
+        <thead>
+          <tr>
+            <th>전략</th>
+            <th>조건</th>
+            <th>상세 내용</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>🟡 기본: 관망</td>
+            <td>현재 상태 유지 시</td>
+            <td>OBV 5일 추세가 상승 반전하고, VWAP 괴리가 -5% 이내로 축소될 때까지 신규 진입 보류. 현재는 수급 전환의 초기 신호조차 부재합니다.</td>
+          </tr>
+          <tr>
+            <td>🟢 공격적 진입</td>
+            <td>RSI ≤ 30 + MFI ≤ 30<br>+ 거래량 스파이크</td>
+            <td>과매도 극단에서의 기술적 반등을 노리는 전략. 볼린저 하단($74.47) 부근인 <strong>$73~$75 구간</strong>에서 소량 분할 매수 고려. 손절: $70 하회 시 즉시 청산.</td>
+          </tr>
+          <tr>
+            <td>🔵 추세 추종 진입</td>
+            <td>VWAP 상회 복귀<br>+ OBV 반전</td>
+            <td>가격이 VWAP($85.66) 상회 + OBV 5일 추세 상승 전환 시 <strong>$86~$88 구간</strong>에서 진입. 이 경우 수급 전환이 확인된 것이므로 상대적으로 안전한 진입점입니다.</td>
+          </tr>
+          <tr>
+            <td>🔴 기존 보유자</td>
+            <td>현재 보유 중인 경우</td>
+            <td>볼린저 하단($74.47) 이탈 시 부분 손절(50%) 권고. 반등 시 VWAP($85.66) 부근에서 나머지 50% 차익 실현 고려. <strong>레버리지 ETF의 장기 보유는 구조적으로 불리</strong>하다는 점을 인지해야 합니다.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="insight-box tip">
+      <strong>💰 수급 기반 최적 진입 시나리오:</strong> MFI가 30 이하로 진입하면서 동시에 거래량이 20일 평균 대비 2배 이상 급증하는 "셀링 클라이맥스(Selling Climax)"가 발생하면, 이는 매도 에너지 소진의 전형적 신호입니다. 이 시점에서 OBV의 저점 이탈 여부를 확인한 뒤 분할 매수에 진입하는 것이 가장 높은 기대수익률을 제공합니다.
+    </div>
+
+    <!-- Chart: Strategy Zones -->
+    <div class="chart-wrap">
+      <h4>🎯 가격 구간별 전략 맵</h4>
+      <canvas id="strategyChart"></canvas>
+    </div>
+  </div>
+
+  <!-- Section 5: 모니터링 포인트 -->
+  <div class="section">
+    <h2 class="section-title"><span class="section-num">05</span> 향후 모니터링 포인트</h2>
+
+    <div class="card">
+      <ul class="checklist">
+        <li>
+          <span class="check-icon blue">1</span>
+          <div>
+            <strong>OBV 5일 추세 반전 여부 (최우선):</strong>
+            현재 OBV 5일·20일 모두 하락 중. 5일 추세가 먼저 상승 반전하면 단기 수급 전환의 첫 번째 신호로 판독합니다. 예상 관찰 시점: 향후 3~5 거래일.
+          </div>
+        </li>
+        <li>
+          <span class="check-icon blue">2</span>
+          <div>
+            <strong>MFI의 과매도 진입 여부:</strong>
+            현재 49.3에서 30 이하로 진입할 경우, 자금 유출이 극단에 도달했음을 의미. 이후 MFI가 30 상향 돌파하는 시점이 기술적 매수 타이밍이 됩니다.
+          </div>
+        </li>
+        <li>
+          <span class="check-icon blue">3</span>
+          <div>
+            <strong>NVDA 기초자산의 $170 지지선:</strong>
+            NVDA가 2월 27일 $177.19로 마감. 12월 저점 부근인 $170이 핵심 기술적 지지선입니다. 이 레벨의 이탈 여부가 NVDL의 추가 하락폭을 결정합니다.
+          </div>
+        </li>
+        <li>
+          <span class="check-icon orange">4</span>
+          <div>
+            <strong>하이퍼스케일러 Capex 가이던스 변화:</strong>
+            Meta, Microsoft, Amazon, Google의 향후 AI 투자 규모 발언이 NVDA 수급에 직접적 영향. 특히 3월 중 예정된 컨퍼런스 발언에 주목해야 합니다.
+          </div>
+        </li>
+        <li>
+          <span class="check-icon orange">5</span>
+          <div>
+            <strong>거래량 패턴 변화:</strong>
+            현재 거래량/20일 비율 1.25x가 1.0x 이하로 하락하면 매도 피로(Selling Fatigue)의 신호. 반대로 2.0x 이상 급증 시 셀링 클라이맥스 가능성을 열어두어야 합니다.
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <div class="insight-box caution">
+      <strong>📅 주요 일정:</strong> Vera Rubin 샘플 출하 개시 확인, OpenAI-NVIDIA $1,000억 파트너십 최종 확정 여부, 그리고 3월 GTC(GPU Technology Conference)에서의 젠슨 황 키노트가 향후 수급 방향을 결정짓는 핵심 카탈리스트입니다.
+    </div>
+  </div>
+
+  <!-- Summary Chart -->
+  <div class="section">
+    <h2 class="section-title"><span class="section-num">∑</span> 수급 신호 종합 스코어</h2>
+    <div class="chart-wrap">
+      <h4>📡 5대 수급 지표 레이더 차트</h4>
+      <canvas id="radarChart"></canvas>
+    </div>
+    <div class="card">
+      <div class="card-title">📋 종합 결론</div>
+      <p>
+        NVDL의 현재 수급 상태는 <strong>5개 핵심 지표 중 3개가 약세, 2개가 중립</strong>으로, 명확한 강세 신호는 부재합니다. "실적은 좋았으나 주가는 빠진다"는 전형적인 기대 선반영 → 차익 실현 구간이며, 2배 레버리지 구조가 이 조정을 증폭시키고 있습니다.
+      </p>
+      <br>
+      <p>
+        단, NVIDIA의 펀더멘털(매출 $68.1B, YoY +73%)은 여전히 압도적이며, AI 인프라 투자 사이클이 구조적으로 마무리된 것은 아닙니다. 따라서 현 시점의 전략은 <strong>"급하게 사지 말고, 수급 전환 확인 후 진입"</strong>이 최적입니다. OBV 반전 + VWAP 복귀라는 두 가지 조건이 동시에 충족되는 시점을 인내심 있게 기다리시기 바랍니다.
+      </p>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="report-footer">
+    <p>
+      본 보고서는 기술적 수급 지표에 기반한 분석이며, 투자 결정의 최종 책임은 투자자 본인에게 있습니다.<br>
+      레버리지 ETF는 일간 수익률의 배수를 추종하므로, 장기 보유 시 기초자산과 수익률 괴리가 발생할 수 있습니다.<br>
+      분석 시점: 2026.02.27 23:55 KST
+    </p>
+  </footer>
+
+</div>
+
+<script>
+Chart.defaults.color = '#94a3b8';
+Chart.defaults.borderColor = 'rgba(148,163,184,0.08)';
+Chart.defaults.font.family = "'JetBrains Mono', 'Noto Sans KR', sans-serif";
+Chart.defaults.font.size = 11;
+
+// Volume Chart
+new Chart(document.getElementById('volumeChart'), {
+  type: 'bar',
+  data: {
+    labels: ['20일 평균', '5일 평균', '최근 거래일'],
+    datasets: [{
+      label: '거래량 (백만 주)',
+      data: [12.11, 14.21, 15.13],
+      backgroundColor: ['rgba(59,130,246,0.3)', 'rgba(245,158,11,0.3)', 'rgba(239,68,68,0.4)'],
+      borderColor: ['#3b82f6', '#f59e0b', '#ef4444'],
+      borderWidth: 1.5,
+      borderRadius: 6,
+      barPercentage: 0.6,
+    }, {
+      label: '거래대금 (십억 $)',
+      data: [1.029, 1.224, 1.158],
+      backgroundColor: ['rgba(59,130,246,0.1)', 'rgba(245,158,11,0.1)', 'rgba(239,68,68,0.1)'],
+      borderColor: ['#3b82f6', '#f59e0b', '#ef4444'],
+      borderWidth: 1.5,
+      borderRadius: 6,
+      borderDash: [4, 4],
+      barPercentage: 0.6,
+      yAxisID: 'y1',
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: { position: 'top', labels: { padding: 16, usePointStyle: true, pointStyle: 'rectRounded' } },
+    },
+    scales: {
+      y: { title: { display: true, text: '거래량 (M)' }, grid: { color: 'rgba(148,163,184,0.05)' } },
+      y1: { position: 'right', title: { display: true, text: '거래대금 (B$)' }, grid: { display: false } },
+    }
+  }
+});
+
+// Indicator Gauge Chart
+new Chart(document.getElementById('indicatorChart'), {
+  type: 'bar',
+  data: {
+    labels: ['RSI (0-100)', 'MFI (0-100)', 'BB 위치 (0-100)', 'VWAP 괴리 (±%)', '거래량 비율 (x)'],
+    datasets: [{
+      label: '현재 수치',
+      data: [40.2, 49.3, 14, -9.54, 1.25],
+      backgroundColor: [
+        'rgba(245,158,11,0.35)',
+        'rgba(245,158,11,0.35)',
+        'rgba(239,68,68,0.35)',
+        'rgba(239,68,68,0.35)',
+        'rgba(239,68,68,0.35)',
+      ],
+      borderColor: ['#f59e0b', '#f59e0b', '#ef4444', '#ef4444', '#ef4444'],
+      borderWidth: 1.5,
+      borderRadius: 6,
+    }]
+  },
+  options: {
+    indexAxis: 'y',
+    responsive: true,
+    plugins: {
+      legend: { display: false },
+    },
+    scales: {
+      x: { grid: { color: 'rgba(148,163,184,0.05)' } },
+      y: { grid: { display: false } }
+    }
+  }
+});
+
+// Strategy Price Map
+new Chart(document.getElementById('strategyChart'), {
+  type: 'bar',
+  data: {
+    labels: ['손절 구간', '공격적 매수', '현재가', 'VWAP 회복', '추세 추종 진입', '볼린저 상단'],
+    datasets: [{
+      label: '가격 ($)',
+      data: [70, 74, 77.48, 85.66, 87, 96.34],
+      backgroundColor: [
+        'rgba(239,68,68,0.5)',
+        'rgba(16,185,129,0.35)',
+        'rgba(245,158,11,0.5)',
+        'rgba(59,130,246,0.3)',
+        'rgba(59,130,246,0.5)',
+        'rgba(139,92,246,0.3)',
+      ],
+      borderColor: ['#ef4444', '#10b981', '#f59e0b', '#3b82f6', '#3b82f6', '#8b5cf6'],
+      borderWidth: 1.5,
+      borderRadius: 6,
+      barPercentage: 0.5,
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: (ctx) => `$${ctx.raw}`
+        }
+      }
+    },
+    scales: {
+      y: { title: { display: true, text: '가격 ($)' }, grid: { color: 'rgba(148,163,184,0.05)' }, suggestedMin: 60, suggestedMax: 105 },
+      x: { grid: { display: false } }
+    }
+  }
+});
+
+// Radar Chart
+new Chart(document.getElementById('radarChart'), {
+  type: 'radar',
+  data: {
+    labels: ['OBV 추세', 'PVT 추세', 'MFI 강도', 'VWAP 괴리', '거래량 압력'],
+    datasets: [{
+      label: '약세 신호 강도 (10=최강 약세)',
+      data: [8, 8, 5, 7.5, 6.5],
+      backgroundColor: 'rgba(239,68,68,0.15)',
+      borderColor: '#ef4444',
+      borderWidth: 2,
+      pointBackgroundColor: '#ef4444',
+      pointRadius: 5,
+    }, {
+      label: '중립 기준선',
+      data: [5, 5, 5, 5, 5],
+      backgroundColor: 'rgba(148,163,184,0.05)',
+      borderColor: 'rgba(148,163,184,0.3)',
+      borderWidth: 1,
+      borderDash: [4, 4],
+      pointRadius: 0,
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: { position: 'top', labels: { padding: 16, usePointStyle: true } },
+    },
+    scales: {
+      r: {
+        beginAtZero: true,
+        max: 10,
+        ticks: { stepSize: 2, backdropColor: 'transparent' },
+        grid: { color: 'rgba(148,163,184,0.08)' },
+        pointLabels: { font: { size: 11 } },
+        angleLines: { color: 'rgba(148,163,184,0.08)' },
+      }
+    }
+  }
+});
+</script>
+</body>
+</html>

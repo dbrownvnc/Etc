@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>AI는 빛의 속도로 달린다 — 엔비디아·코히런트, 텍사스에서 미국 제조업을 다시 쓰다</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;0,800;1,500;1,600&family=Noto+Sans+KR:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #ffffff;
+    --bg-soft: #fafafa;
+    --text: #1a1a1a;
+    --text-soft: #777777;
+    --accent: #e11d48;
+    --accent-soft: #f43f5e;
+    --line: #e5e5e5;
+    --blue: #2563eb;
+    --gray: #6b7280;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans KR', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+  .page {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 0 22px 80px;
+  }
+  /* ---------- HERO ---------- */
+  .hero {
+    padding: 64px 22px 40px;
+    max-width: 680px;
+    margin: 0 auto;
+    border-bottom: 1px solid var(--line);
+  }
+  .hero-eyebrow {
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 700;
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .hero-eyebrow::before {
+    content: '';
+    width: 18px; height: 2px;
+    background: var(--accent);
+    display: inline-block;
+  }
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 800;
+    font-size: 38px;
+    line-height: 1.18;
+    letter-spacing: -0.01em;
+    margin: 0 0 18px;
+  }
+  .hero h1 em {
+    color: var(--accent);
+    font-style: italic;
+  }
+  .hero .dek {
+    font-size: 16px;
+    line-height: 1.65;
+    color: var(--text-soft);
+    margin: 0 0 26px;
+  }
+  .hero-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    font-size: 12.5px;
+    color: var(--text-soft);
+    border-top: 1px solid var(--line);
+    padding-top: 16px;
+  }
+  .hero-meta span { font-weight: 600; color: var(--text); }
+
+  /* ---------- SECTION TYPOGRAPHY ---------- */
+  section { padding: 46px 0; border-bottom: 1px solid var(--line); }
+  section:last-of-type { border-bottom: none; }
+  .section-label {
+    font-size: 11.5px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+  h2.section-title {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    font-size: 25px;
+    line-height: 1.3;
+    margin: 0 0 18px;
+  }
+  h3.sub-title {
+    font-family: 'Playfair Display', serif;
+    font-weight: 600;
+    font-style: italic;
+    font-size: 18px;
+    margin: 28px 0 12px;
+    color: var(--text);
+  }
+  p {
+    font-size: 15.5px;
+    line-height: 1.8;
+    color: var(--text);
+    margin: 0 0 16px;
+  }
+  p.lead {
+    font-size: 17px;
+    line-height: 1.75;
+    color: var(--text);
+  }
+  strong { font-weight: 700; }
+  .pull-quote {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 21px;
+    line-height: 1.5;
+    color: var(--text);
+    border-left: 3px solid var(--accent);
+    padding: 4px 0 4px 20px;
+    margin: 26px 0;
+  }
+  .pull-quote cite {
+    display: block;
+    font-family: 'Noto Sans KR', sans-serif;
+    font-style: normal;
+    font-size: 12.5px;
+    color: var(--text-soft);
+    margin-top: 10px;
+    font-weight: 600;
+  }
+
+  /* ---------- STAT CARDS ---------- */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin: 22px 0;
+  }
+  .stat-card {
+    background: var(--bg-soft);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 16px 14px;
+  }
+  .stat-card .num {
+    font-family: 'Playfair Display', serif;
+    font-weight: 800;
+    font-size: 26px;
+    color: var(--accent);
+    line-height: 1.1;
+  }
+  .stat-card .label {
+    font-size: 12px;
+    color: var(--text-soft);
+    margin-top: 6px;
+    line-height: 1.4;
+  }
+
+  /* ---------- TIMELINE ---------- */
+  .timeline { margin: 24px 0; position: relative; }
+  .t-item {
+    display: grid;
+    grid-template-columns: 64px 1fr;
+    gap: 14px;
+    padding-bottom: 22px;
+    position: relative;
+  }
+  .t-item:not(:last-child)::before {
+    content: '';
+    position: absolute;
+    left: 31px; top: 22px; bottom: 0;
+    width: 1px;
+    background: var(--line);
+  }
+  .t-date {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--accent);
+    text-align: right;
+    padding-top: 1px;
+  }
+  .t-dot {
+    display: none;
+  }
+  .t-body .t-title { font-weight: 700; font-size: 14.5px; margin-bottom: 4px; }
+  .t-body .t-desc { font-size: 13.5px; color: var(--text-soft); line-height: 1.6; }
+
+  /* ---------- TABLE ---------- */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 13.5px;
+    background: var(--bg-soft);
+  }
+  th {
+    background: var(--accent);
+    color: #fff;
+    font-weight: 600;
+    text-align: left;
+    padding: 10px 12px;
+    font-size: 12.5px;
+  }
+  td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--line);
+    color: var(--text);
+  }
+  tr:last-child td { border-bottom: none; }
+
+  /* ---------- CHART ---------- */
+  .chart-container {
+    position: relative;
+    max-height: 340px;
+    background: var(--bg-soft);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 18px 14px 8px;
+    margin: 22px 0;
+  }
+  .chart-container canvas {
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    max-height: 300px;
+  }
+  .chart-container.chart-ready canvas { opacity: 1; }
+  .chart-title {
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 10px;
+  }
+  .chart-caption {
+    font-size: 11.5px;
+    color: var(--text-soft);
+    margin-top: 10px;
+    line-height: 1.5;
+  }
+
+  /* ---------- FADE-IN ---------- */
+  .fade-in {
+    opacity: 0;
+    transform: translateY(18px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .fade-in.visible { opacity: 1; transform: translateY(0); }
+
+  /* ---------- SIMULATOR ---------- */
+  .sim-box {
+    background: var(--bg-soft);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 22px 18px;
+    margin: 22px 0;
+  }
+  .sim-title {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    font-size: 16px;
+    margin-bottom: 4px;
+  }
+  .sim-sub {
+    font-size: 12.5px;
+    color: var(--text-soft);
+    margin-bottom: 18px;
+    line-height: 1.5;
+  }
+  .sim-row { margin-bottom: 18px; }
+  .sim-row label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .sim-row label .val { color: var(--accent); font-family: 'Playfair Display', serif; font-weight: 700; }
+  input[type="range"] {
+    width: 100%;
+    -webkit-appearance: none;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--line);
+    outline: none;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+    box-shadow: 0 1px 4px rgba(225,29,72,0.4);
+  }
+  input[type="range"]::-moz-range-thumb {
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+    border: none;
+  }
+  .sim-output {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 18px;
+  }
+  .sim-output .box {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 14px;
+    text-align: center;
+  }
+  .sim-output .box .v {
+    font-family: 'Playfair Display', serif;
+    font-weight: 800;
+    font-size: 22px;
+    color: var(--accent);
+  }
+  .sim-output .box .l {
+    font-size: 11px;
+    color: var(--text-soft);
+    margin-top: 4px;
+  }
+  .sim-reset {
+    width: 100%;
+    margin-top: 16px;
+    padding: 10px;
+    background: #fff;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    font-weight: 700;
+    font-size: 13px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .sim-reset:active { background: var(--accent); color: #fff; }
+
+  /* ---------- DIAGRAM ---------- */
+  .flow-diagram {
+    margin: 24px 0;
+  }
+  .flow-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 0;
+    cursor: pointer;
+    border-bottom: 1px solid var(--line);
+    transition: background 0.2s;
+  }
+  .flow-step:last-child { border-bottom: none; }
+  .flow-step:active { background: var(--bg-soft); }
+  .flow-num {
+    flex-shrink: 0;
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    border: 1.5px solid var(--accent);
+    color: var(--accent);
+    font-weight: 700;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.25s;
+  }
+  .flow-step.active .flow-num {
+    background: var(--accent);
+    color: #fff;
+  }
+  .flow-content .flow-title {
+    font-weight: 700;
+    font-size: 14.5px;
+    margin-bottom: 2px;
+  }
+  .flow-content .flow-desc {
+    font-size: 13px;
+    color: var(--text-soft);
+    line-height: 1.6;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+  }
+  .flow-step.active .flow-content .flow-desc {
+    max-height: 200px;
+    margin-top: 6px;
+  }
+
+  /* ---------- KEY TAKEAWAYS ---------- */
+  .takeaway-list { list-style: none; padding: 0; margin: 20px 0; }
+  .takeaway-list li {
+    display: flex;
+    gap: 12px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--line);
+    font-size: 14.5px;
+    line-height: 1.65;
+  }
+  .takeaway-list li:last-child { border-bottom: none; }
+  .takeaway-list .tk-mark {
+    flex-shrink: 0;
+    color: var(--accent);
+    font-weight: 800;
+    font-family: 'Playfair Display', serif;
+  }
+
+  /* ---------- FOOTER ---------- */
+  .footer-note {
+    padding: 40px 0 0;
+    text-align: center;
+  }
+  .footer-note .mark {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+  .footer-note p {
+    font-size: 12px;
+    color: var(--text-soft);
+    margin: 0;
+  }
+
+  .disclaimer {
+    background: var(--bg-soft);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 14px 16px;
+    font-size: 12px;
+    color: var(--text-soft);
+    line-height: 1.6;
+    margin-top: 30px;
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-eyebrow">NOVA Real Invest · 산업 분석</div>
+  <h1>AI는 결국,<br><em>빛의 속도</em>로 달린다</h1>
+  <p class="dek">엔비디아와 코히런트가 텍사스 셔먼에서 던진 메시지 — 컴퓨팅을 넘어선 인프라 전쟁, 그리고 미국 제조업의 재산업화(Reindustrialization)</p>
+  <div class="hero-meta">
+    <div>출처 <span>NVIDIA · Coherent 기공식 (2026.06.16)</span></div>
+    <div>분석일 <span>2026.06.25</span></div>
+  </div>
+</div>
+
+<div class="page">
+
+<section class="fade-in">
+  <div class="section-label">Overview</div>
+  <h2 class="section-title">왜 이 행사가 중요한가</h2>
+  <p class="lead">2026년 6월 16일, 텍사스 셔먼(Sherman). 엔비디아(NVIDIA) CEO 젠슨 황(Jensen Huang)과 코히런트(Coherent) CEO 짐 앤더슨(Jim Anderson)이 나란히 섰다. 단순한 공장 증설 발표가 아니었다. <strong>AI 인프라의 다음 전쟁터가 '컴퓨팅 칩'이 아니라 '연결(Connectivity)'에 있다</strong>는 선언이었다.</p>
+  <p>코히런트는 세계 최초이자 최대 규모의 6인치 인듐 포스파이드(Indium Phosphide, InP) 양산 시설을 셔먼에서 운영 중이다. 이번 증설로 <strong>생산 공간은 2배, 웨이퍼 생산능력은 4배</strong>로 늘어난다. 이는 지난 3월 엔비디아가 코히런트에 발표한 <strong>20억 달러(약 2조 7천억 원) 규모의 전략적 투자 및 다년간 구매 계약</strong>의 후속 조치다.</p>
+  <div class="pull-quote">
+    "오늘은 코히런트뿐 아니라 미국 제조업, 그리고 AI 인프라의 미래를 위해 정말 중요한 순간이다."
+    <cite>— 짐 앤더슨, 코히런트 CEO</cite>
+  </div>
+</section>
+
+<section class="fade-in">
+  <div class="section-label">Key Facts</div>
+  <h2 class="section-title">숫자로 보는 셔먼 증설</h2>
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="num">$650M</div>
+      <div class="label">셔먼 공장 증설 총 투자 규모</div>
+    </div>
+    <div class="stat-card">
+      <div class="num">$50M</div>
+      <div class="label">미 상무부 CHIPS Act 직접 지원금(의향서)</div>
+    </div>
+    <div class="stat-card">
+      <div class="num">4x</div>
+      <div class="label">InP 웨이퍼 생산능력 증대 (12개월 내)</div>
+    </div>
+    <div class="stat-card">
+      <div class="num">2x</div>
+      <div class="label">제조 공간 확장</div>
+    </div>
+    <div class="stat-card">
+      <div class="num">1,000+</div>
+      <div class="label">완공 시 창출 예상 일자리</div>
+    </div>
+    <div class="stat-card">
+      <div class="num">550+</div>
+      <div class="label">고급 제조·엔지니어링 직접 고용</div>
+    </div>
+  </div>
+  <p style="font-size:12px;color:var(--text-soft);margin-top:-6px;">※ CHIPS Act $50M 외 텍사스주·셔먼 경제개발공사로부터 약 $20M(타 보도 기준 $17M) 별도 지원 기존 수령</p>
+</section>
+
+<section class="fade-in">
+  <div class="section-label">The Bottleneck</div>
+  <h2 class="section-title">"컴퓨팅이 아니라, 연결이 문제다"</h2>
+  <p class="lead">젠슨 황이 이날 가장 강조한 단어는 '컴퓨팅'이 아니라 <strong>'커넥티비티(Connectivity)'</strong>였다. AI 시스템이 거대해질수록, 수백만 개의 칩이 마치 하나의 컴퓨터처럼 동작해야 한다. 이를 그는 <strong>"AI 팩토리(AI Factory)"</strong>라고 불렀다.</p>
+  <p>가까운 거리의 연결은 전기 회로(electrical circuit)로 충분하다. 그러나 거리가 멀어지면 전기 신호는 한계에 부딫힌다. 이 문제를 푸는 유일한 방법이 <strong>실리콘 포토닉스(Silicon Photonics)</strong>, 즉 빛으로 데이터를 옮기는 광통신 기술이다.</p>
+
+  <h3 class="sub-title">왜 인듐 포스파이드(InP)인가</h3>
+  <p>코히런트가 셔먼에서 만드는 InP 레이저는 전기를 빛(광자)으로 바꾸는 핵심 부품이다. 이 레이저는 태양 표면과 맞먹는 광 강도로, 머리카락 굵기의 광섬유 속에서 매초 수백억 번 빛을 점멸시킨다. 이를 통해 엔비디아의 GPU와 서버, 데이터센터가 마치 하나의 시스템처럼 데이터를 주고받는다. InP는 직접 밴드갭(direct bandgap)과 높은 전자 이동도 등 광섬유 통신 파장대에 최적화된 물성을 지녀, 400G·800G급 광 트랜시버 내부의 레이저·변조기 제작에 대체 불가능한 소재로 꼽힌다.</p>
+
+  <div class="chart-container fade-in">
+    <div class="chart-title">셔먼 공장 증설 전후 비교 (제조 공간 vs. 웨이퍼 생산능력)</div>
+    <canvas id="chartCapacity" height="220"></canvas>
+    <div class="chart-caption">제조 공간은 2배, 웨이퍼 생산능력은 4배로 확대되어 비용 효율이 동반 개선된다.</div>
+  </div>
+</section>
+
+<section class="fade-in">
+  <div class="section-label">Mechanism</div>
+  <h2 class="section-title">전기에서 빛으로 — 데이터가 이동하는 5단계</h2>
+  <p>아래 단계를 눌러 AI 데이터센터 안에서 신호가 어떻게 '전기 → 빛 → 전기'로 변환되며 칩과 칩을 연결하는지 확인해보세요.</p>
+  <div class="flow-diagram" id="flowDiagram">
+    <div class="flow-step" data-step="1">
+      <div class="flow-num">1</div>
+      <div class="flow-content">
+        <div class="flow-title">GPU 내부에서 연산 완료</div>
+        <div class="flow-desc">실리콘 웨이퍼 기반 프로세서가 데이터를 처리한다. 이 칩들은 수백만 개 단위로 동시에 작동해야 한다.</div>
+      </div>
+    </div>
+    <div class="flow-step" data-step="2">
+      <div class="flow-num">2</div>
+      <div class="flow-content">
+        <div class="flow-title">근거리는 전기 신호로 전달</div>
+        <div class="flow-desc">칩과 칩이 가까운 경우, 기존 전기 회로(electrical circuit)로 충분히 데이터를 주고받을 수 있다.</div>
+      </div>
+    </div>
+    <div class="flow-step" data-step="3">
+      <div class="flow-num">3</div>
+      <div class="flow-content">
+        <div class="flow-title">원거리 전송의 한계 — 전기에서 빛으로 전환</div>
+        <div class="flow-desc">서버와 서버, 랙과 랙처럼 거리가 멀어지면 전기 신호는 한계에 부딫힌다. 이때 인듐 포스파이드 레이저가 전기를 광자(photon)로 변환한다.</div>
+      </div>
+    </div>
+    <div class="flow-step" data-step="4">
+      <div class="flow-num">4</div>
+      <div class="flow-content">
+        <div class="flow-title">광섬유를 통한 초고속 전송</div>
+        <div class="flow-desc">셔먼에서 생산된 6인치 InP 레이저가 머리카락 굵기의 광섬유 속에서 매초 수백억 번 점멸하며 데이터를 빛의 속도로 실어 나른다.</div>
+      </div>
+    </div>
+    <div class="flow-step" data-step="5">
+      <div class="flow-num">5</div>
+      <div class="flow-content">
+        <div class="flow-title">수신 칩에서 다시 전기로 변환, 연산 재개</div>
+        <div class="flow-desc">목적지 칩에 도달한 광신호는 다시 전기로 변환되어 다음 연산에 사용된다. 이 전 과정이 반복되며 수백만 개 칩이 '하나의 컴퓨터'처럼 작동한다.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="fade-in">
+  <div class="section-label">Simulator</div>
+  <h2 class="section-title">웨이퍼 생산능력 시뮬레이터</h2>
+  <p>셔먼 공장의 12개월 내 4배 증산 계획을 직접 조절해보며, 시간에 따른 누적 생산능력 변화를 가늠해볼 수 있습니다.</p>
+
+  <div class="sim-box">
+    <div class="sim-title">InP 웨이퍼 생산능력 추정 계산기</div>
+    <div class="sim-sub">기준선을 100으로 두고, 목표 증대 배율과 도달 시점을 조절해보세요.</div>
+
+    <div class="sim-row">
+      <label>목표 증대 배율 <span class="val" id="multVal">4.0x</span></label>
+      <input type="range" id="multSlider" min="1" max="6" step="0.5" value="4">
+    </div>
+    <div class="sim-row">
+      <label>목표 달성까지 소요 기간(개월) <span class="val" id="monthVal">12개월</span></label>
+      <input type="range" id="monthSlider" min="3" max="24" step="1" value="12">
+    </div>
+
+    <div class="sim-output">
+      <div class="box">
+        <div class="v" id="outFinal">400</div>
+        <div class="l">목표 시점 생산능력 (기준=100)</div>
+      </div>
+      <div class="box">
+        <div class="v" id="outMonthly">+25%</div>
+        <div class="l">월평균 증가율</div>
+      </div>
+    </div>
+    <button class="sim-reset" id="simReset">기본값으로 초기화 (4배 · 12개월)</button>
+  </div>
+
+  <div class="chart-container fade-in">
+    <div class="chart-title">시간에 따른 생산능력 증가 곡선</div>
+    <canvas id="chartGrowth" height="220"></canvas>
+    <div class="chart-caption">슬라이더를 조정하면 위 계산기 결과와 함께 곡선이 즉시 갱신됩니다.</div>
+  </div>
+</section>
+
+<section class="fade-in">
+  <div class="section-label">Big Picture</div>
+  <h2 class="section-title">"이것은 산업혁명이다" — 젠슨 황의 AI 프레임</h2>
+  <p class="lead">젠슨 황은 이날 AI를 단순한 IT 기술이 아니라 <strong>"100조 달러 규모의 기술이 모든 산업을 재편하는 산업혁명"</strong>으로 규정했다. 그가 짚은 영역은 에너지, 반도체, 인프라부터 언어모델, 자율주행, 로보틱스, 생물학·화학 모델까지 전 산업을 가로지른다.</p>
+
+  <h3 class="sub-title">AI가 바꾸는 다섯 가지 영역</h3>
+  <ul class="takeaway-list">
+    <li><span class="tk-mark">·</span><div><strong>신약 개발(Drug Discovery)</strong> — 방대한 연구 논문과 단백질·화학 데이터를 AI가 읽고, 로봇이 실험을 수행해 신약 개발 속도를 끌어올린다.</div></li>
+    <li><span class="tk-mark">·</span><div><strong>금융·헬스케어·교육·교통</strong> — 칩 디자인을 포함해 정보 처리가 핵심인 거의 모든 산업이 영향권에 든다.</div></li>
+    <li><span class="tk-mark">·</span><div><strong>에너지 그리드 현대화</strong> — AI 인프라 확장은 곧 에너지 그리드를 업그레이드할 시대적 기회이기도 하다는 점을 강조했다.</div></li>
+    <li><span class="tk-mark">·</span><div><strong>자동차·로보틱스</strong> — 언어모델을 넘어 물리적 세계를 다루는 모델로 AI의 적용 범위가 확장되고 있다.</div></li>
+    <li><span class="tk-mark">·</span><div><strong>제조업 자체의 부활</strong> — AI 인프라 구축이 곧 미국 내 칩 팹, 패키징 공장, 데이터센터, 에너지 전환 설비 투자를 견인한다.</div></li>
+  </ul>
+</section>
+
+<section class="fade-in">
+  <div class="section-label">Reindustrialization</div>
+  <h2 class="section-title">자동차 산업 이후, 50년 만의 제조업 귀환</h2>
+  <p>젠슨 황은 지난 100년의 산업사를 자동차 산업에 비유했다. 자동차 산업이 없었다면 지금의 미국 경제가 존재할 수 없었다는 것이다. 그러나 지난 50년간 미국은 제조업 대신 정보처리(information processing) 중심 경제로 옮겨갔고, 자동차 생산은 오랫동안 줄어들었다.</p>
+  <p>그가 던진 메시지는 명확하다. <strong>"AI 인프라 구축이 미국 제조업을 다시 불러오고 있다."</strong> 미국은 최근 몇 년간 60만 개의 생산직 일자리를 창출했으며, 칩 팹·패키징 플랜트·컴퓨터 플랜트·AI 데이터센터·에너지 전환 설비가 동시에 늘어나는 재산업화(Reindustrialization) 국면에 들어섰다고 진단했다.</p>
+
+  <div class="timeline">
+    <div class="t-item">
+      <div class="t-date">1846</div>
+      <div class="t-dot"></div>
+      <div class="t-body">
+        <div class="t-title">셔먼, 텍사스의 작은 정착지</div>
+        <div class="t-desc">인구 약 5만 명 규모로 출발한 지역 — 행사에서 지역의 역사적 정체성으로 언급됨.</div>
+      </div>
+    </div>
+    <div class="t-item">
+      <div class="t-date">1971</div>
+      <div class="t-dot"></div>
+      <div class="t-body">
+        <div class="t-title">코히런트, 제조 기업으로 창립</div>
+        <div class="t-desc">펜실베이니아 사크슨버그(Saxonburg)에서 제조 기업으로 출발. 줄곧 미국 제조업체로서의 정체성을 유지했다.</div>
+      </div>
+    </div>
+    <div class="t-item">
+      <div class="t-date">2026.03</div>
+      <div class="t-dot"></div>
+      <div class="t-body">
+        <div class="t-title">엔비디아, 코히런트에 $20억 전략 투자</div>
+        <div class="t-desc">공급망 확보, R&D 심화, 미국 내 제조 확대를 목표로 한 다년간 구매 계약 포함 투자 발표.</div>
+      </div>
+    </div>
+    <div class="t-item">
+      <div class="t-date">2026.06.16</div>
+      <div class="t-dot"></div>
+      <div class="t-body">
+        <div class="t-title">셔먼 공장 증설 기공식</div>
+        <div class="t-desc">$650M 규모 증설 착공, $50M CHIPS Act 지원 의향서 체결. 50년 만에 세계 최첨단 6인치 InP 생산라인이 셔먼에 들어선다.</div>
+      </div>
+    </div>
+    <div class="t-item">
+      <div class="t-date">2027 (예상)</div>
+      <div class="t-dot"></div>
+      <div class="t-body">
+        <div class="t-title">웨이퍼 생산능력 4배 달성 목표</div>
+        <div class="t-desc">증설 완료 시 1,000개 이상 일자리(직접 고용 550개 이상) 창출 전망.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pull-quote">
+    "50년이 걸려 1배를 만들었다. 우리는 1년 안에 4배를 만들 것이다. 이 스케일업은 놀라운 일이다."
+    <cite>— 짐 앤더슨, 코히런트 CEO</cite>
+  </div>
+</section>
+
+<section class="fade-in">
+  <div class="section-label">Investment Lens</div>
+  <h2 class="section-title">투자자가 주목해야 할 지점</h2>
+  <table>
+    <thead>
+      <tr><th>구분</th><th>핵심 내용</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>핵심 기업</td><td>코히런트(NYSE: COHR) — 엔비디아 광통신 핵심 공급망</td></tr>
+      <tr><td>제품군</td><td>InP 레이저, 광 트랜시버용 부품, Spectrum-X·Quantum-X Photonics 스위치 연계 광모듈</td></tr>
+      <tr><td>투자 규모</td><td>엔비디아 $20억 전략 투자(2026.03) + 셔먼 증설 $650M</td></tr>
+      <tr><td>정부 지원</td><td>CHIPS Act $50M 의향서 + 텍사스주·지역 약 $20M</td></tr>
+      <tr><td>고용 효과</td><td>완공 시 1,000개+ 일자리, 직접 고용 550개+</td></tr>
+      <tr><td>전력 효율</td><td>광 연결 도입으로 전력 소비 최대 50% 절감 가능성 언급</td></tr>
+    </tbody>
+  </table>
+  <p>이 발표가 투자 관점에서 의미를 갖는 이유는, AI 인프라 투자의 중심이 <strong>'GPU 자체'에서 '연결 인프라(optical interconnect)'로 확장</strong>되고 있음을 보여주기 때문이다. 엔비디아가 20년 넘게 협력해온 코히런트에 직접 지분·구매 계약 형태로 투자한 것은, GPU 클러스터 확장의 다음 병목이 광통신 공급망에 있다는 판단을 시사한다.</p>
+
+  <div class="pull-quote">
+    "코히런트는 세계적인 기업이며, 당신들이 하는 일은 우리의 미래에, AI의 미래에, 그리고 미국의 재산업화에 결정적이다."
+    <cite>— 젠슨 황, 엔비디아 CEO</cite>
+  </div>
+</section>
+
+<section class="fade-in">
+  <div class="section-label">Closing</div>
+  <h2 class="section-title">10년 후, 우리는 이 순간을 어떻게 기억할까</h2>
+  <p>행사를 마무리하며 진행자가 던진 질문 — "10년 후 이 순간을 어떻게 돌아볼까?" — 에 대해, 발표자들은 <strong>AI 인프라 시장이 현재보다 10배 이상 커질 수 있다</strong>는 전망과 함께, 이번 투자가 "미국이 다시 경제 성장을 주도하게 된 전환점"으로 기억되길 바란다는 메시지를 남겼다.</p>
+  <ul class="takeaway-list">
+    <li><span class="tk-mark">01</span><div>AI 경쟁의 다음 무대는 컴퓨팅이 아니라 <strong>연결(광통신) 인프라</strong>다.</div></li>
+    <li><span class="tk-mark">02</span><div>인듐 포스파이드(InP)는 AI 데이터센터의 숨은 핵심 소재로 부상하고 있다.</div></li>
+    <li><span class="tk-mark">03</span><div>엔비디아의 공급망 투자는 GPU를 넘어 <strong>광학·소재 기업까지 확장</strong>되는 추세다.</div></li>
+    <li><span class="tk-mark">04</span><div>미국 정부(CHIPS Act)·주정부·민간 자본이 함께 움직이는 <strong>재산업화(Reindustrialization)</strong> 흐름이 가속화되고 있다.</div></li>
+  </ul>
+</section>
+
+<div class="disclaimer">
+  본 리포트는 2026년 6월 16일 엔비디아·코히런트 텍사스 셔먼 기공식 영상 자막 및 공개된 보도자료·뉴스 보도를 바탕으로 작성된 분석 콘텐츠입니다. 특정 종목에 대한 매수·매도 추천이 아니며, 투자 결정은 본인의 판단과 책임 하에 이루어져야 합니다.
+</div>
+
+<div class="footer-note">
+  <div class="mark">NOVA Real Invest</div>
+  <p>AI Infrastructure & Investment Analysis</p>
+</div>
+
+</div>
+
+<script>
+  // Fade-in observer
+  const fadeObs = new IntersectionObserver((entries) => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        setTimeout(() => e.target.classList.add('visible'), i * 80);
+        fadeObs.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.fade-in').forEach(el => fadeObs.observe(el));
+
+  // Chart configs
+  const accentColor = '#e11d48';
+  const darkColor = '#1a1a1a';
+  const grayColor = '#6b7280';
+  const blueColor = '#2563eb';
+
+  const chartConfigs = {};
+
+  chartConfigs['chartCapacity'] = () => {
+    new Chart(document.getElementById('chartCapacity'), {
+      type: 'bar',
+      data: {
+        labels: ['제조 공간', '웨이퍼 생산능력'],
+        datasets: [
+          {
+            label: '증설 전 (기준 = 1x)',
+            data: [1, 1],
+            backgroundColor: '#6b7280',
+            borderRadius: 4,
+          },
+          {
+            label: '증설 후',
+            data: [2, 4],
+            backgroundColor: accentColor,
+            borderRadius: 4,
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { position: 'bottom', labels: { font: { size: 11, family: 'Noto Sans KR' }, boxWidth: 12 } },
+          tooltip: {
+            callbacks: {
+              label: (ctx) => `${ctx.dataset.label}: ${ctx.parsed.y}배`
+            }
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: { callback: (v) => v + 'x', font: { size: 11 } },
+            grid: { color: '#e5e5e5' }
+          },
+          x: { grid: { display: false }, ticks: { font: { size: 11, family: 'Noto Sans KR' } } }
+        }
+      }
+    });
+  };
+
+  let growthChart;
+  chartConfigs['chartGrowth'] = () => {
+    const ctx = document.getElementById('chartGrowth');
+    growthChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: [],
+        datasets: [{
+          label: '생산능력 (기준=100)',
+          data: [],
+          borderColor: accentColor,
+          backgroundColor: 'rgba(225,29,72,0.08)',
+          fill: true,
+          tension: 0.35,
+          pointRadius: 0,
+          borderWidth: 2.5
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          y: { beginAtZero: true, grid: { color: '#e5e5e5' }, ticks: { font: { size: 11 } } },
+          x: { grid: { display: false }, ticks: { font: { size: 11 }, maxTicksLimit: 7 } }
+        }
+      }
+    });
+    updateGrowthChart();
+  };
+
+  const chartObs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        const canvas = e.target.querySelector('canvas');
+        if (canvas && chartConfigs[canvas.id]) {
+          chartConfigs[canvas.id]();
+          e.target.classList.add('chart-ready');
+          chartObs.unobserve(e.target);
+        }
+      }
+    });
+  }, { threshold: 0.15 });
+  document.querySelectorAll('.chart-container').forEach(el => chartObs.observe(el));
+
+  // Flow diagram interaction
+  document.querySelectorAll('.flow-step').forEach(step => {
+    step.addEventListener('click', () => {
+      const isActive = step.classList.contains('active');
+      document.querySelectorAll('.flow-step').forEach(s => s.classList.remove('active'));
+      if (!isActive) step.classList.add('active');
+    });
+  });
+  // open first step by default
+  document.querySelector('.flow-step[data-step="1"]').classList.add('active');
+
+  // Simulator logic
+  const multSlider = document.getElementById('multSlider');
+  const monthSlider = document.getElementById('monthSlider');
+  const multVal = document.getElementById('multVal');
+  const monthVal = document.getElementById('monthVal');
+  const outFinal = document.getElementById('outFinal');
+  const outMonthly = document.getElementById('outMonthly');
+
+  function updateGrowthChart() {
+    if (!growthChart) return;
+    const mult = parseFloat(multSlider.value);
+    const months = parseInt(monthSlider.value);
+    const base = 100;
+    const finalVal = base * mult;
+
+    const labels = [];
+    const data = [];
+    for (let m = 0; m <= months; m++) {
+      labels.push(`${m}월`);
+      // smooth S-curve-ish ramp using ease
+      const t = m / months;
+      const eased = t * t * (3 - 2 * t); // smoothstep
+      data.push(Math.round(base + (finalVal - base) * eased));
+    }
+    growthChart.data.labels = labels;
+    growthChart.data.datasets[0].data = data;
+    growthChart.update();
+  }
+
+  function updateSimOutputs() {
+    const mult = parseFloat(multSlider.value);
+    const months = parseInt(monthSlider.value);
+    const finalVal = Math.round(100 * mult);
+    const monthlyRate = (Math.pow(mult, 1 / months) - 1) * 100;
+
+    multVal.textContent = mult.toFixed(1) + 'x';
+    monthVal.textContent = months + '개월';
+    outFinal.textContent = finalVal;
+    outMonthly.textContent = '+' + monthlyRate.toFixed(1) + '%';
+
+    updateGrowthChart();
+  }
+
+  multSlider.addEventListener('input', updateSimOutputs);
+  monthSlider.addEventListener('input', updateSimOutputs);
+
+  document.getElementById('simReset').addEventListener('click', () => {
+    multSlider.value = 4;
+    monthSlider.value = 12;
+    updateSimOutputs();
+  });
+
+  // initial sync once chart loads
+  const initSimWatcher = setInterval(() => {
+    if (growthChart) {
+      updateSimOutputs();
+      clearInterval(initSimWatcher);
+    }
+  }, 150);
+</script>
+
+</body>
+</html>

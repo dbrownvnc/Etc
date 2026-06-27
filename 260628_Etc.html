@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 논쟁은 끝났다 — NVIDIA 연례 주주총회 분석</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;0,900;1,500&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+  :root{
+    --bg:#ffffff; --bg2:#fafafa; --ink:#1a1a1a; --sub:#777777;
+    --accent:#e11d48; --accent2:#f43f5e; --line:#e5e5e5;
+    --c1:#e11d48; --c2:#1a1a1a; --c3:#6b7280; --c4:#2563eb;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{
+    background:var(--bg); color:var(--ink);
+    font-family:'Noto Sans KR',sans-serif; font-weight:400;
+    line-height:1.75; -webkit-font-smoothing:antialiased;
+    word-break:keep-all;
+  }
+  .wrap{max-width:680px; margin:0 auto; padding:0 22px;}
+
+  /* ---- HERO ---- */
+  header.hero{padding:64px 0 40px; border-bottom:2px solid var(--ink);}
+  .eyebrow{
+    font-size:.74rem; letter-spacing:.32em; text-transform:uppercase;
+    color:var(--accent); font-weight:700; margin-bottom:22px;
+  }
+  .hero h1{
+    font-family:'Playfair Display',serif; font-weight:900;
+    font-size:2.85rem; line-height:1.08; letter-spacing:-.01em;
+    margin-bottom:20px;
+  }
+  .hero h1 em{font-style:italic; color:var(--accent); }
+  .dek{font-size:1.06rem; color:#444; font-weight:300; line-height:1.7;}
+  .meta{
+    margin-top:26px; padding-top:18px; border-top:1px solid var(--line);
+    font-size:.8rem; color:var(--sub); display:flex; flex-wrap:wrap; gap:6px 18px;
+  }
+  .meta b{color:var(--ink); font-weight:500;}
+
+  /* ---- EDITOR NOTE ---- */
+  .ed-note{
+    margin:26px 0 0; padding:14px 16px; background:var(--bg2);
+    border-left:3px solid var(--accent); border-radius:0 6px 6px 0;
+    font-size:.8rem; color:var(--sub); line-height:1.65;
+  }
+  .ed-note b{color:var(--ink);}
+
+  /* ---- SECTION ---- */
+  section{padding:50px 0; border-bottom:1px solid var(--line);}
+  .sec-no{
+    font-family:'Playfair Display',serif; font-style:italic;
+    font-size:.95rem; color:var(--accent); margin-bottom:8px; font-weight:500;
+  }
+  h2{
+    font-family:'Playfair Display',serif; font-weight:700;
+    font-size:1.72rem; line-height:1.2; margin-bottom:8px; letter-spacing:-.01em;
+  }
+  h3{
+    font-size:1.04rem; font-weight:700; margin:26px 0 10px;
+    padding-left:12px; border-left:3px solid var(--accent);
+  }
+  p{margin-bottom:14px; font-size:.97rem;}
+  p.lead{font-size:1.04rem; color:#333;}
+  strong{font-weight:700;}
+  .hl{background:linear-gradient(transparent 58%, #fde0e6 58%); font-weight:500;}
+
+  /* ---- KEY TAKEAWAYS ---- */
+  .takeaways{list-style:none; margin:8px 0;}
+  .takeaways li{
+    position:relative; padding:13px 0 13px 30px; border-bottom:1px dashed var(--line);
+    font-size:.95rem;
+  }
+  .takeaways li:last-child{border-bottom:none;}
+  .takeaways li::before{
+    content:""; position:absolute; left:4px; top:20px;
+    width:9px; height:9px; background:var(--accent); border-radius:2px; transform:rotate(45deg);
+  }
+
+  /* ---- BIG STAT ---- */
+  .stat-row{display:flex; flex-wrap:wrap; gap:14px; margin:24px 0;}
+  .stat{
+    flex:1 1 140px; background:var(--bg2); border:1px solid var(--line);
+    border-radius:10px; padding:18px 16px; text-align:left;
+  }
+  .stat .num{
+    font-family:'Playfair Display',serif; font-weight:900;
+    font-size:1.95rem; color:var(--accent); line-height:1;
+  }
+  .stat .lbl{font-size:.78rem; color:var(--sub); margin-top:8px; line-height:1.4;}
+  .stat .delta{font-size:.72rem; color:var(--c4); font-weight:700; margin-top:4px;}
+
+  /* ---- TABLE ---- */
+  .tbl-wrap{overflow-x:auto; margin:18px 0; border:1px solid var(--line); border-radius:10px;}
+  table{width:100%; border-collapse:collapse; font-size:.88rem; min-width:420px;}
+  thead th{background:var(--accent); color:#fff; padding:12px 14px; text-align:right; font-weight:500;}
+  thead th:first-child{text-align:left;}
+  tbody td{padding:11px 14px; text-align:right; border-top:1px solid var(--line); background:var(--bg2);}
+  tbody td:first-child{text-align:left; font-weight:500;}
+  tbody tr:nth-child(even) td{background:#fff;}
+  .up{color:#16a34a; font-weight:700;}
+  .down{color:var(--accent); font-weight:700;}
+
+  /* ---- CHART ---- */
+  .chart-card{
+    margin:24px 0; padding:20px 16px 14px; background:var(--bg2);
+    border:1px solid var(--line); border-radius:12px;
+  }
+  .chart-card .cap{font-size:.8rem; color:var(--sub); margin-bottom:14px; font-weight:500;}
+  .chart-card .cap b{color:var(--accent);}
+  .chart-container{position:relative; max-height:340px;}
+  .chart-container canvas{opacity:0; transition:opacity .4s ease; max-height:300px;}
+  .chart-container.chart-ready canvas{opacity:1;}
+  .src{font-size:.68rem; color:#aaa; margin-top:10px; text-align:right;}
+
+  /* ---- FADE ---- */
+  .fade-in{opacity:0; transform:translateY(18px); transition:opacity .7s ease, transform .7s ease;}
+  .fade-in.visible{opacity:1; transform:translateY(0);}
+
+  /* ---- 3-STAGE FLOW ---- */
+  .flow{display:flex; flex-direction:column; gap:10px; margin:20px 0;}
+  .flow-step{
+    border:1px solid var(--line); border-radius:10px; padding:14px 16px;
+    background:#fff; cursor:pointer; transition:all .25s ease; position:relative;
+  }
+  .flow-step:hover{border-color:var(--accent2);}
+  .flow-step.active{background:var(--accent); border-color:var(--accent); color:#fff;}
+  .flow-step .fs-top{display:flex; align-items:center; gap:10px;}
+  .flow-step .fs-no{
+    font-family:'Playfair Display',serif; font-weight:900; font-size:1.1rem;
+    color:var(--accent); width:24px;
+  }
+  .flow-step.active .fs-no{color:#fff;}
+  .flow-step .fs-title{font-weight:700; font-size:1rem;}
+  .flow-step .fs-en{font-size:.72rem; color:var(--sub); font-weight:400;}
+  .flow-step.active .fs-en{color:rgba(255,255,255,.8);}
+  .flow-step .fs-body{
+    max-height:0; overflow:hidden; transition:max-height .3s ease, margin .3s ease;
+    font-size:.9rem; line-height:1.6;
+  }
+  .flow-step.active .fs-body{max-height:200px; margin-top:10px;}
+  .flow-hint{font-size:.76rem; color:var(--sub); text-align:center; margin-bottom:8px;}
+
+  /* ---- FLYWHEEL ---- */
+  .flywheel{margin:24px auto; max-width:340px; text-align:center;}
+  .fw-stage{
+    display:inline-block; margin:6px; padding:10px 16px; border-radius:24px;
+    border:1.5px solid var(--line); background:#fff; cursor:pointer; font-weight:500;
+    font-size:.9rem; transition:all .2s ease;
+  }
+  .fw-stage:hover{border-color:var(--accent2);}
+  .fw-stage.on{background:var(--accent); color:#fff; border-color:var(--accent);}
+  .fw-arrow{color:var(--accent); font-size:1.1rem; line-height:1;}
+  .fw-detail{
+    margin-top:16px; min-height:64px; padding:14px 16px; background:var(--bg2);
+    border:1px solid var(--line); border-radius:10px; font-size:.9rem;
+    line-height:1.6; text-align:left;
+  }
+  .fw-detail b{color:var(--accent);}
+
+  /* ---- SIM ---- */
+  .sim{margin:24px 0; padding:20px 18px; background:var(--bg2); border:1px solid var(--line); border-radius:12px;}
+  .sim h4{font-size:.98rem; font-weight:700; margin-bottom:4px;}
+  .sim .sim-sub{font-size:.78rem; color:var(--sub); margin-bottom:18px;}
+  .sim-ctrl{margin:16px 0;}
+  .sim-ctrl label{display:flex; justify-content:space-between; font-size:.85rem; font-weight:500; margin-bottom:8px;}
+  .sim-ctrl label span{color:var(--accent); font-weight:700;}
+  input[type=range]{
+    -webkit-appearance:none; width:100%; height:6px; border-radius:3px;
+    background:linear-gradient(90deg,var(--accent) 0%,var(--accent) 50%,#e5e5e5 50%,#e5e5e5 100%);
+    outline:none;
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none; width:22px; height:22px; border-radius:50%;
+    background:#fff; border:3px solid var(--accent); cursor:pointer; box-shadow:0 1px 4px rgba(0,0,0,.2);
+  }
+  input[type=range]::-moz-range-thumb{
+    width:22px; height:22px; border-radius:50%; background:#fff;
+    border:3px solid var(--accent); cursor:pointer;
+  }
+  .sim-out{display:flex; gap:12px; margin-top:18px;}
+  .sim-out .so{flex:1; text-align:center; background:#fff; border:1px solid var(--line); border-radius:10px; padding:14px 8px;}
+  .sim-out .so .v{font-family:'Playfair Display',serif; font-weight:900; font-size:1.5rem; color:var(--accent); line-height:1;}
+  .sim-out .so .k{font-size:.72rem; color:var(--sub); margin-top:6px;}
+  .sim-reset{
+    margin-top:16px; width:100%; padding:11px; border:1px solid var(--accent); border-radius:8px;
+    background:#fff; color:var(--accent); font-weight:700; font-size:.85rem; cursor:pointer;
+    font-family:inherit; transition:all .2s;
+  }
+  .sim-reset:hover{background:var(--accent); color:#fff;}
+  .sim-note{font-size:.7rem; color:#aaa; margin-top:12px; line-height:1.5;}
+
+  /* ---- PILLS ---- */
+  .pills{display:flex; flex-wrap:wrap; gap:8px; margin:14px 0;}
+  .pill{
+    font-size:.78rem; padding:6px 13px; border-radius:20px; background:#fff;
+    border:1px solid var(--line); color:#444; font-weight:500;
+  }
+  .pill.key{background:var(--accent); color:#fff; border-color:var(--accent);}
+
+  /* ---- QUOTE ---- */
+  .pull{
+    margin:28px 0; padding:4px 0 4px 22px; border-left:4px solid var(--accent);
+    font-family:'Playfair Display',serif; font-style:italic; font-size:1.3rem;
+    line-height:1.4; color:var(--ink);
+  }
+  .pull cite{display:block; margin-top:10px; font-family:'Noto Sans KR'; font-style:normal;
+    font-size:.78rem; color:var(--sub); font-weight:500;}
+
+  /* ---- VOTE ---- */
+  .vote-list{list-style:none;}
+  .vote-list li{
+    display:flex; align-items:center; gap:12px; padding:12px 14px; margin-bottom:8px;
+    border:1px solid var(--line); border-radius:8px; background:var(--bg2); font-size:.9rem;
+  }
+  .vote-badge{
+    flex-shrink:0; width:48px; text-align:center; padding:4px 0; border-radius:6px;
+    font-size:.74rem; font-weight:700; color:#fff;
+  }
+  .vote-badge.pass{background:#16a34a;} .vote-badge.fail{background:var(--accent);}
+
+  /* ---- TERM ---- */
+  .term{margin:18px 0; padding:14px 16px; background:#fff; border:1px dashed var(--accent2); border-radius:8px;}
+  .term dt{font-weight:700; font-size:.9rem; color:var(--accent); margin-bottom:4px;}
+  .term dd{font-size:.86rem; color:#444; line-height:1.6;}
+
+  /* ---- FOOTER ---- */
+  footer{padding:40px 0 60px; text-align:center; color:var(--sub); font-size:.78rem; line-height:1.7;}
+  footer .lg{font-family:'Playfair Display',serif; font-weight:900; font-size:1.2rem; color:var(--ink); margin-bottom:8px;}
+
+  @media(max-width:480px){
+    .hero h1{font-size:2.2rem;}
+    h2{font-size:1.46rem;}
+    .stat .num{font-size:1.7rem;}
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow">NVIDIA · 2026 연례 주주총회</div>
+    <h1>"AI <em>논쟁</em>은<br>끝났다"</h1>
+    <p class="dek">젠슨 황은 60년 만의 컴퓨팅 패러다임 전환을 선언했다. 핵심 메시지는 단 하나 — <strong>유용한 AI가 도착했고, 그것은 수익이 된다.</strong> 토큰이 곧 매출이고, 그래서 컴퓨팅 수요는 폭발한다.</p>
+    <div class="meta">
+      <span><b>발표</b> Jensen Huang (CEO)</span>
+      <span><b>일자</b> 2026.06.27</span>
+      <span><b>형식</b> Business Update + Q&amp;A</span>
+    </div>
+    <div class="ed-note">
+      <b>편집자 노트.</b> 원본 자막은 영어 발표의 한국어 자동변환 과정에서 일부 수치·단위가 깨졌습니다. 본 리포트의 모든 숫자는 <b>발표 슬라이드(FY26 실적표·InferenceX 차트·Vera Rubin 구성도)</b>와 깨지지 않은 영어 원문을 교차검증해 복원했으며, 출처가 불분명한 수치는 표기하지 않았습니다.
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- 1. 핵심 요약 -->
+  <section>
+    <div class="sec-no">01 — Executive Summary</div>
+    <h2>한눈에 보는 핵심</h2>
+    <ul class="takeaways">
+      <li><strong>패러다임 전환.</strong> 60년간 "사람이 코드를 짜고 컴퓨터가 실행"하던 시대에서, 이제 컴퓨터가 <strong>이해·추론·계획·도구사용</strong>으로 직접 일을 하는 시대로 넘어갔다.</li>
+      <li><strong>"유용한 AI = 수익".</strong> 토큰이 가치를 가지면 수요가 가속된다. AI의 <span class="hl">ROI 질문은 답이 나왔다</span>는 것이 황의 결론.</li>
+      <li><strong>실적 점프.</strong> FY26 매출 <strong>$215.9B(+65%)</strong>, 영업이익 $130.4B(+60%), 희석 EPS $4.90(+67%).</li>
+      <li><strong>Blackwell = 추론 왕.</strong> 와트당 성능·토큰 단가에서 압도적 우위. 슬라이드 기준 <strong>퍼포먼스/와트 50배, 비용 35배 낮음.</strong></li>
+      <li><strong>Vera Rubin 양산.</strong> '생각하는 GPU(Rubin)'와 '에이전트용 CPU(Vera)'로 새 시장을 연다.</li>
+      <li><strong>주주환원 강화.</strong> 분기배당 25배 인상, 자사주 +$80B, FCF의 50%+ 환원 방침.</li>
+    </ul>
+  </section>
+
+  <!-- 2. 컴퓨팅 대전환 -->
+  <section>
+    <div class="sec-no">02 — The Reset</div>
+    <h2>10~15년마다 리셋되는 산업, 이번엔 더 크다</h2>
+    <p class="lead">황은 컴퓨터 산업의 역사를 거대한 리셋의 연속으로 봤다. <strong>메인프레임 → PC → 인터넷 → 클라우드 → 모바일 클라우드.</strong> 그리고 지금의 리셋은 이전 어떤 것보다 크다고 단언했다.</p>
+    <p>60년 동안 인간은 소프트웨어를 작성했고 컴퓨터는 명령을 실행했다. AI는 이 구조 자체를 바꿨다. 이제 컴퓨터는 단순한 도구가 아니라, 그의 표현대로 <strong>"기술을 사용하는 기술을 사용하는 기술"</strong>이다. 데이터센터는 더 이상 단순 장비가 아니라 <strong>AI 팩토리이자 디지털 인텔리전스의 인프라</strong>로 재정의된다.</p>
+
+    <h3>AI는 3단계로 진화했다 (탭하여 확인)</h3>
+    <p class="flow-hint">각 단계를 눌러 펼쳐보세요</p>
+    <div class="flow" id="aiFlow">
+      <div class="flow-step" data-i="0">
+        <div class="fs-top"><span class="fs-no">1</span>
+          <div><div class="fs-title">생성형 AI</div><div class="fs-en">Generative AI</div></div></div>
+        <div class="fs-body">2년 전 ChatGPT가 세상의 주목을 끌었다. 글쓰기·그림·요약·질의응답 — 콘텐츠를 '생성'하는 단계.</div>
+      </div>
+      <div class="flow-step" data-i="1">
+        <div class="fs-top"><span class="fs-no">2</span>
+          <div><div class="fs-title">추론형 AI</div><div class="fs-en">Reasoning AI</div></div></div>
+        <div class="fs-body">문제를 단계적으로 '생각'하며 풀어내는 단계. 단순 응답을 넘어 사고 과정을 거친다.</div>
+      </div>
+      <div class="flow-step" data-i="2">
+        <div class="fs-top"><span class="fs-no">3</span>
+          <div><div class="fs-title">에이전트형 AI</div><div class="fs-en">Agentic AI · 현재</div></div></div>
+        <div class="fs-body">도구를 쓰고, 메모리에 접근하고, 코드를 작성하고, 다른 에이전트를 호출하며, 결과를 검증하고 — <strong>일이 끝날 때까지 스스로 계속 작업한다.</strong> 황은 "에이전트형 AI가 이미 도착했다"고 선언했다.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. 유용한 AI = 수익 -->
+  <section>
+    <div class="sec-no">03 — Useful AI Is Profitable</div>
+    <h2>토큰이 곧 매출이다</h2>
+    <p class="lead">황의 핵심 논리는 단순하다. <strong>AI가 유용한 일을 하면 토큰이 가치를 갖고, 토큰이 수익이 되면 컴퓨팅 수요가 가속된다.</strong></p>
+    <p>그가 든 증거는 소프트웨어 개발이다. 코딩은 기업에서 AI가 본격 확산된 <strong>첫 번째 대형 활용 사례</strong>다. GitHub 개발자들이 병합한 풀 리퀘스트(PR) 수는 꾸준히 우상향했고, 2026년 초 몇 달 사이 속도가 거의 <strong>3배</strong>로 뛰었다.</p>
+
+    <div class="chart-card fade-in">
+      <div class="cap">GitHub 풀 리퀘스트 병합 수 추이 <b>— 2026년 초 약 3배 가속</b></div>
+      <div class="chart-container"><canvas id="chartPR" height="230"></canvas></div>
+      <div class="src">출처: 발표 내 GitHub PR 인용 · 2026 수치는 "거의 3배" 발언 기반 추정 구간</div>
+    </div>
+
+    <p>황에 따르면 약 <strong>3,000만 명</strong>의 소프트웨어 개발자가 일하고, 그들의 작업은 <span class="hl">약 100조 달러</span> 규모의 글로벌 경제활동을 떠받친다. 에이전트가 가세하면서 같은 인력이 만들어내는 산출은 <strong>약 9조 달러</strong>로, 이전보다 <strong>6조 달러 더</strong> 늘었다는 것이 그의 주장이다.</p>
+    <p class="src" style="text-align:left;">※ 위 인력·금액 수치는 자막 깨짐으로 단위 복원에 일부 불확실성이 있어 "약(approx.)"으로 표기함.</p>
+
+    <div class="pull">"고객은 컴퓨터를 사는 게 아니다. 매출을 창출하는 AI 팩토리를 짓는 것이다."<cite>— Jensen Huang</cite></div>
+  </section>
+
+  <!-- 4. FY26 실적 -->
+  <section>
+    <div class="sec-no">04 — FY26 Results</div>
+    <h2>숫자가 증명한 한 해</h2>
+    <div class="stat-row">
+      <div class="stat"><div class="num">$215.9B</div><div class="lbl">FY26 매출</div><div class="delta">▲ 65% YoY</div></div>
+      <div class="stat"><div class="num">$4.90</div><div class="lbl">희석 EPS</div><div class="delta">▲ 67% YoY</div></div>
+    </div>
+
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>($ Millions, GAAP)</th><th>FY26</th><th>FY25</th><th>YoY</th></tr></thead>
+        <tbody>
+          <tr><td>매출 Revenue</td><td>$215,938</td><td>$130,497</td><td class="up">+65%</td></tr>
+          <tr><td>매출총이익률 GM%</td><td>71.1%</td><td>75.0%</td><td class="down">−3.9%p</td></tr>
+          <tr><td>영업이익</td><td>$130,387</td><td>$81,453</td><td class="up">+60%</td></tr>
+          <tr><td>희석 EPS</td><td>$4.90</td><td>$2.94</td><td class="up">+67%</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="chart-card fade-in">
+      <div class="cap">FY25 → FY26 손익 점프 <b>(단위: $B)</b></div>
+      <div class="chart-container"><canvas id="chartFin" height="240"></canvas></div>
+      <div class="src">출처: NVIDIA FY26 Results 슬라이드 (GAAP)</div>
+    </div>
+
+    <p>추가로 황은 <strong>영업현금흐름 $103B</strong>를 창출했고 <strong>$41B</strong>를 주주에게 환원했다고 밝혔다. <strong>데이터센터 매출은 $194B(+68%)</strong>, 해외 매출은 3배 넘게 늘어 <strong>$30B+</strong>를 기록했다. 약 <strong>40개국, GDP 합산 $50조</strong> 규모의 국가들이 NVIDIA 인프라 기반 AI 팩토리를 짓고 있다.</p>
+    <p>주목할 점은 <strong>매출총이익률이 75.0%에서 71.1%로 3.9%p 하락</strong>한 것. 매출이 65% 폭증하는 가운데 마진이 소폭 내려간 배경은 자막에 명시되지 않았으나, 일반적으로 신제품(Blackwell) 램프업 초기 원가 구조와 시스템 비중 확대가 영향을 준다.</p>
+  </section>
+
+  <!-- 5. 추론 왕 -->
+  <section>
+    <div class="sec-no">05 — The Inference King</div>
+    <h2>Blackwell, '추론 왕'에 오르다</h2>
+    <p class="lead">추론(Inference)은 토큰을 생성하는 과정이자 AI를 수익화하는 단계다. 데이터센터는 전력에 제약되므로, <strong>와트당 처리량(perf/watt)</strong>이 곧 매출 잠재력을 결정한다.</p>
+    <p>SemiAnalysis의 InferenceX 벤치마크에서 <strong>GB300 NVL72</strong>는 '추론 왕'으로 선언됐다. 슬라이드 기준 경쟁 플랫폼 대비 <strong>퍼포먼스/와트 50배</strong>, <strong>토큰 비용 35배 낮음</strong>을 제시했다. 황은 발언에서 처리량 <strong>30배</strong>, 그리고 MLPerf 추론 벤치마크 <strong>7연속 1위</strong>를 강조했다.</p>
+
+    <div class="chart-card fade-in">
+      <div class="cap">상호작용성(TPS/User) 대비 — 토글로 전환 <b id="bwToggleLabel">: 와트당 처리량</b></div>
+      <div style="text-align:center;margin-bottom:12px;">
+        <button class="sim-reset" id="bwToggle" style="width:auto;display:inline-block;padding:8px 20px;">⇄ 토큰 비용 보기로 전환</button>
+      </div>
+      <div class="chart-container"><canvas id="chartBW" height="240"></canvas></div>
+      <div class="src">출처: SemiAnalysis InferenceX (DeepSeek R1 0528 · FP4 · 1K/1K) — 슬라이드 곡선 형태 재현</div>
+    </div>
+
+    <p>경제 효과의 핵심은 황의 한 문장으로 요약된다. <strong>NVIDIA 시스템은 사는 가격이 가장 비싸 보일 수 있지만, 토큰 단가가 가장 낮고 처리량·수익이 가장 높다.</strong> 즉 "구매가"가 아니라 "팩토리가 만드는 매출과 그 단가"가 진짜 기준이라는 것.</p>
+  </section>
+
+  <!-- 6. Vera Rubin -->
+  <section>
+    <div class="sec-no">06 — Vera Rubin</div>
+    <h2>에이전트를 위한 플랫폼</h2>
+    <p class="lead">황은 세대 전환을 이렇게 정리했다. <strong>Hopper는 사전학습을, Blackwell은 랙 스케일 추론을, 그리고 Vera Rubin은 에이전트를 위해 만들어졌다.</strong></p>
+    <p>에이전트형 AI는 컴퓨팅 패턴 자체를 바꾼다. 에이전트는 생각하고, 도구를 쓰고, DB에 접근하고, 메모리를 불러오고, 코드를 실행하고, 애플리케이션을 반복 호출한다. 이때 <strong>GPU가 '생각'을 담당한다면, CPU는 이 모든 흐름을 끊김 없이 유지</strong>해야 한다. CPU가 병목이 되는 순간 GPU는 놀게 되고, AI 팩토리에서 노는 GPU는 곧 잃어버린 매출이다.</p>
+
+    <div class="pull">"Vera는 에이전트의 CPU, Rubin은 생각의 GPU다."<cite>— Jensen Huang</cite></div>
+
+    <p>그래서 NVIDIA는 기업/에이전트를 위한 새로운 CPU <strong>Vera</strong>를 설계했다. 황은 이를 <strong>완전히 새로운 시장</strong>으로 규정했다. 지금까지 모든 CPU는 '사람'을 위해 만들어졌고 사람은 초(second) 단위 세계에 살지만, 에이전트는 <strong>나노초(nanosecond) 단위</strong>의 극도로 빠른 반응을 요구하기 때문이다. 그는 Vera를 <strong>회사 역사상 가장 중요한 프로젝트 진전</strong>이라 표현했다.</p>
+
+    <h3>Vera Rubin은 칩이 아니라 'AI 팩토리 플랫폼'</h3>
+    <p>슬라이드는 Vera Rubin이 단일 칩이 아니라 통합 시스템임을 보여준다. 컴퓨트 트레이, NVLink 스위치 트레이, Vera CPU 트레이, Spectrum-6 스위치 트레이, BlueField-4 스토리지 트레이가 하나의 랙으로 묶인다.</p>
+    <div class="pills">
+      <span class="pill key">Vera Rubin NVL72 Compute</span>
+      <span class="pill">NVLink Switch</span>
+      <span class="pill">Vera CPU</span>
+      <span class="pill">Spectrum-6 SPX</span>
+      <span class="pill">BlueField-4 Storage</span>
+    </div>
+
+    <h3>3개의 네트워크 회사</h3>
+    <p>NVIDIA는 사실상 3개의 네트워킹 사업을 가진다. 각각의 역할이 다르다.</p>
+    <dl class="term">
+      <dt>NVLink (스케일업)</dt><dd>여러 GPU를 묶어 '하나의 컴퓨터'로 만든다. 랙 내부 결합.</dd>
+    </dl>
+    <dl class="term">
+      <dt>Spectrum-X (스케일아웃)</dt><dd>AI를 위해 설계된 이더넷. AI 팩토리 단위로 확장하며 더 큰 네트워크로 묶는다.</dd>
+    </dl>
+    <dl class="term">
+      <dt>InfiniBand</dt><dd>세계 최대 AI·HPC 시스템을 위한 최저 지연(latency) 네트워크.</dd>
+    </dl>
+
+    <h3>이미 움직이는 생태계</h3>
+    <p>황은 Vera Rubin이 <strong>풀 프로덕션(양산)</strong>에 들어갔으며, 주요 모델 빌더·퍼블릭 클라우드·AI 클라우드·하이퍼스케일러가 모두 채택 중이라고 밝혔다. 슬라이드의 얼리 어답터에는 <strong>OpenAI, 앤스로픽, SpaceX</strong>가 올랐다.</p>
+    <div class="pills">
+      <span class="pill key">OpenAI</span><span class="pill key">앤스로픽</span><span class="pill key">SpaceX</span>
+      <span class="pill">Oracle Cloud</span><span class="pill">CoreWeave</span><span class="pill">Nebius</span>
+      <span class="pill">Lambda</span><span class="pill">together.ai</span><span class="pill">Crusoe</span>
+    </div>
+  </section>
+
+  <!-- 7. CUDA 플라이휠 -->
+  <section>
+    <div class="sec-no">07 — The Moat</div>
+    <h2>20년의 CUDA 플라이휠</h2>
+    <p class="lead">황은 CUDA를 <strong>NVIDIA가 만든 가장 중요한 투자</strong>라 부른다. 20년간 단 하나의 가속 컴퓨팅 아키텍처에 집중해 만든 자기강화 루프다.</p>
+    <p class="flow-hint">각 단계를 눌러 어떻게 순환하는지 확인하세요</p>
+    <div class="flywheel">
+      <div class="fw-stage on" data-fw="0">설치 기반</div>
+      <div class="fw-arrow">↓</div>
+      <div class="fw-stage" data-fw="1">개발자</div>
+      <div class="fw-arrow">↓</div>
+      <div class="fw-stage" data-fw="2">돌파구 앱</div>
+      <div class="fw-arrow">↓</div>
+      <div class="fw-stage" data-fw="3">새로운 시장</div>
+      <div class="fw-arrow">↺ (다시 설치 기반 확대)</div>
+      <div class="fw-detail" id="fwDetail"></div>
+    </div>
+    <p>이 위에 쌓인 <strong>CUDA-X</strong> 라이브러리 군이 AI·과학·산업 전반의 가속을 담당하며, 황은 신약개발·디지털 생물학 도구 모음 <strong>BioNeMo</strong>도 발표했다. NVIDIA의 전략은 <strong>"수직 통합, 수평 개방"</strong> — 전체 스택을 직접 만들어 끝단까지 최적화한 뒤, 그것을 개방해 업계 전체가 그 위에 쌓도록 한다.</p>
+  </section>
+
+  <!-- 8. 사업 구조 -->
+  <section>
+    <div class="sec-no">08 — Two Platforms</div>
+    <h2>이제 NVIDIA는 두 개의 플랫폼이다</h2>
+    <p>황은 사업을 더 쉽게 이해하도록 <strong>데이터센터</strong>와 <strong>엣지 컴퓨팅</strong> 두 시장 플랫폼으로 설명했다.</p>
+    <div class="stat-row">
+      <div class="stat"><div class="num" style="font-size:1.4rem;">데이터센터</div><div class="lbl">하이퍼스케일 · AI 클라우드 · 인더스트리얼 · 엔터프라이즈</div></div>
+      <div class="stat"><div class="num" style="font-size:1.4rem;">엣지</div><div class="lbl">PC · 워크스테이션 · 게이밍 · 로보틱스 · 오토모티브</div></div>
+    </div>
+    <p>이 모든 시장에 대응할 수 있는 이유는 <strong>하나의 아키텍처, 하나의 소프트웨어 스택, 풍부한 생태계</strong>를 공유하기 때문이다. 황은 AI를 하나의 '5단계 케이크'에 비유했다.</p>
+    <div class="pills" style="justify-content:center;">
+      <span class="pill">에너지</span><span class="fw-arrow">›</span>
+      <span class="pill">칩·시스템</span><span class="fw-arrow">›</span>
+      <span class="pill">인프라</span><span class="fw-arrow">›</span>
+      <span class="pill">모델</span><span class="fw-arrow">›</span>
+      <span class="pill key">애플리케이션</span>
+    </div>
+    <p style="margin-top:16px;">전통적 데이터센터가 파일을 저장·전송한다면, <strong>AI 팩토리는 토큰을 제조</strong>한다. 그 토큰은 코드·답변·디자인·행동·서비스가 되고, <span class="hl">모든 토큰이 곧 이익의 단위</span>다.</p>
+  </section>
+
+  <!-- 9. Physical AI -->
+  <section>
+    <div class="sec-no">09 — Physical AI</div>
+    <h2>다음 성장 웨이브: 물리적 AI</h2>
+    <p class="lead">황은 <strong>피지컬 AI</strong>를 NVIDIA 성장의 다음 파도로 지목했다. "현실 세계의 에이전트형 AI" — 로봇·자동차·공장이 동적 환경에서 인지·추론·계획·작동한다.</p>
+    <p>NVIDIA는 이 분야의 풀 루프를 모두 갖췄다고 강조했다.</p>
+    <dl class="term"><dt>AI 팩토리</dt><dd>모델을 학습시킨다.</dd></dl>
+    <dl class="term"><dt>Omniverse</dt><dd>가상 세계에서 시뮬레이션한다.</dd></dl>
+    <dl class="term"><dt>Jetson (Thor)</dt><dd>로봇 안에서 실제로 구동한다.</dd></dl>
+    <dl class="term"><dt>Cosmos</dt><dd>이 모든 것을 떠받치는 '월드 파운데이션 모델'.</dd></dl>
+    <p>운송·제조·수술로봇·서비스(호스피탈리티)까지 산업 전반에서 로봇 시스템이 구축되고 있으며, 슬라이드는 Isaac GROOT(휴머노이드), Hyperion(자율주행), Aerial ARC, Holoscan(의료) 등을 Vera Rubin을 중심으로 한 생태계로 묶어 보여줬다.</p>
+  </section>
+
+  <!-- 10. 미국 생태계 / 수출규제 -->
+  <section>
+    <div class="sec-no">10 — America &amp; Policy</div>
+    <h2>미국 앵커 생태계와 수출 규제</h2>
+    <p>황은 NVIDIA를 <strong>"미국 기술을 만드는 미국 기업"</strong>으로 규정하고, AI를 미국 재산업화의 기회로 제시했다. AI로 번 이익과 규모로 다음 파트너들에 투자하고 있으며, 이들은 미국 내 공장 건설·고용을 진행 중이라고 밝혔다.</p>
+    <div class="pills">
+      <span class="pill">Intel</span><span class="pill">Micron</span><span class="pill">TSMC</span>
+      <span class="pill">Foxconn</span><span class="pill">Wistron</span><span class="pill">Amkor</span>
+      <span class="pill">Marvell</span><span class="pill">Corning</span><span class="pill">Coherent</span><span class="pill">Lumentum</span>
+    </div>
+    <p style="margin-top:14px;">에너지 부문에서는 <strong>Caterpillar, GE Vernova, Vertiv</strong> 및 원자력·재생에너지 파트너와 협력해 미국의 발전·전력망 역량을 강화한다고 했다. 또한 Capital One, 현대차그룹, Jane Street, Eli Lilly 등이 NVIDIA 인프라를 확장 도입 중이라 언급했다.</p>
+
+    <h3>국가 안보 우선 · 중국 H200</h3>
+    <p>황은 <strong>"상업적 기회가 미국 국가안보와 충돌하면 국가안보가 먼저"</strong>라고 못 박았다. 동시에 밀수·짜깁기로 데이터센터를 구축하는 것은 <strong>막다른 길</strong>이라며, 제한 제품에는 어떤 지원·수리도 제공하지 않는다고 강조했다.</p>
+    <p>중국 관련해서는, <strong>H200의 중국 고객향 라이선스가 승인됐지만 아직 매출은 발생하지 않았고, 실제 반입 허용 여부도 불확실</strong>하다고 밝혔다.</p>
+  </section>
+
+  <!-- 11. 주주환원 + 시뮬레이터 -->
+  <section>
+    <div class="sec-no">11 — Capital Returns</div>
+    <h2>주주환원: 배당 25배, 자사주 +$80B</h2>
+    <p class="lead">황은 NVIDIA가 <strong>예외적 성장 + 강한 마진/현금흐름 + 늘어나는 자본환원</strong>의 조합을 제공한다고 했다.</p>
+    <div class="stat-row">
+      <div class="stat"><div class="num">25×</div><div class="lbl">분기 배당 인상</div></div>
+      <div class="stat"><div class="num">+$80B</div><div class="lbl">추가 자사주 매입 승인</div></div>
+      <div class="stat"><div class="num">50%+</div><div class="lbl">FCF 환원 방침<br>(올해·내년·이후)</div></div>
+    </div>
+
+    <div class="sim">
+      <h4>FCF 환원 시뮬레이터</h4>
+      <div class="sim-sub">"FCF의 50% 이상을 환원" 방침을 슬라이더로 체험해보세요. (잉여현금흐름·환원율을 가정값으로 조정)</div>
+      <div class="sim-ctrl">
+        <label>가정 잉여현금흐름(FCF) <span id="fcfVal">$80B</span></label>
+        <input type="range" id="fcfRange" min="40" max="160" value="80" step="5">
+      </div>
+      <div class="sim-ctrl">
+        <label>환원율 <span id="payVal">50%</span></label>
+        <input type="range" id="payRange" min="50" max="100" value="50" step="5">
+      </div>
+      <div class="sim-out">
+        <div class="so"><div class="v" id="retOut">$40B</div><div class="k">주주 환원액</div></div>
+        <div class="so"><div class="v" id="reinvOut">$40B</div><div class="k">재투자 여력</div></div>
+      </div>
+      <button class="sim-reset" id="simReset">초기값으로 리셋</button>
+      <div class="sim-note">※ 본 시뮬레이터는 발표에서 제시된 "FCF 50%+ 환원" 방침을 이해하기 위한 <b>개념 예시</b>입니다. 슬라이더 입력값은 가정치이며 NVIDIA의 실제 전망·수치가 아닙니다.</div>
+    </div>
+  </section>
+
+  <!-- 12. 투표 결과 -->
+  <section style="border-bottom:none;">
+    <div class="sec-no">12 — Voting Results</div>
+    <h2>주총 표결 결과 (잠정)</h2>
+    <ul class="vote-list">
+      <li><span class="vote-badge pass">가결</span><span>이사 후보 <strong>10명 전원</strong> 재선임 (필요 정족수 충족)</span></li>
+      <li><span class="vote-badge pass">가결</span><span>안건 2, 3 승인</span></li>
+      <li><span class="vote-badge pass">가결</span><span>안건 4 — 정관/내규의 <strong>초다수결(supermajority)을 단순다수결로 대체</strong></span></li>
+      <li><span class="vote-badge fail">부결</span><span>안건 5, 6, 7 미승인</span></li>
+    </ul>
+    <p class="src" style="text-align:left;">※ 최종 집계는 추후 SEC에 제출되는 Form 8-K(영업일 4일 내 예정)로 공시 예정.</p>
+
+    <div class="pull" style="margin-top:30px;">"유용한 AI가 도착했고, 그것은 수익이 된다. 그래서 컴퓨팅은 곧 매출이다. AI의 시대가 전속력으로 달리고 있다."<cite>— Jensen Huang, 마무리 발언</cite></div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="lg">NVIDIA</div>
+    2026 Annual Stockholder Meeting · Business Update<br>
+    본 문서는 공개 발표 자막과 슬라이드를 바탕으로 한 분석 요약이며, 투자 자문이 아닙니다.
+  </div>
+</footer>
+
+<script>
+/* ===== FADE-IN OBSERVER ===== */
+const fadeObs = new IntersectionObserver((entries) => {
+  entries.forEach((e, i) => {
+    if (e.isIntersecting) {
+      setTimeout(() => e.target.classList.add('visible'), i * 80);
+      fadeObs.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.12 });
+document.querySelectorAll('.fade-in').forEach(el => fadeObs.observe(el));
+
+/* ===== CHART CONFIGS ===== */
+const baseFont = "'Noto Sans KR', sans-serif";
+Chart.defaults.font.family = baseFont;
+Chart.defaults.color = '#777777';
+
+const chartConfigs = {};
+
+chartConfigs['chartPR'] = () => {
+  new Chart(document.getElementById('chartPR'), {
+    type:'line',
+    data:{
+      labels:['2023','2024','2025','2026 초(약 3배↑)'],
+      datasets:[{
+        label:'병합된 PR (백만 건)',
+        data:[300,400,500,1450],
+        borderColor:'#e11d48', backgroundColor:'rgba(225,29,72,.08)',
+        borderWidth:3, tension:.3, fill:true,
+        pointBackgroundColor:'#e11d48', pointRadius:5, pointHoverRadius:7
+      }]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{legend:{display:false},
+        tooltip:{callbacks:{label:c=>` ${c.parsed.y}백만 건`}}},
+      scales:{
+        y:{beginAtZero:true, grid:{color:'#eee'}, ticks:{callback:v=>v+'M'}},
+        x:{grid:{display:false}}
+      }
+    }
+  });
+};
+
+chartConfigs['chartFin'] = () => {
+  new Chart(document.getElementById('chartFin'), {
+    type:'bar',
+    data:{
+      labels:['매출','영업이익','순현금흐름*'],
+      datasets:[
+        {label:'FY25', data:[130.5,81.5,null], backgroundColor:'#6b7280', borderRadius:4},
+        {label:'FY26', data:[215.9,130.4,103], backgroundColor:'#e11d48', borderRadius:4}
+      ]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{legend:{position:'top'},
+        tooltip:{callbacks:{label:c=>c.parsed.y!=null?` ${c.dataset.label}: $${c.parsed.y}B`:''}}},
+      scales:{
+        y:{beginAtZero:true, grid:{color:'#eee'}, ticks:{callback:v=>'$'+v+'B'}},
+        x:{grid:{display:false}}
+      }
+    }
+  });
+};
+
+/* Blackwell toggle chart */
+let bwChart = null; let bwMode = 'perf';
+const bwData = {
+  perf:{
+    label:'토큰/와트 (팩토리 매출 동인)',
+    nvidia:[8.3,5.5,2.7,1.0,0.6,0.4].map(v=>v*1000000),
+    comp:[1.0,0.8,0.5,0.35,0.3,0.25].map(v=>v*1000000),
+    yfmt:v=>(v/1000000)+'M', ytitle:'토큰/와트'
+  },
+  cost:{
+    label:'토큰 비용 ($, 낮을수록 우위)',
+    nvidia:[0.05,0.06,0.08,0.20,0.45,0.55],
+    comp:[0.05,0.4,1.2,2.6,3.6,4.2],
+    yfmt:v=>'$'+v, ytitle:'토큰 비용'
+  }
+};
+function drawBW(){
+  const d = bwData[bwMode];
+  if(bwChart) bwChart.destroy();
+  bwChart = new Chart(document.getElementById('chartBW'), {
+    type:'line',
+    data:{
+      labels:[0,40,80,120,160,200],
+      datasets:[
+        {label:'GB300 NVL72 (NVIDIA)', data:d.nvidia, borderColor:'#e11d48',
+         backgroundColor:'rgba(225,29,72,.06)', borderWidth:3, tension:.35,
+         pointRadius:3, fill:true},
+        {label:'Competition', data:d.comp, borderColor:'#6b7280',
+         borderWidth:2, borderDash:[5,4], tension:.35, pointRadius:3, fill:false}
+      ]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{legend:{position:'top'},
+        tooltip:{callbacks:{label:c=>` ${c.dataset.label}: ${d.yfmt(c.parsed.y)}`}}},
+      scales:{
+        y:{beginAtZero:true, grid:{color:'#eee'}, ticks:{callback:d.yfmt},
+           title:{display:true,text:d.ytitle}},
+        x:{grid:{display:false}, title:{display:true,text:'Interactivity (TPS/User)'}}
+      }
+    }
+  });
+}
+chartConfigs['chartBW'] = drawBW;
+
+/* ===== CHART OBSERVER ===== */
+const chartObs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const canvas = e.target.querySelector('canvas');
+      if (canvas && chartConfigs[canvas.id]) {
+        chartConfigs[canvas.id]();
+        e.target.classList.add('chart-ready');
+        chartObs.unobserve(e.target);
+      }
+    }
+  });
+}, { threshold: 0.15 });
+document.querySelectorAll('.chart-container').forEach(el => chartObs.observe(el));
+
+/* BW toggle button */
+document.getElementById('bwToggle').addEventListener('click', ()=>{
+  bwMode = (bwMode==='perf') ? 'cost' : 'perf';
+  document.getElementById('bwToggleLabel').textContent =
+    bwMode==='perf' ? ': 와트당 처리량' : ': 토큰 비용';
+  document.getElementById('bwToggle').textContent =
+    bwMode==='perf' ? '⇄ 토큰 비용 보기로 전환' : '⇄ 처리량 보기로 전환';
+  if(bwChart) drawBW();
+});
+
+/* ===== AI FLOW ===== */
+document.querySelectorAll('#aiFlow .flow-step').forEach(step=>{
+  step.addEventListener('click', ()=>{
+    const wasActive = step.classList.contains('active');
+    document.querySelectorAll('#aiFlow .flow-step').forEach(s=>s.classList.remove('active'));
+    if(!wasActive) step.classList.add('active');
+  });
+});
+
+/* ===== FLYWHEEL ===== */
+const fwText = [
+  '<b>설치 기반(Installed Base)</b> — 전 세계에 깔린 NVIDIA GPU가 개발자를 끌어들인다. 클수록 매력이 커진다.',
+  '<b>개발자(Developers)</b> — 모인 개발자들이 혁신적인 애플리케이션을 만든다.',
+  '<b>돌파구 앱(Breakthroughs)</b> — 그 앱들이 이전에 없던 새로운 시장을 창출한다.',
+  '<b>새로운 시장(New Markets)</b> — 새 시장이 다시 설치 기반을 확장시킨다 → 루프 가속. 황은 "이 플라이휠이 빨라지고 있다"고 말했다.'
+];
+const fwDetail = document.getElementById('fwDetail');
+fwDetail.innerHTML = fwText[0];
+document.querySelectorAll('.fw-stage').forEach(st=>{
+  st.addEventListener('click', ()=>{
+    document.querySelectorAll('.fw-stage').forEach(s=>s.classList.remove('on'));
+    st.classList.add('on');
+    fwDetail.innerHTML = fwText[+st.dataset.fw];
+  });
+});
+
+/* ===== FCF SIM ===== */
+const fcfRange=document.getElementById('fcfRange');
+const payRange=document.getElementById('payRange');
+const fcfVal=document.getElementById('fcfVal');
+const payVal=document.getElementById('payVal');
+const retOut=document.getElementById('retOut');
+const reinvOut=document.getElementById('reinvOut');
+function fillRange(el){
+  const pct=((el.value-el.min)/(el.max-el.min))*100;
+  el.style.background=`linear-gradient(90deg,#e11d48 0%,#e11d48 ${pct}%,#e5e5e5 ${pct}%,#e5e5e5 100%)`;
+}
+function updateSim(){
+  const fcf=+fcfRange.value, pay=+payRange.value;
+  fcfVal.textContent='$'+fcf+'B';
+  payVal.textContent=pay+'%';
+  const ret=Math.round(fcf*pay/100);
+  retOut.textContent='$'+ret+'B';
+  reinvOut.textContent='$'+(fcf-ret)+'B';
+  fillRange(fcfRange); fillRange(payRange);
+}
+fcfRange.addEventListener('input',updateSim);
+payRange.addEventListener('input',updateSim);
+document.getElementById('simReset').addEventListener('click',()=>{
+  fcfRange.value=80; payRange.value=50; updateSim();
+});
+updateSim();
+</script>
+</body>
+</html>

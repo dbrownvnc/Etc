@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NVIDIA 주주총회 — 이해도 점검 퀴즈</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,500&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#ffffff; --bg2:#fafafa; --ink:#1a1a1a; --sub:#777777;
+    --accent:#e11d48; --accent2:#f43f5e; --line:#e5e5e5;
+    --green:#16a34a; --greenbg:#e7f6ec; --redbg:#fde7ec;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:var(--bg2); color:var(--ink);
+    font-family:'Noto Sans KR',sans-serif; line-height:1.7;
+    -webkit-font-smoothing:antialiased; word-break:keep-all; padding-bottom:60px;
+  }
+  .wrap{max-width:680px; margin:0 auto; padding:0 18px;}
+
+  /* HEADER */
+  .qhead{padding:46px 0 26px; text-align:center;}
+  .qhead .eyebrow{font-size:.72rem; letter-spacing:.3em; text-transform:uppercase; color:var(--accent); font-weight:700; margin-bottom:14px;}
+  .qhead h1{font-family:'Playfair Display',serif; font-weight:900; font-size:2.1rem; line-height:1.15; margin-bottom:10px;}
+  .qhead p{font-size:.9rem; color:var(--sub);}
+
+  /* STICKY SCORE */
+  .scorebar{
+    position:sticky; top:0; z-index:50; background:rgba(255,255,255,.96);
+    backdrop-filter:blur(8px); border-bottom:1px solid var(--line); padding:12px 0;
+  }
+  .score-inner{max-width:680px; margin:0 auto; padding:0 18px; display:flex; align-items:center; gap:14px;}
+  .score-stats{display:flex; gap:16px; font-size:.82rem; font-weight:500; flex-shrink:0;}
+  .score-stats b{font-family:'Playfair Display',serif; font-size:1.05rem; color:var(--accent);}
+  .pbar-wrap{flex:1; height:9px; background:var(--line); border-radius:5px; overflow:hidden;}
+  .pbar{height:100%; width:0; border-radius:5px; background:var(--accent); transition:width .4s ease, background .4s ease;}
+  @media(max-width:480px){
+    .score-stats{gap:10px; font-size:.74rem;}
+    .qhead h1{font-size:1.7rem;}
+  }
+
+  /* QUIZ CARD */
+  .q-card{
+    background:#fff; border:1px solid var(--line); border-radius:14px;
+    padding:22px 20px; margin:18px 0; box-shadow:0 1px 4px rgba(0,0,0,.03);
+  }
+  .q-top{display:flex; align-items:center; gap:10px; margin-bottom:14px;}
+  .q-no{
+    font-family:'Playfair Display',serif; font-weight:900; font-size:1.3rem;
+    color:var(--accent); line-height:1;
+  }
+  .q-type{font-size:.68rem; padding:3px 9px; border-radius:12px; background:var(--bg2); border:1px solid var(--line); color:var(--sub); font-weight:500;}
+  .q-diff{font-size:.68rem; padding:3px 9px; border-radius:12px; font-weight:700; color:#fff;}
+  .d-easy{background:#16a34a;} .d-mid{background:#2563eb;} .d-hard{background:var(--accent);}
+  .q-text{font-size:1.04rem; font-weight:500; margin-bottom:16px; line-height:1.6;}
+
+  /* OPTIONS */
+  .opt{
+    display:block; width:100%; text-align:left; padding:13px 16px; margin-bottom:9px;
+    border:1.5px solid var(--line); border-radius:10px; background:#fff; cursor:pointer;
+    font-family:inherit; font-size:.94rem; color:var(--ink); transition:all .18s ease; position:relative;
+  }
+  .opt:hover:not(:disabled){border-color:var(--accent2); background:#fff5f7;}
+  .opt:disabled{cursor:default;}
+  .opt.correct{background:var(--greenbg); border-color:var(--green); font-weight:700;}
+  .opt.wrong{background:var(--redbg); border-color:var(--accent);}
+  .opt .badge{float:right; font-weight:700; font-size:.82rem;}
+  .opt.correct .badge{color:var(--green);}
+  .opt.wrong .badge{color:var(--accent);}
+
+  /* OX */
+  .ox-row{display:flex; gap:12px;}
+  .ox-btn{
+    flex:1; padding:18px; border:1.5px solid var(--line); border-radius:12px; background:#fff;
+    cursor:pointer; font-family:'Playfair Display',serif; font-weight:900; font-size:1.6rem;
+    color:var(--ink); transition:all .18s ease;
+  }
+  .ox-btn:hover:not(:disabled){border-color:var(--accent2); background:#fff5f7;}
+  .ox-btn:disabled{cursor:default;}
+  .ox-btn.correct{background:var(--greenbg); border-color:var(--green); color:var(--green);}
+  .ox-btn.wrong{background:var(--redbg); border-color:var(--accent); color:var(--accent);}
+
+  /* SHORT */
+  .short-row{display:flex; gap:8px;}
+  .short-row input{
+    flex:1; padding:13px 15px; border:1.5px solid var(--line); border-radius:10px;
+    font-family:inherit; font-size:.95rem; outline:none; transition:border .18s;
+  }
+  .short-row input:focus{border-color:var(--accent);}
+  .short-row input:disabled{background:var(--bg2);}
+  .short-row button{
+    padding:0 22px; border:none; border-radius:10px; background:var(--accent); color:#fff;
+    font-family:inherit; font-weight:700; font-size:.9rem; cursor:pointer; transition:background .18s;
+  }
+  .short-row button:hover:not(:disabled){background:#c01840;}
+  .short-row button:disabled{background:var(--sub); cursor:default;}
+  .short-result{margin-top:10px; font-size:.88rem; font-weight:700;}
+  .short-result.ok{color:var(--green);} .short-result.no{color:var(--accent);}
+
+  /* EXPLANATION */
+  .expl{
+    max-height:0; overflow:hidden; transition:max-height .4s ease, margin .4s ease, padding .4s ease;
+    background:var(--bg2); border-radius:10px; padding:0 16px; font-size:.88rem; line-height:1.65; color:#444;
+  }
+  .expl.show{max-height:400px; margin-top:14px; padding:14px 16px;}
+  .expl b{color:var(--accent);}
+  .expl .src{display:block; margin-top:8px; font-size:.76rem; color:var(--sub); border-top:1px dashed var(--line); padding-top:8px;}
+
+  /* RESULT MODAL */
+  .overlay{
+    position:fixed; inset:0; background:rgba(26,26,26,.55); display:none;
+    align-items:center; justify-content:center; z-index:100; padding:20px; backdrop-filter:blur(3px);
+  }
+  .overlay.show{display:flex;}
+  .modal{
+    background:#fff; border-radius:18px; max-width:380px; width:100%; padding:34px 28px; text-align:center;
+    box-shadow:0 20px 60px rgba(0,0,0,.3); animation:pop .35s cubic-bezier(.2,1.2,.4,1);
+  }
+  @keyframes pop{from{transform:scale(.85); opacity:0;} to{transform:scale(1); opacity:1;}}
+  .modal .grade{font-family:'Playfair Display',serif; font-weight:900; font-size:4.5rem; line-height:1; color:var(--accent);}
+  .modal .score-line{font-size:1.1rem; font-weight:700; margin:10px 0 6px;}
+  .modal .msg{font-size:.92rem; color:var(--sub); margin-bottom:24px; line-height:1.6;}
+  .modal .ring{font-size:.84rem; color:var(--sub); margin-bottom:4px;}
+  .modal button{
+    width:100%; padding:14px; border:none; border-radius:10px; background:var(--accent); color:#fff;
+    font-family:inherit; font-weight:700; font-size:.95rem; cursor:pointer; transition:background .2s;
+  }
+  .modal button:hover{background:#c01840;}
+
+  footer{text-align:center; color:var(--sub); font-size:.76rem; padding:30px 18px 0; line-height:1.6;}
+</style>
+</head>
+<body>
+
+<div class="scorebar">
+  <div class="score-inner">
+    <div class="score-stats">
+      <span>푼 문제 <b id="sSolved">0</b>/10</span>
+      <span>맞힘 <b id="sCorrect">0</b></span>
+      <span>정답률 <b id="sRate">0</b>%</span>
+    </div>
+    <div class="pbar-wrap"><div class="pbar" id="pbar"></div></div>
+  </div>
+</div>
+
+<div class="qhead wrap">
+  <div class="eyebrow">NVIDIA 2026 Stockholder Meeting</div>
+  <h1>이해도 점검 퀴즈</h1>
+  <p>총 10문제 · 클릭 즉시 채점 · 해설 자동 표시</p>
+</div>
+
+<main class="wrap" id="quizRoot"></main>
+
+<footer class="wrap">
+  본 퀴즈는 NVIDIA 연례 주주총회 발표 자막·슬라이드에 실제 등장한 내용만으로 출제되었습니다.
+</footer>
+
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <div class="ring">최종 결과</div>
+    <div class="grade" id="mGrade">A</div>
+    <div class="score-line" id="mScore">10 / 10</div>
+    <div class="msg" id="mMsg"></div>
+    <button id="retryBtn">다시 풀기</button>
+  </div>
+</div>
+
+<script>
+const QUIZ_DATA = [
+  {
+    id:1, type:'mc', difficulty:'easy',
+    question:'NVIDIA의 FY26 연간 매출은 전년 대비 몇 % 증가했는가?',
+    options:['약 35%','약 50%','약 65%','약 80%'],
+    answer:2,
+    explanation:'FY26 매출은 $215,938M으로 FY25($130,497M) 대비 <b>65% 증가</b>했다. 영업이익은 60%, 희석 EPS는 67% 늘었다.',
+    src:'발표 슬라이드 "FY26 Results" — Revenue Up 65%'
+  },
+  {
+    id:2, type:'mc', difficulty:'easy',
+    question:'추론(Inference) 벤치마크에서 Blackwell(GB300 NVL72)에 붙은 별칭은?',
+    options:['Training King','Inference King (추론 왕)','Token Master','Edge Champion'],
+    answer:1,
+    explanation:'SemiAnalysis의 InferenceX 벤치마크에서 Blackwell은 <b>"추론 왕(Inference King)"</b>으로 선언됐다. 와트당 성능·토큰 단가에서 우위를 보였다.',
+    src:'원문 "Blackwell is recognized / declared the inference king"'
+  },
+  {
+    id:3, type:'mc', difficulty:'mid',
+    question:'황이 새로 설계한 CPU "Vera"의 핵심 역할은?',
+    options:['게이밍 그래픽 가속','에이전트(agent)를 위한 CPU','데이터 저장 전용 칩','디스플레이 출력 컨트롤러'],
+    answer:1,
+    explanation:'황은 GPU(Rubin)가 "생각"을 담당한다면 CPU(Vera)는 그 흐름을 끊김 없이 유지해야 한다고 했다. Vera는 나노초 단위 반응을 요구하는 <b>에이전트를 위한 CPU</b>로, 완전히 새로운 시장을 연다.',
+    src:'원문 "Vera is the agent\'s CPU" / "opening a brand new CPU market built for agents"'
+  },
+  {
+    id:4, type:'mc', difficulty:'mid',
+    question:'황이 설명한 AI의 진화 3단계 순서로 올바른 것은?',
+    options:[
+      '추론형 → 생성형 → 에이전트형',
+      '생성형 → 추론형 → 에이전트형',
+      '에이전트형 → 생성형 → 추론형',
+      '생성형 → 에이전트형 → 추론형'
+    ],
+    answer:1,
+    explanation:'2년 전 <b>생성형(Generative)</b> AI(ChatGPT)가 등장했고, 이후 <b>추론형(Reasoning)</b>이 문제를 단계적으로 사고하게 됐으며, 이제 <b>에이전트형(Agentic)</b> AI가 도착해 스스로 도구를 쓰고 일을 끝까지 수행한다.',
+    src:'원문 "generative ai... then reasoning ai... agentic ai has now arrived"'
+  },
+  {
+    id:5, type:'mc', difficulty:'hard',
+    question:'발표 슬라이드 기준, GB300 NVL72가 경쟁 플랫폼 대비 가진 "와트당 성능(Perf/Watt)" 우위는?',
+    options:['약 5배','약 15배','약 30배','약 50배'],
+    answer:3,
+    explanation:'슬라이드 "Tokens per Watt Drives Factory Revenue"는 <b>50배 높은 퍼포먼스/와트</b>를, "Performance Drives Token Cost"는 <b>35배 낮은 비용</b>을 제시했다. (※ 황의 발언 중 "30배"는 토큰 처리량(throughput) 수치로, 구분 필요.)',
+    src:'슬라이드 InferenceX — "50X Higher Perf/Watt", "35X Lower Cost"'
+  },
+  {
+    id:6, type:'mc', difficulty:'mid',
+    question:'데이터센터가 전력에 제약되기 때문에, 토큰 처리량과 매출 잠재력을 결정하는 핵심 지표는?',
+    options:['칩 면적(다이 사이즈)','와트당 성능(performance per watt)','클럭 속도(GHz)','메모리 용량(GB)'],
+    answer:1,
+    explanation:'황은 "데이터센터는 전력에 제약되므로, 토큰 처리량과 매출 잠재력은 인프라의 <b>와트당 성능</b>으로 정의된다"고 했다. 그래서 추론 경제성에서 perf/watt가 결정적이다.',
+    src:'원문 "their token throughput and revenue potential are defined by the AI infrastructure\'s performance per watt"'
+  },
+  {
+    id:7, type:'short', difficulty:'mid',
+    question:'황이 "회사 역사상 가장 중요한 프로젝트 진전"이라 표현한, 에이전트용으로 새로 만든 CPU의 이름은? (영문 한 단어)',
+    accept:['vera','베라'],
+    answer:'Vera',
+    explanation:'황은 에이전트 시대를 위해 설계한 새 CPU <b>Vera</b>를 회사 역사상 가장 중요한 프로젝트 진전이라 표현했다. 사람이 아닌 에이전트(나노초 반응)를 위한 CPU라는 점에서 새 시장을 연다.',
+    src:'원문 "Vera will be the most important project advancement in our company\'s history"'
+  },
+  {
+    id:8, type:'short', difficulty:'hard',
+    question:'설치 기반 → 개발자 → 돌파구 앱 → 새 시장이 서로를 강화하는, NVIDIA의 20년 자기강화 루프를 부르는 이름은? (예: "○○○ 플라이휠")',
+    accept:['cuda','쿠다','플라이휠','flywheel','cuda flywheel','쿠다 플라이휠'],
+    answer:'CUDA 플라이휠 (CUDA Flywheel)',
+    explanation:'황은 CUDA를 "가장 중요한 투자"라 부르며, 설치 기반→개발자→돌파구 앱→새 시장이 순환하며 가속되는 <b>CUDA 플라이휠</b>을 핵심 해자로 제시했다.',
+    src:'슬라이드 "20 YEARS CUDA FLYWHEEL" + 원문 "That flywheel is accelerating"'
+  },
+  {
+    id:9, type:'ox', difficulty:'easy',
+    question:'주총 표결 결과, 안건 5·6·7은 모두 가결(승인)되었다.',
+    answer:'X',
+    explanation:'<b>틀렸다.</b> 안건 5, 6, 7은 <b>부결(미승인)</b>되었다. 반면 이사 10명 전원 재선임, 안건 2·3, 그리고 초다수결을 단순다수결로 바꾸는 안건 4는 가결됐다.',
+    src:'원문 "Proposals 5, 6, and 7 have not been approved"'
+  },
+  {
+    id:10, type:'ox', difficulty:'mid',
+    question:'황은 H200의 중국 고객향 라이선스가 승인됐지만, 아직 매출은 발생하지 않았다고 밝혔다.',
+    answer:'O',
+    explanation:'<b>맞다.</b> 미국 정부가 중국 고객향 H200 라이선스를 승인했으나, 아직 매출은 없으며 실제 반입 허용 여부도 불확실하다고 했다. 황은 "국가안보가 상업적 기회보다 우선"이라는 원칙도 강조했다.',
+    src:'원문 "approved licenses of H-200s... we have yet to generate any revenue"'
+  }
+];
+
+let state = { solved:0, correct:0 };
+const answered = new Set();
+const root = document.getElementById('quizRoot');
+
+const typeLabel = {mc:'객관식', short:'단답형', ox:'O / X'};
+const diffLabel = {easy:['쉬움','d-easy'], mid:['보통','d-mid'], hard:['어려움','d-hard']};
+
+QUIZ_DATA.forEach(q=>{
+  const card = document.createElement('div');
+  card.className='q-card';
+  const [dTxt,dCls] = diffLabel[q.difficulty];
+  let inner = `<div class="q-top">
+      <span class="q-no">Q${q.id}</span>
+      <span class="q-type">${typeLabel[q.type]}</span>
+      <span class="q-diff ${dCls}">${dTxt}</span>
+    </div>
+    <div class="q-text">${q.question}</div>`;
+
+  if(q.type==='mc'){
+    inner += '<div class="opts">';
+    q.options.forEach((o,i)=>{ inner += `<button class="opt" data-q="${q.id}" data-i="${i}">${o}<span class="badge"></span></button>`; });
+    inner += '</div>';
+  } else if(q.type==='ox'){
+    inner += `<div class="ox-row">
+        <button class="ox-btn" data-q="${q.id}" data-v="O">O</button>
+        <button class="ox-btn" data-q="${q.id}" data-v="X">X</button>
+      </div>`;
+  } else {
+    inner += `<div class="short-row">
+        <input type="text" id="in-${q.id}" placeholder="정답 입력 후 제출" autocomplete="off">
+        <button data-q="${q.id}" class="short-submit">제출</button>
+      </div><div class="short-result" id="sr-${q.id}"></div>`;
+  }
+  inner += `<div class="expl" id="expl-${q.id}"></div>`;
+  card.innerHTML = inner;
+  root.appendChild(card);
+});
+
+function revealExpl(q){
+  const el = document.getElementById('expl-'+q.id);
+  el.innerHTML = `${q.explanation}<span class="src">📌 근거: ${q.src}</span>`;
+  el.classList.add('show');
+}
+
+function updateScore(){
+  document.getElementById('sSolved').textContent = state.solved;
+  document.getElementById('sCorrect').textContent = state.correct;
+  const rate = state.solved ? Math.round(state.correct/state.solved*100) : 0;
+  document.getElementById('sRate').textContent = rate;
+  const bar = document.getElementById('pbar');
+  bar.style.width = (state.solved/10*100)+'%';
+  let col = '#e11d48';
+  if(rate>=70) col='#16a34a'; else if(rate>=40) col='#f59e0b';
+  bar.style.background = col;
+  if(state.solved===10) setTimeout(showResult,450);
+}
+
+function grade(q, isCorrect){
+  if(answered.has(q.id)) return;
+  answered.add(q.id);
+  state.solved++; if(isCorrect) state.correct++;
+  revealExpl(q);
+  updateScore();
+}
+
+/* MC */
+document.querySelectorAll('.opt').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    const qid = +btn.dataset.q, idx = +btn.dataset.i;
+    if(answered.has(qid)) return;
+    const q = QUIZ_DATA.find(x=>x.id===qid);
+    const isCorrect = idx===q.answer;
+    const sibs = document.querySelectorAll(`.opt[data-q="${qid}"]`);
+    sibs.forEach(s=>{
+      s.disabled = true;
+      const si = +s.dataset.i;
+      if(si===q.answer){ s.classList.add('correct'); s.querySelector('.badge').textContent='✓ 정답'; }
+    });
+    if(!isCorrect){ btn.classList.add('wrong'); btn.querySelector('.badge').textContent='✗ 오답'; }
+    grade(q, isCorrect);
+  });
+});
+
+/* OX */
+document.querySelectorAll('.ox-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    const qid=+btn.dataset.q, v=btn.dataset.v;
+    if(answered.has(qid)) return;
+    const q = QUIZ_DATA.find(x=>x.id===qid);
+    const isCorrect = v===q.answer;
+    document.querySelectorAll(`.ox-btn[data-q="${qid}"]`).forEach(s=>{
+      s.disabled=true;
+      if(s.dataset.v===q.answer) s.classList.add('correct');
+    });
+    if(!isCorrect) btn.classList.add('wrong');
+    grade(q, isCorrect);
+  });
+});
+
+/* SHORT */
+function normalize(s){ return s.trim().toLowerCase().replace(/\s+/g,''); }
+document.querySelectorAll('.short-submit').forEach(btn=>{
+  const qid=+btn.dataset.q;
+  const input=document.getElementById('in-'+qid);
+  const submit=()=>{
+    if(answered.has(qid)) return;
+    const val = normalize(input.value);
+    if(!val){ input.focus(); return; }
+    const q = QUIZ_DATA.find(x=>x.id===qid);
+    const isCorrect = q.accept.some(a=>{ const na=normalize(a); return val.includes(na)||na.includes(val); });
+    input.disabled=true; btn.disabled=true;
+    const sr=document.getElementById('sr-'+qid);
+    sr.className='short-result '+(isCorrect?'ok':'no');
+    sr.textContent = isCorrect ? '✓ 정답!' : `✗ 오답 — 정답: ${q.answer}`;
+    grade(q, isCorrect);
+  };
+  btn.addEventListener('click', submit);
+  input.addEventListener('keydown', e=>{ if(e.key==='Enter') submit(); });
+});
+
+/* RESULT */
+function showResult(){
+  const score = state.correct;
+  let grade, msg;
+  if(score>=9){ grade='A'; msg='완벽에 가깝습니다. 발표 핵심을 정확히 짚으셨네요!'; }
+  else if(score>=7){ grade='B'; msg='탄탄합니다. 몇 개의 디테일만 더 챙기면 완벽!'; }
+  else if(score>=5){ grade='C'; msg='절반은 넘겼습니다. 해설을 한 번 더 훑어보세요.'; }
+  else { grade='D'; msg='리포트를 다시 읽고 도전해보세요. 충분히 따라잡을 수 있어요.'; }
+  document.getElementById('mGrade').textContent = grade;
+  document.getElementById('mScore').textContent = `${score} / 10  ·  정답률 ${score*10}%`;
+  document.getElementById('mMsg').textContent = msg;
+  document.getElementById('overlay').classList.add('show');
+}
+
+document.getElementById('retryBtn').addEventListener('click', ()=>{
+  state={solved:0,correct:0}; answered.clear();
+  document.getElementById('overlay').classList.remove('show');
+  root.innerHTML=''; buildAll();
+  updateScore();
+  window.scrollTo({top:0, behavior:'smooth'});
+});
+
+/* rebuild on retry */
+function buildAll(){
+  QUIZ_DATA.forEach(q=>{
+    const card=document.createElement('div'); card.className='q-card';
+    const [dTxt,dCls]=diffLabel[q.difficulty];
+    let inner=`<div class="q-top"><span class="q-no">Q${q.id}</span><span class="q-type">${typeLabel[q.type]}</span><span class="q-diff ${dCls}">${dTxt}</span></div><div class="q-text">${q.question}</div>`;
+    if(q.type==='mc'){ inner+='<div class="opts">'; q.options.forEach((o,i)=>{inner+=`<button class="opt" data-q="${q.id}" data-i="${i}">${o}<span class="badge"></span></button>`;}); inner+='</div>'; }
+    else if(q.type==='ox'){ inner+=`<div class="ox-row"><button class="ox-btn" data-q="${q.id}" data-v="O">O</button><button class="ox-btn" data-q="${q.id}" data-v="X">X</button></div>`; }
+    else{ inner+=`<div class="short-row"><input type="text" id="in-${q.id}" placeholder="정답 입력 후 제출" autocomplete="off"><button data-q="${q.id}" class="short-submit">제출</button></div><div class="short-result" id="sr-${q.id}"></div>`; }
+    inner+=`<div class="expl" id="expl-${q.id}"></div>`;
+    card.innerHTML=inner; root.appendChild(card);
+  });
+  bindEvents();
+}
+
+function bindEvents(){
+  document.querySelectorAll('.opt').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const qid=+btn.dataset.q, idx=+btn.dataset.i;
+      if(answered.has(qid)) return;
+      const q=QUIZ_DATA.find(x=>x.id===qid);
+      const isCorrect=idx===q.answer;
+      document.querySelectorAll(`.opt[data-q="${qid}"]`).forEach(s=>{
+        s.disabled=true; const si=+s.dataset.i;
+        if(si===q.answer){ s.classList.add('correct'); s.querySelector('.badge').textContent='✓ 정답'; }
+      });
+      if(!isCorrect){ btn.classList.add('wrong'); btn.querySelector('.badge').textContent='✗ 오답'; }
+      grade(q,isCorrect);
+    });
+  });
+  document.querySelectorAll('.ox-btn').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const qid=+btn.dataset.q, v=btn.dataset.v;
+      if(answered.has(qid)) return;
+      const q=QUIZ_DATA.find(x=>x.id===qid);
+      const isCorrect=v===q.answer;
+      document.querySelectorAll(`.ox-btn[data-q="${qid}"]`).forEach(s=>{ s.disabled=true; if(s.dataset.v===q.answer) s.classList.add('correct'); });
+      if(!isCorrect) btn.classList.add('wrong');
+      grade(q,isCorrect);
+    });
+  });
+  document.querySelectorAll('.short-submit').forEach(btn=>{
+    const qid=+btn.dataset.q; const input=document.getElementById('in-'+qid);
+    const submit=()=>{
+      if(answered.has(qid)) return;
+      const val=normalize(input.value); if(!val){ input.focus(); return; }
+      const q=QUIZ_DATA.find(x=>x.id===qid);
+      const isCorrect=q.accept.some(a=>{const na=normalize(a); return val.includes(na)||na.includes(val);});
+      input.disabled=true; btn.disabled=true;
+      const sr=document.getElementById('sr-'+qid);
+      sr.className='short-result '+(isCorrect?'ok':'no');
+      sr.textContent=isCorrect?'✓ 정답!':`✗ 오답 — 정답: ${q.answer}`;
+      grade(q,isCorrect);
+    };
+    btn.addEventListener('click',submit);
+    input.addEventListener('keydown',e=>{ if(e.key==='Enter') submit(); });
+  });
+}
+
+updateScore();
+</script>
+</body>
+</html>

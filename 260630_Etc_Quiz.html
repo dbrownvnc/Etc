@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>퀴즈 — 퀄컴 HBC와 AI 서버 전쟁</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600&family=Noto+Sans+KR:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#ffffff;
+    --bg-alt:#fafafa;
+    --text:#1a1a1a;
+    --text-2:#777777;
+    --accent:#e11d48;
+    --accent-2:#f43f5e;
+    --border:#e5e5e5;
+    --green:#16a34a;
+    --green-bg:#e8f8ee;
+    --red:#dc2626;
+    --red-bg:#fdecee;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg-alt);
+    color:var(--text);
+    font-family:'Noto Sans KR', sans-serif;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  .page{max-width:680px; margin:0 auto; padding:0 16px 60px;}
+
+  .hero{padding:30px 0 18px; text-align:center;}
+  .hero .eyebrow{
+    font-size:11.5px; letter-spacing:.18em; color:var(--accent); font-weight:700;
+    text-transform:uppercase; margin-bottom:10px;
+  }
+  .hero h1{
+    font-family:'Playfair Display', serif; font-size:25px; font-weight:700; margin:0;
+    color:var(--text); line-height:1.35;
+  }
+  .hero p{font-size:13.5px; color:var(--text-2); margin:10px 0 0;}
+
+  /* sticky scoreboard */
+  .scoreboard{
+    position:sticky; top:0; z-index:50;
+    background:#fff; border-bottom:1px solid var(--border);
+    padding:12px 16px; margin:0 -16px 20px;
+    box-shadow:0 2px 10px rgba(0,0,0,0.04);
+  }
+  .score-row{display:flex; justify-content:space-between; align-items:center; max-width:648px; margin:0 auto;}
+  .score-item{text-align:center; flex:1;}
+  .score-item .label{font-size:10.5px; color:var(--text-2); margin-bottom:2px;}
+  .score-item .value{font-family:'Playfair Display',serif; font-weight:700; font-size:19px; color:var(--text);}
+  .score-item .value.rose{color:var(--accent);}
+  .progress-bar-track{
+    height:7px; border-radius:5px; background:var(--border); margin-top:10px; overflow:hidden; max-width:648px; margin-left:auto; margin-right:auto;
+  }
+  .progress-bar-fill{
+    height:100%; width:0%; border-radius:5px; background:#dc2626; transition:width .4s ease, background .4s ease;
+  }
+
+  .qcard{
+    background:#fff; border:1px solid var(--border); border-radius:10px;
+    padding:20px 18px; margin-bottom:16px;
+  }
+  .qhead{display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;}
+  .qnum{font-family:'Playfair Display',serif; font-weight:700; font-size:14px; color:var(--accent);}
+  .badges{display:flex; gap:6px;}
+  .badge{
+    font-size:10.5px; padding:3px 9px; border-radius:100px; font-weight:700;
+  }
+  .badge.diff-easy{background:#e8f8ee; color:#16a34a;}
+  .badge.diff-medium{background:#fff4e0; color:#c2750c;}
+  .badge.diff-hard{background:#fdecee; color:#dc2626;}
+  .badge.type{background:var(--bg-alt); color:var(--text-2); border:1px solid var(--border);}
+
+  .qtext{font-size:15.5px; font-weight:600; margin:6px 0 14px; line-height:1.55; color:var(--text);}
+
+  .options{display:flex; flex-direction:column; gap:9px;}
+  .opt{
+    text-align:left; padding:12px 14px; border-radius:7px; border:1.5px solid var(--border);
+    background:#fff; font-size:14.5px; color:var(--text); cursor:pointer;
+    font-family:'Noto Sans KR',sans-serif; position:relative; transition:all .15s ease;
+  }
+  .opt:hover:not(:disabled){border-color:var(--accent-2); background:#fff8f9;}
+  .opt:disabled{cursor:default;}
+  .opt .opt-badge{
+    float:right; font-size:11px; font-weight:700; padding:2px 8px; border-radius:100px; margin-left:8px;
+  }
+  .opt.correct{background:var(--green-bg); border-color:var(--green); color:#0c5f2b;}
+  .opt.correct .opt-badge{background:var(--green); color:#fff;}
+  .opt.wrong{background:var(--red-bg); border-color:var(--red); color:#7a1620;}
+  .opt.wrong .opt-badge{background:var(--red); color:#fff;}
+
+  .ox-row{display:flex; gap:10px;}
+  .ox-btn{
+    flex:1; padding:16px; font-size:20px; font-weight:800; border-radius:8px;
+    border:1.5px solid var(--border); background:#fff; cursor:pointer; font-family:'Playfair Display',serif;
+    color:var(--text);
+  }
+  .ox-btn:hover:not(:disabled){border-color:var(--accent-2);}
+  .ox-btn.correct{background:var(--green-bg); border-color:var(--green); color:#0c5f2b;}
+  .ox-btn.wrong{background:var(--red-bg); border-color:var(--red); color:#7a1620;}
+
+  .sa-row{display:flex; gap:8px; margin-top:4px;}
+  .sa-input{
+    flex:1; padding:12px 14px; border-radius:7px; border:1.5px solid var(--border);
+    font-size:14.5px; font-family:'Noto Sans KR',sans-serif; outline:none;
+  }
+  .sa-input:focus{border-color:var(--accent);}
+  .sa-submit{
+    padding:12px 18px; border-radius:7px; border:none; background:var(--accent); color:#fff;
+    font-weight:700; font-size:14px; cursor:pointer; font-family:'Noto Sans KR',sans-serif;
+  }
+  .sa-submit:disabled{background:var(--border); color:var(--text-2); cursor:default;}
+  .sa-feedback{
+    margin-top:10px; padding:10px 12px; border-radius:6px; font-size:14px; font-weight:700; display:none;
+  }
+  .sa-feedback.correct{display:block; background:var(--green-bg); color:#0c5f2b;}
+  .sa-feedback.wrong{display:block; background:var(--red-bg); color:#7a1620;}
+
+  .explain{
+    margin-top:14px; padding:14px 15px; background:var(--bg-alt); border-radius:7px;
+    border-left:3px solid var(--accent); display:none; font-size:13.5px; color:var(--text);
+    line-height:1.6;
+  }
+  .explain.show{display:block;}
+  .explain .etitle{font-weight:700; color:var(--accent); font-size:12.5px; margin-bottom:6px; text-transform:uppercase; letter-spacing:.03em;}
+
+  /* result modal */
+  .overlay{
+    position:fixed; inset:0; background:rgba(26,26,26,.55); display:none;
+    align-items:center; justify-content:center; z-index:100; padding:20px;
+  }
+  .overlay.show{display:flex;}
+  .result-card{
+    background:#fff; border-radius:16px; padding:34px 26px; max-width:380px; width:100%;
+    text-align:center; box-shadow:0 20px 60px rgba(0,0,0,.3);
+  }
+  .result-card .grade{
+    font-family:'Playfair Display',serif; font-weight:800; font-size:58px; color:var(--accent); margin-bottom:6px;
+  }
+  .result-card .score-text{font-size:16px; color:var(--text); font-weight:700; margin-bottom:4px;}
+  .result-card .pct-text{font-size:13.5px; color:var(--text-2); margin-bottom:16px;}
+  .result-card .msg{font-size:14px; color:var(--text); margin-bottom:22px; line-height:1.6;}
+  .retry-btn{
+    background:var(--accent); color:#fff; border:none; padding:13px 26px; border-radius:8px;
+    font-size:14.5px; font-weight:700; cursor:pointer; font-family:'Noto Sans KR',sans-serif;
+  }
+
+  footer{text-align:center; color:var(--text-2); font-size:12px; margin-top:30px;}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="hero">
+    <div class="eyebrow">QUIZ</div>
+    <h1>퀄컴 HBC와<br>AI 서버 전쟁</h1>
+    <p>드래곤플라이, HBM 대 HBC, 그리고 한국의 기회 — 10문제로 점검하기</p>
+  </div>
+
+  <div class="scoreboard">
+    <div class="score-row">
+      <div class="score-item"><div class="label">푼 문제</div><div class="value" id="solvedCount">0 / 10</div></div>
+      <div class="score-item"><div class="label">맞힌 문제</div><div class="value rose" id="correctCount">0</div></div>
+      <div class="score-item"><div class="label">정답률</div><div class="value" id="pctCount">0%</div></div>
+    </div>
+    <div class="progress-bar-track"><div class="progress-bar-fill" id="progressFill"></div></div>
+  </div>
+
+  <div id="quizContainer"></div>
+
+  <footer>안될공학 · 퀄컴 HBC 분석 시험문제</footer>
+</div>
+
+<div class="overlay" id="resultOverlay">
+  <div class="result-card">
+    <div class="grade" id="gradeText">A</div>
+    <div class="score-text" id="finalScoreText">10 / 10 정답</div>
+    <div class="pct-text" id="finalPctText">정답률 100%</div>
+    <div class="msg" id="finalMsg">완벽합니다! HBC와 메모리 월의 핵심을 정확히 짚으셨네요.</div>
+    <button class="retry-btn" id="retryBtn">다시 풀기</button>
+  </div>
+</div>
+
+<script>
+const QUIZ_DATA = [
+  {
+    id:1, type:'mc', difficulty:'easy',
+    question:'퀄컴이 2026년 6월 24일 인베스터데이에서 데이터센터 시장에 출사표를 던지며 발표한 풀세트 플랫폼의 이름은?',
+    options:['스냅드래곤 클라우드','드래곤플라이(Dragonfly)','오라이언 서버','스냅드래곤 X'],
+    answer:1,
+    explanation:'퀄컴은 "Qualcomm Dragonfly"라는 이름으로 가속기·네트워크·CPU·메모리·소프트웨어를 묶은 풀세트 플랫폼을 공개했습니다. 자막 근거: "퀄컴 인베스터데이 무대에서 드래곤플라이...데이터 센터 시장에 정식으로 출사표를 던졌어요."'
+  },
+  {
+    id:2, type:'mc', difficulty:'easy',
+    question:'퀄컴이 드래곤플라이를 발표하며 함께한 파트너 회사는?',
+    options:['SK하이닉스','마이크론','삼성전자','TSMC'],
+    answer:2,
+    explanation:'드래곤플라이의 파트너는 갤럭시 생태계를 함께 키워온 삼성전자입니다. 자막 근거: "심지어 파트너도 잭드래곤의 삼성이죠."'
+  },
+  {
+    id:3, type:'ox', difficulty:'easy',
+    question:'HBC는 HBM처럼 새로운 메모리 규격이다.',
+    answer:false,
+    explanation:'HBC(High Bandwidth Compute)는 이름이 HBM과 비슷해 헷갈리기 쉽지만 새로운 메모리 규격이 아닙니다. 메모리 다이 위에 연산 다이를 쌓은 3D 적층 구조입니다. 자막 근거: "HBC는 새로운 메모리 규격이 아닙니다."'
+  },
+  {
+    id:4, type:'mc', difficulty:'medium',
+    question:'HBM과 HBC의 핵심적인 발상 차이를 가장 정확히 설명한 것은?',
+    options:[
+      'HBM은 데이터 이동량을 줄이고, HBC는 통로를 넓힌다',
+      'HBM은 통로(대역폭)를 넓히고, HBC는 옮길 데이터 자체를 줄인다',
+      '둘 다 통로를 넓히는 방식이다',
+      '둘 다 메모리 용량을 늘리는 방식이다'
+    ],
+    answer:1,
+    explanation:'HBM은 데이터를 더 빨리 보내려 통로(대역폭)를 넓힌 기술이고, HBC는 메모리 옆에서 미리 계산해 옮길 데이터 자체를 줄이는 정반대의 해법입니다. 자막 근거: "HBM은 데이터를 더 빨리 보내자...길을 넓히는 쪽이었고요. HBC는 아예 옮길 데이터를 줄여버리자...통행량 자체를 줄이는 쪽이에요."'
+  },
+  {
+    id:5, type:'sa', difficulty:'medium',
+    question:'HBC 1세대를 탑재한 첫 가속기 카드 AI250의 메모리 용량은 몇 GB인가? (숫자만 입력)',
+    answer:'768',
+    explanation:'AI250 카드 한 장의 메모리 용량은 768GB입니다. 자막 근거: "이 카드 한 장이 메모리 용량이 768GB."'
+  },
+  {
+    id:6, type:'mc', difficulty:'medium',
+    question:'그록(Groq)과 퀄컴 HBC가 디코드 병목을 해결하는 방식의 차이를 옳게 설명한 것은?',
+    options:[
+      '그록은 DRAM(용량), 퀄컴은 SRAM(속도)을 선택했다',
+      '그록은 SRAM(속도), 퀄컴은 DRAM(용량)을 선택했다',
+      '둘 다 SRAM을 사용한다',
+      '둘 다 HBM을 사용한다'
+    ],
+    answer:1,
+    explanation:'그록은 빠르지만 작은 SRAM(속도)을 택했고, 퀄컴은 느려도 용량이 큰 DRAM(용량) 곁에 계산기를 붙였습니다. 자막 근거: "그록은 S램을 골랐고요 퀄컴은 D램을 골랐거든요."'
+  },
+  {
+    id:7, type:'mc', difficulty:'medium',
+    question:"본문에서 설명한 '유효 대역폭(effective bandwidth)'의 의미로 가장 정확한 것은?",
+    options:[
+      '메모리에서 실제로 물리적으로 전송된 속도',
+      '메모리 옆 연산으로 줄인 데이터까지 환산해서 합친 값',
+      'GPU의 연산 속도만을 측정한 값',
+      'HBM과 동일한 측정 방식으로 잰 값'
+    ],
+    answer:1,
+    explanation:'유효 대역폭은 실제로 통과한 물리적 속도가 아니라, 메모리 옆에서 처리해 굳이 안 보내도 됐던 데이터까지 보냈다고 치고 환산해 합친 값입니다. 자막 근거: "이거를 모르고 넘어가시면 숫자에 속아버려요...환산을 해서 합친 값이에요. 그래서 유효 대역폭이라고 부르는 겁니다."'
+  },
+  {
+    id:8, type:'sa', difficulty:'hard',
+    question:'퀄컴이 누비아(Nuvia)를 인수해 얻은, C1000 CPU에 쓰인 코어의 이름은? (한글 또는 영문)',
+    answer:['오라이언','oryon'],
+    explanation:'C1000은 퀄컴이 누비아라는 칩 설계 회사를 인수해 얻은 오라이언(Oryon) 코어를 사용합니다. 자막 근거: "C1000은 오라이언이라는 코어를 쓰는데 이거는 퀄컴이 누비아라는 칩 설계 회사를 통째로 인수를 해서 손에 넣은 기술이에요."'
+  },
+  {
+    id:9, type:'mc', difficulty:'hard',
+    question:"퀄컴이 약 39억 달러에 인수한 AI 소프트웨어 회사로, 하드웨어 종류에 관계없이 같은 AI 모델을 그대로 돌릴 수 있게 해주는 '통역사' 역할을 하는 곳은?",
+    options:['Hugging Face','Modular','Nuvia','Groq'],
+    answer:1,
+    explanation:'퀄컴은 모듈러(Modular)를 약 39억 달러, 전액 주식으로 인수했습니다. CPU·GPU·NPU 등 하드웨어가 달라도 같은 모델을 코드 수정 없이 돌릴 수 있게 해주는 회사로, 엔비디아의 CUDA에 도전하는 행보입니다. 자막 근거: "컬펌이 이번에 모듈러라는 AI 소프트웨어 회사를 인수하기로 했는데요...금액이 약 39억 달러입니다."'
+  },
+  {
+    id:10, type:'ox', difficulty:'medium',
+    question:'이번 퀄컴의 발표는 삼성전자와 SK하이닉스의 HBC 공급 계약이 확정되었음을 의미한다.',
+    answer:false,
+    explanation:'협력사 명단에 SK하이닉스 아메리카, 삼성SDS 등의 이름이 올라 있지만, HBC에 들어갈 메모리 공급사나 3D 적층 담당은 발표되지 않았습니다. 자막 근거: "이번 발표가 두 회사의 HBC 공급 계약을 의미하지는 않는다는 점입니다...김칫국부터 마시면 안 돼요."'
+  }
+];
+
+let state = { solved: 0, correct: 0 };
+const total = QUIZ_DATA.length;
+
+const diffLabel = { easy:'쉬움', medium:'보통', hard:'어려움' };
+const typeLabel = { mc:'객관식', sa:'단답형', ox:'OX' };
+
+function renderQuiz(){
+  const container = document.getElementById('quizContainer');
+  container.innerHTML = '';
+  QUIZ_DATA.forEach((q, idx) => {
+    const card = document.createElement('div');
+    card.className = 'qcard';
+    card.id = 'qcard-' + q.id;
+
+    let bodyHtml = '';
+    if (q.type === 'mc') {
+      bodyHtml = `<div class="options" id="opts-${q.id}">` +
+        q.options.map((opt, i) => `<button class="opt" data-idx="${i}" onclick="answerMC(${q.id}, ${i})">${opt}</button>`).join('') +
+        `</div>`;
+    } else if (q.type === 'ox') {
+      bodyHtml = `<div class="ox-row" id="opts-${q.id}">
+        <button class="ox-btn" data-val="true" onclick="answerOX(${q.id}, true)">O</button>
+        <button class="ox-btn" data-val="false" onclick="answerOX(${q.id}, false)">X</button>
+      </div>`;
+    } else if (q.type === 'sa') {
+      bodyHtml = `<div class="sa-row" id="opts-${q.id}">
+        <input type="text" class="sa-input" id="sa-input-${q.id}" placeholder="답을 입력하세요">
+        <button class="sa-submit" id="sa-submit-${q.id}" onclick="answerSA(${q.id})">제출</button>
+      </div>
+      <div class="sa-feedback" id="sa-feedback-${q.id}"></div>`;
+    }
+
+    card.innerHTML = `
+      <div class="qhead">
+        <span class="qnum">Q${idx+1}</span>
+        <div class="badges">
+          <span class="badge type">${typeLabel[q.type]}</span>
+          <span class="badge diff-${q.difficulty}">${diffLabel[q.difficulty]}</span>
+        </div>
+      </div>
+      <div class="qtext">${q.question}</div>
+      ${bodyHtml}
+      <div class="explain" id="explain-${q.id}">
+        <div class="etitle">해설</div>
+        <div>${q.explanation}</div>
+      </div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+function lockQuestion(id){
+  const opts = document.getElementById('opts-' + id);
+  if (!opts) return;
+  opts.querySelectorAll('button').forEach(b => b.disabled = true);
+  const input = document.getElementById('sa-input-' + id);
+  if (input) input.disabled = true;
+}
+
+function showExplain(id){
+  const ex = document.getElementById('explain-' + id);
+  if (ex) ex.classList.add('show');
+}
+
+function recordAnswer(isCorrect){
+  state.solved += 1;
+  if (isCorrect) state.correct += 1;
+  updateScoreboard();
+  if (state.solved === total) {
+    setTimeout(showResult, 500);
+  }
+}
+
+function updateScoreboard(){
+  document.getElementById('solvedCount').textContent = state.solved + ' / ' + total;
+  document.getElementById('correctCount').textContent = state.correct;
+  const pct = state.solved > 0 ? Math.round((state.correct / state.solved) * 100) : 0;
+  document.getElementById('pctCount').textContent = pct + '%';
+  const fill = document.getElementById('progressFill');
+  fill.style.width = pct + '%';
+  if (pct < 40) fill.style.background = '#dc2626';
+  else if (pct < 70) fill.style.background = '#f59e0b';
+  else fill.style.background = '#16a34a';
+}
+
+function answerMC(id, selectedIdx){
+  const q = QUIZ_DATA.find(item => item.id === id);
+  if (!q || document.getElementById('qcard-' + id).dataset.answered) return;
+  document.getElementById('qcard-' + id).dataset.answered = '1';
+
+  const opts = document.querySelectorAll('#opts-' + id + ' .opt');
+  opts.forEach((btn, i) => {
+    if (i === q.answer) {
+      btn.classList.add('correct');
+      btn.innerHTML = btn.innerHTML + '<span class="opt-badge">✓ 정답!</span>';
+    } else if (i === selectedIdx) {
+      btn.classList.add('wrong');
+      btn.innerHTML = btn.innerHTML + '<span class="opt-badge">✗ 오답</span>';
+    }
+  });
+  lockQuestion(id);
+  showExplain(id);
+  recordAnswer(selectedIdx === q.answer);
+}
+
+function answerOX(id, val){
+  const q = QUIZ_DATA.find(item => item.id === id);
+  if (!q || document.getElementById('qcard-' + id).dataset.answered) return;
+  document.getElementById('qcard-' + id).dataset.answered = '1';
+
+  const btns = document.querySelectorAll('#opts-' + id + ' .ox-btn');
+  btns.forEach(btn => {
+    const btnVal = btn.dataset.val === 'true';
+    if (btnVal === q.answer) {
+      btn.classList.add('correct');
+    } else if (btnVal === val) {
+      btn.classList.add('wrong');
+    }
+  });
+  lockQuestion(id);
+  showExplain(id);
+  recordAnswer(val === q.answer);
+}
+
+function answerSA(id){
+  const q = QUIZ_DATA.find(item => item.id === id);
+  const card = document.getElementById('qcard-' + id);
+  if (!q || card.dataset.answered) return;
+
+  const input = document.getElementById('sa-input-' + id);
+  const raw = input.value.trim();
+  if (raw === '') { input.focus(); return; }
+
+  card.dataset.answered = '1';
+  const normalized = raw.toLowerCase().replace(/\s/g, '');
+  const acceptable = Array.isArray(q.answer) ? q.answer : [q.answer];
+  const isCorrect = acceptable.some(a => a.toLowerCase().replace(/\s/g, '') === normalized);
+
+  const feedback = document.getElementById('sa-feedback-' + id);
+  feedback.classList.add(isCorrect ? 'correct' : 'wrong');
+  feedback.textContent = isCorrect
+    ? '✓ 정답! (' + (Array.isArray(q.answer) ? q.answer[0] : q.answer) + ')'
+    : '✗ 오답 — 정답: ' + (Array.isArray(q.answer) ? q.answer[0] : q.answer);
+
+  lockQuestion(id);
+  document.getElementById('sa-submit-' + id).disabled = true;
+  showExplain(id);
+  recordAnswer(isCorrect);
+}
+
+function showResult(){
+  const pct = Math.round((state.correct / total) * 100);
+  let grade = 'D', msg = '아쉬워요. 다시 한번 차근차근 짚어볼까요?';
+  if (pct === 100) { grade = 'A+'; msg = '완벽합니다! HBC와 메모리 월의 핵심을 정확히 짚으셨네요.'; }
+  else if (pct >= 80) { grade = 'A'; msg = '훌륭해요! HBM과 HBC의 차이를 제대로 이해하셨습니다.'; }
+  else if (pct >= 60) { grade = 'B'; msg = '잘하셨어요. 몇 가지 디테일만 더 다지면 완벽합니다.'; }
+  else if (pct >= 40) { grade = 'C'; msg = '핵심 개념을 다시 한번 짚어보면 좋겠어요.'; }
+
+  document.getElementById('gradeText').textContent = grade;
+  document.getElementById('finalScoreText').textContent = state.correct + ' / ' + total + ' 정답';
+  document.getElementById('finalPctText').textContent = '정답률 ' + pct + '%';
+  document.getElementById('finalMsg').textContent = msg;
+  document.getElementById('resultOverlay').classList.add('show');
+}
+
+function resetQuiz(){
+  state = { solved: 0, correct: 0 };
+  updateScoreboard();
+  document.getElementById('resultOverlay').classList.remove('show');
+  renderQuiz();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+document.getElementById('retryBtn').addEventListener('click', resetQuiz);
+
+renderQuiz();
+updateScoreboard();
+</script>
+</body>
+</html>

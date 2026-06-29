@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>메모리가 연산의 무대가 된다 — 퀄컴 HBC와 한국의 기회</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;0,800;1,500;1,600&family=Noto+Sans+KR:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+<style>
+  :root{
+    --bg:#ffffff;
+    --bg-alt:#fafafa;
+    --text:#1a1a1a;
+    --text-2:#777777;
+    --accent:#e11d48;
+    --accent-2:#f43f5e;
+    --border:#e5e5e5;
+    --c1:#e11d48;
+    --c2:#1a1a1a;
+    --c3:#6b7280;
+    --c4:#2563eb;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Noto Sans KR', sans-serif;
+    -webkit-font-smoothing:antialiased;
+    line-height:1.75;
+  }
+  .page{
+    max-width:680px;
+    margin:0 auto;
+    padding:0 22px 90px;
+  }
+  h1,h2,h3{font-family:'Playfair Display', serif; margin:0;}
+  .eyebrow{
+    font-family:'Noto Sans KR', sans-serif;
+    font-weight:700;
+    font-size:11.5px;
+    letter-spacing:0.18em;
+    color:var(--accent);
+    text-transform:uppercase;
+    margin-bottom:10px;
+  }
+  /* HERO */
+  .hero{
+    padding:54px 0 36px;
+    border-bottom:1px solid var(--border);
+  }
+  .hero .kicker{
+    display:flex; align-items:center; gap:8px;
+    font-size:11.5px; color:var(--text-2); margin-bottom:18px;
+    font-weight:500;
+  }
+  .hero .kicker .dot{width:5px;height:5px;border-radius:50%;background:var(--accent);}
+  .hero h1{
+    font-size:34px;
+    font-weight:700;
+    line-height:1.28;
+    letter-spacing:-0.01em;
+    color:var(--text);
+  }
+  .hero h1 em{font-style:italic; color:var(--accent);}
+  .hero .sub{
+    margin-top:16px;
+    font-size:16.5px;
+    color:var(--text-2);
+    font-weight:400;
+    line-height:1.6;
+  }
+  .meta-row{
+    margin-top:26px;
+    display:flex;
+    gap:18px;
+    font-size:12.5px;
+    color:var(--text-2);
+    border-top:1px solid var(--border);
+    padding-top:16px;
+    flex-wrap:wrap;
+  }
+  .meta-row b{color:var(--text); font-weight:600;}
+
+  /* fade-in / chart pattern (required) */
+  .fade-in{
+    opacity:0;
+    transform:translateY(18px);
+    transition:opacity 0.7s ease, transform 0.7s ease;
+  }
+  .fade-in.visible{opacity:1; transform:translateY(0);}
+  .chart-container{
+    position:relative;
+    max-height:340px;
+    margin:22px 0 8px;
+  }
+  .chart-container canvas{
+    opacity:0;
+    transition:opacity 0.4s ease;
+    max-height:300px;
+  }
+  .chart-container.chart-ready canvas{opacity:1;}
+
+  section{padding:40px 0;}
+  section + section{border-top:1px solid var(--border);}
+  .num-tag{
+    display:inline-flex; align-items:center; justify-content:center;
+    width:30px; height:30px; border-radius:50%;
+    background:var(--accent); color:#fff;
+    font-family:'Playfair Display',serif; font-weight:700; font-size:14px;
+    margin-bottom:14px;
+  }
+  h2.section-title{
+    font-size:25px; font-weight:700; line-height:1.35; margin-bottom:14px; color:var(--text);
+  }
+  h3.sub-title{
+    font-size:18px; font-weight:600; font-family:'Noto Sans KR',sans-serif;
+    color:var(--accent); margin:24px 0 10px;
+  }
+  p{margin:0 0 14px; font-size:15.5px; color:var(--text);}
+  p.lead{font-size:16.5px; color:var(--text);}
+  ul, ol{margin:0 0 16px; padding-left:20px;}
+  li{margin-bottom:8px; font-size:15.5px;}
+  strong{font-weight:700;}
+  strong.hl{color:var(--accent); font-weight:700;}
+
+  .pull{
+    margin:26px 0;
+    padding:20px 20px 20px 22px;
+    border-left:3px solid var(--accent);
+    background:var(--bg-alt);
+    font-family:'Playfair Display', serif;
+    font-style:italic;
+    font-size:18px;
+    line-height:1.55;
+    color:var(--text);
+  }
+
+  .callout{
+    margin:24px 0;
+    padding:20px 20px;
+    background:var(--bg-alt);
+    border:1px solid var(--border);
+    border-radius:4px;
+  }
+  .callout .ctitle{
+    font-weight:700; font-size:13px; letter-spacing:0.04em;
+    color:var(--accent); margin-bottom:8px; text-transform:uppercase;
+  }
+  .callout p:last-child{margin-bottom:0;}
+
+  .warn{
+    margin:24px 0;
+    padding:18px 20px;
+    background:#fff1f3;
+    border:1px solid #fbd0da;
+    border-radius:4px;
+  }
+  .warn .ctitle{
+    font-weight:700; font-size:13px; color:var(--accent); margin-bottom:8px;
+    display:flex; align-items:center; gap:6px;
+  }
+  .warn p:last-child{margin-bottom:0;}
+  .warn p{font-size:14.5px; color:#5c1322;}
+
+  table{width:100%; border-collapse:collapse; margin:20px 0; font-size:14px;}
+  th{
+    background:var(--accent); color:#fff; font-weight:600; text-align:left;
+    padding:10px 12px; font-size:13px;
+  }
+  td{padding:10px 12px; border-bottom:1px solid var(--border); background:var(--bg-alt);}
+  tr:last-child td{border-bottom:none;}
+
+  .chip-row{display:flex; gap:8px; flex-wrap:wrap; margin:14px 0;}
+  .chip{
+    font-size:12.5px; padding:5px 12px; border-radius:100px;
+    border:1px solid var(--border); color:var(--text-2); background:#fff;
+  }
+
+  /* analogy compare */
+  .vs-wrap{
+    display:flex; gap:10px; margin:20px 0;
+  }
+  .vs-card{
+    flex:1; padding:16px; border-radius:6px; border:1px solid var(--border);
+    background:var(--bg-alt);
+  }
+  .vs-card h4{font-size:14px; margin:0 0 8px; font-weight:700; color:var(--text);}
+  .vs-card .tagline{font-size:12px; color:var(--accent); font-weight:600; margin-bottom:8px;}
+  .vs-card p{font-size:13.5px; margin:0; color:var(--text-2);}
+
+  /* interactive: position picker */
+  .picker-row{display:flex; gap:8px; margin:18px 0 0;}
+  .picker-btn{
+    flex:1; padding:11px 6px; font-size:13px; font-weight:600;
+    border:1px solid var(--border); background:#fff; color:var(--text);
+    border-radius:6px; cursor:pointer; transition:all .2s ease;
+    font-family:'Noto Sans KR',sans-serif;
+  }
+  .picker-btn:hover{border-color:var(--accent-2);}
+  .picker-btn.active{background:var(--accent); color:#fff; border-color:var(--accent);}
+  .picker-panel{
+    margin-top:14px; padding:18px; background:var(--bg-alt);
+    border:1px solid var(--border); border-radius:6px; min-height:88px;
+  }
+  .picker-panel h4{margin:0 0 6px; font-size:14.5px; color:var(--accent); font-family:'Noto Sans KR',sans-serif;}
+  .picker-panel p{margin:0; font-size:14px; color:var(--text);}
+
+  /* toggle compare */
+  .toggle-row{display:flex; gap:8px; margin:18px 0;}
+  .toggle-btn{
+    flex:1; padding:11px 8px; font-size:13.5px; font-weight:700;
+    border:1px solid var(--border); background:#fff; color:var(--text-2);
+    border-radius:6px; cursor:pointer; font-family:'Noto Sans KR',sans-serif;
+  }
+  .toggle-btn.active{background:var(--text); color:#fff; border-color:var(--text);}
+  .toggle-btn.active.rose{background:var(--accent); border-color:var(--accent);}
+  .spec-card{
+    border:1px solid var(--border); border-radius:6px; padding:18px; background:var(--bg-alt);
+  }
+  .spec-card .spec-name{font-family:'Playfair Display',serif; font-size:19px; font-weight:700; margin-bottom:4px;}
+  .spec-card .spec-philosophy{font-size:12.5px; color:var(--accent); font-weight:700; margin-bottom:14px; letter-spacing:.02em;}
+  .spec-line{display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px dashed var(--border); font-size:13.5px;}
+  .spec-line:last-child{border-bottom:none;}
+  .spec-line .k{color:var(--text-2);}
+  .spec-line .v{font-weight:700; color:var(--text);}
+
+  /* slider sim */
+  .sim-box{
+    border:1px solid var(--border); border-radius:6px; padding:20px; background:var(--bg-alt); margin:18px 0;
+  }
+  .sim-box .sim-label{font-size:13.5px; color:var(--text-2); margin-bottom:6px; display:flex; justify-content:space-between;}
+  .sim-box .sim-label b{color:var(--accent); font-size:14.5px;}
+  input[type=range]{
+    width:100%; -webkit-appearance:none; height:5px; border-radius:4px;
+    background:var(--border); outline:none; margin:10px 0 18px;
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none; width:20px; height:20px; border-radius:50%;
+    background:var(--accent); cursor:pointer; border:3px solid #fff; box-shadow:0 1px 4px rgba(0,0,0,.25);
+  }
+  .sim-results{display:flex; gap:10px;}
+  .sim-result{
+    flex:1; background:#fff; border:1px solid var(--border); border-radius:6px; padding:14px; text-align:center;
+  }
+  .sim-result .lab{font-size:11.5px; color:var(--text-2); margin-bottom:6px;}
+  .sim-result .num{font-family:'Playfair Display',serif; font-size:23px; font-weight:700; color:var(--text);}
+  .sim-result.hot .num{color:var(--accent);}
+  .sim-note{font-size:12px; color:var(--text-2); margin-top:12px; margin-bottom:0; line-height:1.5;}
+
+  /* timeline */
+  .tline{margin:22px 0 6px; border-left:2px solid var(--border); padding-left:20px;}
+  .tline-item{position:relative; padding-bottom:22px;}
+  .tline-item:last-child{padding-bottom:0;}
+  .tline-item::before{
+    content:''; position:absolute; left:-26px; top:3px; width:10px; height:10px;
+    border-radius:50%; background:var(--accent); border:2px solid #fff; box-shadow:0 0 0 1px var(--accent);
+  }
+  .tline-item .when{font-size:12px; color:var(--accent); font-weight:700; letter-spacing:.04em;}
+  .tline-item .what{font-size:15px; font-weight:700; margin-top:2px;}
+  .tline-item .desc{font-size:13.5px; color:var(--text-2); margin-top:3px;}
+
+  footer{
+    padding-top:36px; text-align:center; color:var(--text-2); font-size:12.5px;
+  }
+  footer .brand{font-family:'Playfair Display',serif; font-weight:700; font-size:15px; color:var(--text); margin-bottom:6px;}
+
+  @media (max-width:380px){
+    .hero h1{font-size:28px;}
+    .vs-wrap{flex-direction:column;}
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="kicker"><span class="dot"></span>QUALCOMM INVESTOR DAY · 2026.06.24 · COMPUTEX</div>
+    <h1>메모리가 <em>연산</em>의 무대가 된다</h1>
+    <p class="sub">스마트폰 칩 회사 퀄컴이 AI 데이터센터에 출사표를 던졌다. HBM이 아닌 <strong>HBC</strong>를 들고 나온 이유, 그리고 이 흐름이 삼성전자와 SK하이닉스에게 의미하는 것.</p>
+    <div class="meta-row">
+      <div><b>분석 대상</b> — 퀄컴 드래곤플라이 / HBC 발표</div>
+      <div><b>관점</b> — 반도체·메모리 산업</div>
+    </div>
+  </div>
+
+  <!-- 1 -->
+  <section>
+    <span class="num-tag">1</span>
+    <h2 class="section-title">잠자리, 데이터센터에 등장하다</h2>
+    <p class="lead">2026년 6월 24일, 퀄컴이 인베스터데이 무대에서 <strong>드래곤플라이(Dragonfly)</strong>라는 이름의 데이터센터 플랫폼을 공개했다. 스마트폰 두뇌 스냅드래곤을 만드는 회사가 엔비디아의 안마당이던 AI 서버 시장에 정식으로 발을 들인 것이다. 파트너는 갤럭시 생태계를 함께 키워온 삼성전자였다.</p>
+    <p>이름에는 메시지가 담겨 있다. 잠자리는 자연에서 가장 효율적으로 나는 곤충으로 꼽힌다. 4개의 날개를 독립적으로 움직이면서도 정교하게 협력하고, 적은 에너지로 오래 난다. 퀄컴은 이 특징을 그대로 데이터센터에 대응시켰다 — <strong>CPU와 AI 가속기, 연결 기술이 따로 돌면서도 하나의 시스템으로 협력</strong>한다는 것. 힘으로 누르는 엔비디아 방식이 아니라 효율로 승부하겠다는 선언이다.</p>
+
+    <h3 class="sub-title">왜 풀세트로 나왔나</h3>
+    <p>퀄컴이 내놓은 건 칩 한 장이 아니라 서버 한 대를 통째로 꾸릴 부품 세트였다. AI 계산을 전담하는 <strong>가속기(NPU)</strong>, 칩끼리 빠르게 통신하게 해주는 <strong>네트워크</strong>, 이 전체를 지휘하는 <strong>서버용 CPU</strong> — 여기에 메모리와 소프트웨어까지 더했다.</p>
+    <p>이유는 시장의 입장 자격이 바뀌었기 때문이다. 엔비디아는 이미 GPU 하나만 파는 게 아니라 CPU·네트워크·소프트웨어까지 묶어서 판다. AMD는 헬리오스(Helios)라는 랙 단위 플랫폼을, 구글은 자체 칩 TPU 중심으로 데이터센터를 통째로 짠다. 이제 칩 하나의 성능 경쟁이 아니라 <strong class="hl">서버 한 랙을 통째로 설계할 역량</strong>이 시장의 입장권이 됐다.</p>
+
+    <div class="pull">"칩 하나 가지고 성능 경쟁을 하는 게 아니라, 서버 한 랙을 통째로 설계할 수 있느냐 — 그게 이 시장의 입장권이 됐다."</div>
+  </section>
+
+  <!-- 2 -->
+  <section>
+    <span class="num-tag">2</span>
+    <h2 class="section-title">왜 지금인가 — 기회와 절박함</h2>
+    <p>퀄컴이 하필 지금 이 문을 두드린 데는 두 가지가 맞물려 있다.</p>
+    <h3 class="sub-title">기회 — 에이전트의 해</h3>
+    <p>퀄컴 CEO 크리스티아노 아몬은 2026년 6월 컴퓨텍스에서 <strong>2026년을 "에이전트의 해"</strong>라고 선언했다. 한 번 묻고 한 번 답하는 챗봇 시대를 넘어, AI 에이전트가 스스로 여러 단계를 추론하고 도구를 불러 쓰는 시대가 온다는 것. 데이터센터가 처리할 일이 폭증한다는 뜻이고, 판이 커지는 지금이 들어갈 타이밍이라는 판단이다.</p>
+    <h3 class="sub-title">절박함 — 스마트폰을 넘어서</h3>
+    <p>퀄컴 매출은 여전히 스마트폰에 크게 묶여 있고, 폰 시장은 예전처럼 빠르게 크지 않는다. 이번 인베스터데이에서 퀄컴은 <strong>2029 회계연도 비핸드셋(스마트폰 외) 매출 목표를 400억 달러</strong>로 크게 높였다. 데이터센터에서 새로운 활로를 찾겠다는 다짐을 숫자로 못 박은 셈이다.</p>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <span class="num-tag">3</span>
+    <h2 class="section-title">AI가 답을 쓰는 두 단계</h2>
+    <p>본격적으로 HBC를 이해하려면 먼저 AI가 글을 만드는 과정을 알아야 한다. 크게 두 단계, <strong>프리필(Prefill)</strong>과 <strong>디코드(Decode)</strong>다.</p>
+    <div class="vs-wrap">
+      <div class="vs-card">
+        <h4>프리필 — 미리 채운다</h4>
+        <div class="tagline">한 번에 몰아서</div>
+        <p>입력된 질문·이미지를 한꺼번에 통째로 훑어 이해하는 단계. 입력 토큰을 한 번에 다 처리할 수 있어 GPU의 막대한 계산력을 제대로 써먹기 좋다.</p>
+      </div>
+      <div class="vs-card">
+        <h4>디코드 — 한 토큰씩</h4>
+        <div class="tagline">하나씩 순서대로</div>
+        <p>답을 한 글자(토큰)씩 만드는 단계. 앞선 토큰을 조건으로 다음 토큰을 계산하는 자기회귀(Auto-Regressive) 구조라 한 번에 몰아서 할 수 없다.</p>
+      </div>
+    </div>
+
+    <h3 class="sub-title">디코드가 느린 진짜 이유 — 메모리 월</h3>
+    <p>토큰 하나를 만들 때마다 AI는 모델의 <strong>가중치</strong>(수백 GB짜리 지식 전체)와 지금까지 쓴 답을 적어둔 <strong>KV 캐시</strong>를 메모리에서 반복적으로 꺼내와야 한다. 글자 하나 적을 때마다 수백 권짜리 백과사전을 처음부터 끝까지 넘겨보는 셈이다. 연산기는 노는데 책 나르는 데 시간을 다 쓰는, 전형적인 데이터 병목이다.</p>
+    <p>문제는 이 격차가 갈수록 벌어진다는 것. AI 모델의 크기는 해마다 폭발적으로 커지는데, 그 데이터를 대주는 메모리 속도는 그만큼 못 따라온다. 아래 그래프(로그 스케일)에서 그 간극이 한눈에 보인다.</p>
+
+    <div class="chart-container fade-in">
+      <canvas id="memWallChart" height="240"></canvas>
+    </div>
+    <p class="sim-note">참고: 영상에서 인용된 Ayar Labs 그래프의 개념을 일반적으로 공개된 모델 파라미터 수와 GPU 메모리 용량(P100 16GB→V100 32GB→A100 80GB→H100 80GB, GPT 계열 파라미터 수 추정치)을 바탕으로 재구성한 그래프입니다. 모델 크기가 해마다 폭증하는 반면 메모리 용량은 완만하게 늘어 격차(메모리 월)가 벌어지는 추세를 보여줍니다.</p>
+
+    <div class="callout">
+      <div class="ctitle">메모리 월(Memory Wall)이란</div>
+      <p>연산 능력은 해마다 가파르게 좋아졌지만, 그 연산기에 데이터를 대주는 메모리 속도는 따라오지 못해 둘 사이 격차가 점점 벌어지는 현상. 칩의 발목을 잡는 것이 더 이상 "얼마나 빨리 계산하느냐"가 아니라 "데이터를 제때 가져오느냐"로 바뀐다. HBM이 비싸고 만들기 까다로워도 쓸 수밖에 없었던 이유가 바로 이 메모리 월 때문이다.</p>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <span class="num-tag">4</span>
+    <h2 class="section-title">배치의 함정과 분리형 추론</h2>
+    <p>디코드가 비효율적인 이유가 하나 더 있다. AI 서버는 여러 사람의 요청을 한 묶음(<strong>배치</strong>)으로 모아 동시에 처리해야 손해를 안 본다. 그런데 한 사람에게 최대한 빨리 답해야 하는 <strong>낮은 배치</strong> 상황에서는 비싼 GPU를 다 채우지도 못한 채 데이터만 나르다가 끝난다. 에이전트가 여러 단계로 생각하고 도구를 부를수록 이 과정은 더 길어진다.</p>
+    <p>그래서 업계는 발상을 바꿨다. 프리필과 디코드를 한 칩에 다 떠넘기지 말고, 단계마다 잘하는 장비를 따로 붙이자는 것 — <strong>분리형 추론(Disaggregated Inference)</strong>이다.</p>
+
+    <div class="warn">
+      <div class="ctitle">⚡ 업계 1등도 증명한 흐름</div>
+      <p>엔비디아는 디코드 전용 칩을 만들던 그록(Groq)을 사실상 통째로 흡수해, 그 칩을 차세대 베라루빈 플랫폼의 7번째 칩으로 끼워 넣었다. GPU의 황제 엔비디아조차 "디코드만큼은 GPU 혼자 감당이 안 된다"고 인정한 셈이다. 퀄컴의 HBC도 같은 문제의식에서, 다른 해법으로 출발한다.</p>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section>
+    <span class="num-tag">5</span>
+    <h2 class="section-title">HBC의 정체 — HBM과 한 글자 다른 이름의 함정</h2>
+    <p>이름이 <strong>HBC, High Bandwidth Compute</strong>. 우리가 아는 HBM(High Bandwidth Memory)과 딱 한 글자 차이라 새로운 메모리 규격으로 오해하기 쉽다. <strong class="hl">하지만 HBC는 새로운 메모리 규격이 아니다.</strong></p>
+    <p>구조를 보면 명확해진다. 반도체는 둥근 웨이퍼에서 네모난 다이(칩 한 조각)를 잘라내 만든다. 보통은 이 다이를 바닥에 평평하게 한 층으로 깐다. HBC는 다이를 위로 쌓는다 — 데이터를 저장하는 <strong>메모리 다이</strong> 위에 계산을 하는 <strong>연산 다이</strong>를 얹어 한 덩어리로 쌓는 3D 적층 구조다. 이걸 <strong>Near Memory Computing</strong>이라 부른다.</p>
+
+    <h3 class="sub-title">HBM vs HBC — 같은 문제, 정반대의 해법</h3>
+    <div class="vs-wrap">
+      <div class="vs-card">
+        <h4>HBM</h4>
+        <div class="tagline">길을 넓힌다</div>
+        <p>데이터를 메모리(DRAM)에서 꺼내 멀리 있는 GPU까지 보내는 통로 자체를 2차선에서 16차선으로 넓힌 기술. 더 빨리, 더 많이 나른다.</p>
+      </div>
+      <div class="vs-card">
+        <h4>HBC</h4>
+        <div class="tagline">짐을 줄인다</div>
+        <p>가벼운 계산은 메모리 바로 위층의 연산 다이가 그 자리에서 끝내버린다. 꼭 필요한 결과만 골라서 GPU로 보내 옮길 데이터 자체를 줄인다.</p>
+      </div>
+    </div>
+    <p>길을 넓히느냐, 보낼 짐을 줄이느냐 — 이 차이가 오늘 핵심 포인트다.</p>
+  </section>
+
+  <!-- 6 -->
+  <section>
+    <span class="num-tag">6</span>
+    <h2 class="section-title">숫자로 보는 HBC — AI250</h2>
+    <p>HBC 1세대를 탑재한 첫 제품은 <strong>AI250</strong> 가속기 카드다.</p>
+    <table>
+      <tr><th>항목</th><th>수치</th></tr>
+      <tr><td>카드당 메모리 용량</td><td>768GB</td></tr>
+      <tr><td>카드당 유효 메모리 대역폭</td><td>133TB/s (effective)</td></tr>
+      <tr><td>이전 세대(AI200) 대비</td><td>유효 대역폭 18배</td></tr>
+      <tr><td>랙 메모리 용량(비공식 추정)</td><td>약 43TB</td></tr>
+      <tr><td>랙 전력(비공식 추정)</td><td>약 160kW</td></tr>
+    </table>
+    <p class="sim-note">랙당 카드 수, 랙 전체 대역폭은 퀄컴이 공식적으로 밝히지 않았다. 인터넷에 떠도는 "랙당 몇 장" 류의 숫자는 역산으로 추정한 값일 뿐 공식 수치가 아니다.</p>
+
+    <h3 class="sub-title">"유효 대역폭"이라는 함정</h3>
+    <p>133TB/s라는 숫자는 메모리에서 실제로 물리적으로 뽑아낸 속도가 아니다. HBC가 메모리 옆에서 자체 처리해 굳이 밖으로 안 보내도 됐던 데이터까지 다 보냈다고 치고 환산해서 합친 값이다. 그래서 <strong>유효(effective) 대역폭</strong>이라 부른다. HBM은 진짜로 통과한 물리적 속도, 즉 <strong>물리(raw) 대역폭</strong>으로 숫자를 매긴다. 두 잣대를 나란히 놓고 "몇 배 더 빠르다"고 비교하면 그건 잘못된 비교다.</p>
+
+    <div class="sim-box">
+      <div class="sim-label">메모리 옆에서 처리해 줄인 데이터 비율 &nbsp;<b id="reduceVal">40%</b></div>
+      <input type="range" id="reduceSlider" min="0" max="90" value="40" step="5">
+      <div class="sim-results">
+        <div class="sim-result">
+          <div class="lab">물리 대역폭 (예시)</div>
+          <div class="num">8 TB/s</div>
+        </div>
+        <div class="sim-result hot">
+          <div class="lab">유효 대역폭 (계산값)</div>
+          <div class="num" id="effOut">13.3 TB/s</div>
+        </div>
+      </div>
+      <p class="sim-note">실제 전선을 타고 흐르는 물리적인 속도는 8TB/s로 고정돼 있어도, 메모리 옆에서 미리 처리해 "굳이 안 보내도 되는" 데이터의 비율이 늘어날수록 유효 대역폭 숫자는 계속 커진다. 슬라이더를 움직여 두 숫자가 왜 같은 잣대가 아닌지 직접 확인해보세요. (위 두 수치는 개념 설명을 위한 예시이며 AI250의 실제 사양이 아닙니다.)</p>
+    </div>
+  </section>
+
+  <!-- 7 -->
+  <section>
+    <span class="num-tag">7</span>
+    <h2 class="section-title">그록 vs 퀄컴 — 속도냐, 용량이냐</h2>
+    <p>HBC의 구조는 엔비디아가 흡수한 그록(Groq)의 LPU/LPX와 자연히 비교된다. 둘 다 디코드 병목을 풀려 하지만 접근이 정반대다. 핵심은 메모리 종류 — <strong>빠르지만 작은 SRAM</strong>과 <strong>느리지만 큰 DRAM</strong> 중 무엇을 택했느냐다.</p>
+
+    <div class="vs-wrap">
+      <div class="vs-card">
+        <h4>SRAM</h4>
+        <div class="tagline">= 속도</div>
+        <p>반응이 즉각적이지만 자리를 많이 차지해 크게 만들지 못한다.</p>
+      </div>
+      <div class="vs-card">
+        <h4>DRAM</h4>
+        <div class="tagline">= 용량</div>
+        <p>상대적으로 느리지만 용량이 크고 값도 싸다.</p>
+      </div>
+    </div>
+
+    <div class="toggle-row">
+      <button class="toggle-btn active" data-spec="groq">그록 · LPX (SRAM)</button>
+      <button class="toggle-btn" data-spec="qc">퀄컴 · HBC (DRAM)</button>
+    </div>
+    <div class="spec-card" id="specCard">
+      <div class="spec-name">Groq LPX</div>
+      <div class="spec-philosophy">SRAM FOR SPEED — 속도로 돌파</div>
+      <div class="spec-line"><span class="k">랙당 LPU 수</span><span class="v">256개</span></div>
+      <div class="spec-line"><span class="k">랙당 SRAM 용량</span><span class="v">128GB</span></div>
+      <div class="spec-line"><span class="k">랙당 SRAM 대역폭</span><span class="v">40 PB/s</span></div>
+      <div class="spec-line"><span class="k">강점</span><span class="v">지터(속도 떨림) 없음</span></div>
+    </div>
+
+    <p style="margin-top:18px;">그록은 칩 하나에 빠른 SRAM 500MB를 넣고, 256개를 한 랙에 모아 랙 전체 SRAM 대역폭 40PB/s를 만든다. 컴파일러가 실행 순서를 미리 다 짜둬서 답이 나오는 속도가 시계 초침처럼 일정하다 — 업계 말로 "지터가 없다."</p>
+    <p>퀄컴은 반대로 갔다. SRAM은 자리를 많이 먹어 크게 못 만든다는 한계 때문에, 조금 느려도 데이터를 왕창 담을 수 있는 DRAM 곁에 계산기를 붙였다 — 데이터 이동을 줄여 속도 손해를 메우는 전략이다.</p>
+
+    <div class="callout">
+      <div class="ctitle">역할 분담은 그대로 GPU 중심</div>
+      <p>그록의 LPX가 디코드를 혼자 다 처리하는 건 아니다. 큰 그림을 그리는 무거운 작업은 여전히 루빈(Rubin) GPU가 맡고, LPX는 0.1초라도 빨리 끝내야 하는 급한 부분(FFN, MoE 연산)만 골라 떠받친다. 어떤 일을 GPU로, 어떤 일을 LPX로 보낼지는 엔비디아의 관리 소프트웨어 다이나모(Dynamo)가 자동으로 나눠준다.</p>
+    </div>
+  </section>
+
+  <!-- 8 -->
+  <section>
+    <span class="num-tag">8</span>
+    <h2 class="section-title">퀄컴이 내놓은 숫자, 그리고 함정</h2>
+    <p>퀄컴은 HBC를 자랑하며 숫자 두 개를 내놨다 — <strong>HBM보다 와트당 대역폭 6배</strong>, <strong>SRAM보다 와트당 용량 200배</strong>. 듣자마자 인상적이지만 함정이 있다.</p>
+    <ul>
+      <li><strong>6배</strong>는 카드 한 장 기준, <strong>200배</strong>는 랙 전체 기준 — 재는 단위 자체가 다르다.</li>
+      <li>6배는 대역폭(속도), 200배는 용량 — 비교하는 항목 자체가 다르다.</li>
+      <li>두 숫자 모두 퀄컴이 <strong>경쟁사의 제품 사양서를 가져다 직접 계산한 추정치</strong>다. 같은 모델을 동일 조건에서 제3자가 측정한 독립 벤치마크가 아니다.</li>
+      <li>HBC 제품은 <strong>아직 나오지 않았다.</strong></li>
+    </ul>
+
+    <h3 class="sub-title">가속기 로드맵 — AI200 → AI250 → AI300</h3>
+    <p>퀄컴은 AI200·AI250에 이어 이번에 <strong>AI300</strong>을 추가했다. HBC 2세대를 단 AI300은 AI200 대비 유효 대역폭을 54배까지 끌어올리는 걸 목표로 한다.</p>
+    <div class="chart-container fade-in">
+      <canvas id="roadmapChart" height="220"></canvas>
+    </div>
+    <p class="sim-note">AI200 대비 유효 대역폭 배수 (퀄컴 발표 기준). 가속기 수백 장을 하나처럼 묶는 연결 규격으로는 UALink와 ESUN을 택했다 — 엔비디아의 독점 기술 NVLink와 달리 여러 회사가 함께 쓰는 개방형 규격이다.</p>
+  </section>
+
+  <!-- 9 -->
+  <section>
+    <span class="num-tag">9</span>
+    <h2 class="section-title">삼성이 먼저 깔아둔 길 — PIM과 PNM</h2>
+    <p>메모리 가까이에 계산기를 붙여 데이터 이동을 줄이는 발상, 사실 퀄컴이 처음은 아니다. 삼성전자가 수년 전부터 HBM-PIM, LPDDR5-PIM이라는 이름으로 공개해온 연구다. 차이는 <strong>계산기를 어디에 두느냐</strong>, 딱 그 위치다.</p>
+
+    <div class="picker-row">
+      <button class="picker-btn active" data-pos="pim">PIM</button>
+      <button class="picker-btn" data-pos="pnm">PNM</button>
+      <button class="picker-btn" data-pos="hbc">HBC</button>
+    </div>
+    <div class="picker-panel" id="posPanel">
+      <h4>PIM — Processing In Memory</h4>
+      <p>계산기를 메모리 칩 안에 직접 심는다. 삼성의 HBM-PIM, LPDDR5-PIM이 대표적. DRAM 저장 구역 바로 옆에 작은 계산기를 박아 넣어, 디코드에서 자주 나오는 가벼운 계산을 그 자리에서 처리한다.</p>
+    </div>
+
+    <p>퀄컴은 메모리 칩과 계산 칩을 따로 만든 뒤 위아래로 쌓아 붙이는 구조라고 설명했다 — 칩 안에 심는 PIM보다는, 계산기를 따로 만들어 메모리 곁에 두는 <strong>PNM</strong> 쪽에 더 가깝다. 다만 정작 중요한 정보 — HBC에 어떤 메모리를 쓰는지, 어느 회사가 공급하는지 — 는 퀄컴이 아직 공개하지 않았다.</p>
+
+    <div class="callout">
+      <div class="ctitle">방향은 같고, 구현은 다르다</div>
+      <p>HBC가 삼성의 기술을 그대로 가져다 쓴 것이라고 단정하기는 어렵다. 지금 할 수 있는 정확한 정리는 — HBC는 삼성이 PIM·PNM으로 먼저 보여준 "메모리 가까이에서 계산하자"는 큰 방향을 같이 따라가지만, 구현 방식은 퀄컴 나름의 독자적인 구조라는 것.</p>
+    </div>
+  </section>
+
+  <!-- 10 -->
+  <section>
+    <span class="num-tag">10</span>
+    <h2 class="section-title">C1000 — 데이터센터의 관제탑</h2>
+    <p>풀세트의 2차 중심에는 퀄컴이 직접 설계한 서버용 CPU <strong>C1000</strong>이 있다. 퀄컴이 칩 설계 회사 누비아(Nuvia)를 인수해 얻은 <strong>오라이언(Oryon)</strong> 코어를 250개 넘게 박았고, 작은 칩 조각들을 레고처럼 이어붙이는 칩렛 방식으로 완성했다.</p>
+    <p>코어를 250개나 박고도 퀄컴은 <strong>전력 대비 성능 2배</strong>를 내세웠다 — 손바닥만한 배터리로 하루 종일 폰을 굴리려고 다져온 전력 효율 노하우를 데이터센터로 가져온 결과다. PCIe 7세대, CXL 같은 최신 연결 규격을 지원해 여러 AI 가속기에 일감을 나눠주는 관제탑 역할을 한다.</p>
+
+    <h3 class="sub-title">드래곤플라이 로드맵</h3>
+    <div class="tline">
+      <div class="tline-item">
+        <div class="when">FY26</div>
+        <div class="what">Connectivity</div>
+        <div class="desc">랙·데이터센터 단위 광/전기 연결 솔루션</div>
+      </div>
+      <div class="tline-item">
+        <div class="when">Q1 FY27</div>
+        <div class="what">Custom Silicon</div>
+        <div class="desc">고객 맞춤형 풀스택 설계, 첨단 패키징</div>
+      </div>
+      <div class="tline-item">
+        <div class="when">2H FY27</div>
+        <div class="what">AI Accelerator</div>
+        <div class="desc">와트당 토큰 생성 효율 강화, 니어 메모리 컴퓨트</div>
+      </div>
+      <div class="tline-item">
+        <div class="when">2H FY28</div>
+        <div class="what">CPU (C1000)</div>
+        <div class="desc">에이전틱·범용·AI 헤드노드용 풀 포트폴리오</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 11 -->
+  <section>
+    <span class="num-tag">11</span>
+    <h2 class="section-title">큰 손 고객들 — 메타, 마이크로소프트, 바이트댄스</h2>
+    <p>칩을 만들겠다는 선언은 누구나 할 수 있다. 그걸 실제로 쓰겠다는 큰 손이 붙었는지는 완전히 다른 얘기다. 퀄컴은 이번에 굵직한 고객을 줄줄이 데려왔다.</p>
+    <div class="chip-row">
+      <span class="chip">CPU(C1000) → Meta</span>
+      <span class="chip">HBC → Microsoft Azure</span>
+      <span class="chip">맞춤형 칩 → ByteDance</span>
+    </div>
+    <p>메타는 C1000을 차세대 서버에 쓰겠다고 공식 발표했고, 마크 주커버그가 직접 무대에 올라 확인했다. 마이크로소프트는 아직 검증도 끝나지 않은 HBC를 자사 클라우드 애저에 도입하기로 했다 — HBC가 단순한 발표용 자랑이 아니라는 첫 번째 증거다. 바이트댄스와의 맞춤형 칩 공급 딜은 6월 초 컴퓨텍스에서 먼저 공개됐다.</p>
+
+    <div class="warn">
+      <div class="ctitle">⚠ 김칫국은 조심할 것</div>
+      <p>실제 양산 시기는 2028년 하반기다 — 지금 당장 깔리는 게 아니라 미래의 약속이다. 전력당 성능 2배라는 수치도 추정치이며, 2028년에 맞붙을 상대는 지금의 인텔·AMD가 아니라 그때의 인텔·AMD다.</p>
+    </div>
+  </section>
+
+  <!-- 12 -->
+  <section>
+    <span class="num-tag">12</span>
+    <h2 class="section-title">모듈러 인수 — CUDA를 정면으로 겨누다</h2>
+    <p>풀세트의 마지막 한 조각, 어쩌면 제일 중요할 소프트웨어. 퀄컴은 AI 소프트웨어 회사 <strong>모듈러(Modular)</strong>를 약 39억 달러, 전액 주식으로 인수하기로 했다.</p>
+    <p>모듈러는 통역사 같은 역할을 한다. CPU든 GPU든 NPU든 맞춤형 칩이든, 하드웨어가 뭐가 됐든 코드를 새로 짜지 않고도 같은 AI 모델을 그대로 돌릴 수 있게 해준다. 엔비디아의 진짜 방어막이 칩이 아니라 소프트웨어 쿠다(CUDA)인 것처럼, 퀄컴이 모듈러를 산 건 사실상 그 CUDA에 정면으로 도전장을 내민 것이다. 여기에 모델을 손쉽게 올리도록 돕는 허깅페이스(Hugging Face)와의 협력까지 더했다.</p>
+  </section>
+
+  <!-- 13 -->
+  <section>
+    <span class="num-tag">13</span>
+    <h2 class="section-title">한국 기업은 어디에 있나</h2>
+    <p>분명히 할 것부터 — 이번 발표가 삼성전자나 SK하이닉스의 <strong>HBC 공급 계약을 의미하지는 않는다.</strong> 퀄컴이 공개한 협력사 명단은 35곳이 넘고 여기에 SK하이닉스 아메리카, 삼성SDS, 마이크론, 나냐 같은 이름이 올라 있지만, HBC에 들어갈 메모리를 누가 공급하는지, 3D 적층 작업을 누가 맡는지는 발표하지 않았다.</p>
+
+    <p>그런데 더 중요한 건 단기 수주 여부가 아니다. <strong class="hl">HBC가 요구하는 기술의 결이 한국 메모리 기업이 제일 잘하는 것과 정확히 겹친다.</strong></p>
+    <ul>
+      <li><strong>칩을 정밀하게 쌓고 붙이는 첨단 패키징</strong> — 머리카락보다 가는 수천 개의 수직 통로(TSV)로 위아래 칩을 잇는 기술. SK하이닉스가 HBM을 만들며 몇 년째 갈고 닦아온 주특기다.</li>
+      <li><strong>메모리 안에 계산을 넣는 노하우</strong> — 삼성의 PIM·PNM 연구가 정확히 그 자체다.</li>
+    </ul>
+
+    <h3 class="sub-title">메모리 회사의 위상이 바뀐다</h3>
+    <p>지금까지 메모리 회사는 정해진 규격에 맞춰 DRAM을 대량으로 찍어 납품하는 부품 공급업체에 가까웠다. 그런데 HBC 같은 구조에서는 고객의 가속기 설계에 따라 메모리도 함께 달라져야 한다 — 설계 단계부터 같이 머리를 맞대는 <strong>코디자인(co-design)</strong>이 필요해진다는 뜻이다. 시키는 대로 찍어내던 공급사에서, 함께 설계하는 파트너로 위상이 올라가는 변화다.</p>
+
+    <div class="pull">"메모리는 더 이상 데이터를 담아두는 그릇에 머물지 않는다. 그 안에서 가벼운 연산까지 직접 수행하는 무대가 되어가고 있다."</div>
+
+    <p>그렇다고 HBM이 밀려나는 건 아니다. 대규모 학습이나 프리필처럼 묵직한 범용 계산에는 여전히 HBM·GPU 조합이 강할 것이다. 낮은 지연과 메모리 효율이 중요한 디코드에서는 SRAM·HBC·PIM 같은 구조가 경쟁한다. <strong>AI 메모리 시장이 "하나의 HBM 경쟁"에서 "작업 성격에 따라 메모리 구조를 골라 쓰는 시장"으로 갈라지기 시작한 것</strong> — 기업에는 무대가 넓어진 기회이자, 만들어야 할 종류와 설계 난이도가 함께 늘어나는 양날의 검이다.</p>
+  </section>
+
+  <!-- 14 -->
+  <section>
+    <span class="num-tag">14</span>
+    <h2 class="section-title">식기 전에 — 냉정한 점검</h2>
+    <p>여기까지 신나게 달려왔지만, 마지막으로 찬물 한 바가지를 끼얹어야 한다.</p>
+    <div class="warn">
+      <div class="ctitle">⚠ 검증되지 않은 것들</div>
+      <ul style="margin-bottom:0;">
+        <li><strong>HBC는 아직 검증된 완제품이 아니다.</strong> AI250 샘플은 2027년 중반, AI300·C1000은 2028년 — 빨라야 1년 반, 길게는 2년 넘게 남은 미래의 약속이다.</li>
+        <li>133TB/s는 물리적 대역폭이 아니라 유효 대역폭이다. HBM보다 효율이 몇 배라는 자랑도 동일 조건의 독립 테스트가 아니라 전부 퀄컴 자체 주장이다.</li>
+        <li>쌓은 칩이 구체적으로 무엇을 계산하는지, 어떤 메모리를 쓰는지, 발열을 어떻게 잡는지, 수율은 괜찮은지, 소프트웨어가 일감을 실제로 잘 나눠줄 수 있는지 — 핵심 정보들이 아직 베일에 가려 있다.</li>
+        <li>삼성 기술을 썼다는 근거도, SK하이닉스가 공급사로 정해졌다는 발표도 없다.</li>
+      </ul>
+    </div>
+
+    <h3 class="sub-title">앞으로 확인할 것</h3>
+    <ul>
+      <li>2027년 AI250 샘플의 실제 디코드 속도와 전력 효율</li>
+      <li>유효 대역폭이 실제 토큰 생성 성능으로 이어지는지</li>
+      <li>메모리 공급사와 3D 적층 방식이 언제 공개되는지</li>
+      <li>메타·바이트댄스 외에 다른 고객이 드래곤플라이를 실제로 얼마나 도입하는지</li>
+    </ul>
+  </section>
+
+  <!-- 15 -->
+  <section>
+    <span class="num-tag">15</span>
+    <h2 class="section-title">결론 — 잠자리는 날 수 있을까</h2>
+    <p>이번 퀄컴의 발표는 엔비디아의 데이터센터를 당장 흔들 완성품은 아니다. 하지만 AI가 학습 중심에서 대규모 추론과 에이전트 중심으로 옮겨가면서, 모든 일을 GPU 하나에 떠넘기던 구조가 잘게 나뉘고 있다는 신호는 확실하다. <strong>프리필에는 GPU, 빠른 디코드에는 SRAM, 대용량 디코드에는 HBC와 PIM</strong> — AI 반도체 경쟁은 이제 가장 빠른 칩 하나를 고르는 게 아니라, CPU·가속기·DRAM·SRAM을 어떤 순서로 배치해 가장 많은 토큰을 가장 적은 전력으로 만드느냐의 싸움으로 넘어가고 있다.</p>
+    <p>적은 에너지로 오래 날기 위해 네 개의 날개를 따로 움직이면서도 하나로 협력하는 잠자리. 퀄컴의 드래곤플라이가 서버 시장에 숟가락 하나 얹겠다는 선언이 아니라는 건 분명해 보인다. 진짜 멀리 날 수 있을지는, 앞으로 지켜봐야 한다.</p>
+  </section>
+
+  <footer>
+    <div class="brand">안될공학</div>
+    <div>본 리포트는 영상 자막 내용을 기반으로 정리되었습니다.</div>
+  </footer>
+
+</div>
+
+<script>
+  // Required IntersectionObserver pattern
+  const fadeObs = new IntersectionObserver((entries) => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        setTimeout(() => e.target.classList.add('visible'), i * 80);
+        fadeObs.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.fade-in').forEach(el => fadeObs.observe(el));
+
+  const chartConfigs = {};
+
+  chartConfigs['memWallChart'] = () => {
+    new Chart(document.getElementById('memWallChart'), {
+      type: 'line',
+      data: {
+        labels: ['2015','2016','2017','2018','2019','2020','2021','2022','2023'],
+        datasets: [
+          {
+            label: 'AI 모델 파라미터 (B, 추정)',
+            data: [0.025,0.025,0.34,0.34,1.5,175,175,540,1800],
+            borderColor: '#e11d48',
+            backgroundColor: '#e11d48',
+            borderWidth: 2.5,
+            pointRadius: 2,
+            tension: 0.25
+          },
+          {
+            label: 'GPU 메모리 용량 (GB)',
+            data: [16,16,32,32,32,80,80,80,80],
+            borderColor: '#2563eb',
+            backgroundColor: '#2563eb',
+            borderWidth: 2.5,
+            pointRadius: 2,
+            tension: 0.25
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            type: 'logarithmic',
+            grid: { color: '#e5e5e5' },
+            ticks: { color: '#777777', font: { size: 10 } }
+          },
+          x: {
+            grid: { display: false },
+            ticks: { color: '#777777', font: { size: 10 } }
+          }
+        },
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: { color: '#1a1a1a', font: { size: 11 }, boxWidth: 12 }
+          }
+        }
+      }
+    });
+  };
+
+  chartConfigs['roadmapChart'] = () => {
+    new Chart(document.getElementById('roadmapChart'), {
+      type: 'bar',
+      data: {
+        labels: ['AI200', 'AI250 (HBC 1세대)', 'AI300 (HBC 2세대)'],
+        datasets: [{
+          label: 'AI200 대비 유효 대역폭 배수',
+          data: [1, 18, 54],
+          backgroundColor: ['#6b7280', '#f43f5e', '#e11d48'],
+          borderRadius: 4,
+          maxBarThickness: 60
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            beginAtZero: true,
+            grid: { color: '#e5e5e5' },
+            ticks: { color: '#777777', font: { size: 10 }, callback: v => v + 'x' }
+          },
+          x: {
+            grid: { display: false },
+            ticks: { color: '#1a1a1a', font: { size: 10.5 } }
+          }
+        },
+        plugins: { legend: { display: false } }
+      }
+    });
+  };
+
+  const chartObs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        const canvas = e.target.querySelector('canvas');
+        if (canvas && chartConfigs[canvas.id]) {
+          chartConfigs[canvas.id]();
+          e.target.classList.add('chart-ready');
+          chartObs.unobserve(e.target);
+        }
+      }
+    });
+  }, { threshold: 0.15 });
+  document.querySelectorAll('.chart-container').forEach(el => chartObs.observe(el));
+
+  // Interactive 1: effective vs raw bandwidth simulator
+  const reduceSlider = document.getElementById('reduceSlider');
+  const reduceVal = document.getElementById('reduceVal');
+  const effOut = document.getElementById('effOut');
+  const PHYSICAL = 8; // TB/s, illustrative example only
+  function updateSim(){
+    const pct = parseInt(reduceSlider.value, 10);
+    reduceVal.textContent = pct + '%';
+    const eff = PHYSICAL / (1 - pct/100);
+    effOut.textContent = eff.toFixed(1) + ' TB/s';
+  }
+  reduceSlider.addEventListener('input', updateSim);
+  updateSim();
+
+  // Interactive 2: Groq vs Qualcomm toggle
+  const specBtns = document.querySelectorAll('.toggle-btn');
+  const specCard = document.getElementById('specCard');
+  const specData = {
+    groq: `
+      <div class="spec-name">Groq LPX</div>
+      <div class="spec-philosophy">SRAM FOR SPEED — 속도로 돌파</div>
+      <div class="spec-line"><span class="k">랙당 LPU 수</span><span class="v">256개</span></div>
+      <div class="spec-line"><span class="k">랙당 SRAM 용량</span><span class="v">128GB</span></div>
+      <div class="spec-line"><span class="k">랙당 SRAM 대역폭</span><span class="v">40 PB/s</span></div>
+      <div class="spec-line"><span class="k">강점</span><span class="v">지터(속도 떨림) 없음</span></div>
+    `,
+    qc: `
+      <div class="spec-name">Qualcomm HBC (AI250)</div>
+      <div class="spec-philosophy">DRAM 옆에서 우회 — 용량으로 돌파</div>
+      <div class="spec-line"><span class="k">카드당 메모리 용량</span><span class="v">768GB</span></div>
+      <div class="spec-line"><span class="k">카드당 유효 대역폭</span><span class="v">133 TB/s</span></div>
+      <div class="spec-line"><span class="k">랙 메모리(비공식 추정)</span><span class="v">약 43TB</span></div>
+      <div class="spec-line"><span class="k">랙 전력(비공식 추정)</span><span class="v">약 160kW</span></div>
+    `
+  };
+  specBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      specBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      specCard.innerHTML = specData[btn.dataset.spec];
+    });
+  });
+
+  // Interactive 3: PIM/PNM/HBC position picker
+  const posBtns = document.querySelectorAll('.picker-btn');
+  const posPanel = document.getElementById('posPanel');
+  const posData = {
+    pim: `<h4>PIM — Processing In Memory</h4><p>계산기를 메모리 칩 안에 직접 심는다. 삼성의 HBM-PIM, LPDDR5-PIM이 대표적. DRAM 저장 구역 바로 옆에 작은 계산기를 박아 넣어, 디코드에서 자주 나오는 가벼운 계산을 그 자리에서 처리한다.</p>`,
+    pnm: `<h4>PNM — Processing Near Memory</h4><p>계산기를 칩 안에 심는 대신, 메모리 곁의 한쪽 자리에 따로 갖다 둔다. 메모리 곁에서 계산한다는 뜻으로, 삼성이 PIM과 함께 연구해온 또 다른 방식이다.</p>`,
+    hbc: `<h4>HBC — 퀄컴의 방식</h4><p>메모리 다이 위에 연산 다이를 쌓아 올린다. 셋 중에서는 칩 안에 심는 PIM보다, 계산기를 따로 만들어 메모리 곁(위)에 두는 PNM 쪽에 더 가깝다. 다만 어떤 메모리를 쓰는지는 아직 공개되지 않았다.</p>`
+  };
+  posBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      posBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      posPanel.innerHTML = posData[btn.dataset.pos];
+    });
+  });
+</script>
+</body>
+</html>

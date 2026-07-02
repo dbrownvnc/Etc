@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>루빈 울트라 쇼크의 진실 | 가젯서울</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;0,900;1,600&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+  :root{
+    --bg:#ffffff; --bg-soft:#fafafa;
+    --text:#1a1a1a; --text-soft:#777777;
+    --accent:#e11d48; --accent2:#f43f5e;
+    --line:#e5e5e5; --blue:#2563eb; --gray:#6b7280;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:var(--bg); color:var(--text);
+    font-family:'Noto Sans KR', sans-serif;
+    line-height:1.75; -webkit-font-smoothing:antialiased;
+    padding-bottom:60px;
+  }
+  .wrap{ max-width:560px; margin:0 auto; padding:0 20px; }
+
+  /* ---------- HERO ---------- */
+  .hero{
+    background:var(--text); color:#fff; padding:56px 20px 40px;
+    position:relative; overflow:hidden;
+  }
+  .hero::after{
+    content:""; position:absolute; right:-60px; top:-60px; width:220px; height:220px;
+    border-radius:50%; background:radial-gradient(circle, var(--accent) 0%, transparent 70%);
+    opacity:.35;
+  }
+  .hero .eyebrow{
+    font-size:12px; letter-spacing:.18em; text-transform:uppercase; color:var(--accent2);
+    font-weight:700; margin-bottom:18px; display:flex; align-items:center; gap:8px;
+  }
+  .hero .eyebrow::before{ content:""; width:22px; height:2px; background:var(--accent2); display:inline-block; }
+  .hero h1{
+    font-family:'Playfair Display', serif; font-weight:900; font-size:34px; line-height:1.22;
+    letter-spacing:-.01em; margin-bottom:16px;
+  }
+  .hero h1 em{ font-style:italic; color:var(--accent2); }
+  .hero p.lead{ font-size:15px; color:#cfcfcf; font-weight:300; line-height:1.65; }
+  .hero .meta{ margin-top:28px; font-size:12px; color:#9a9a9a; display:flex; gap:14px; flex-wrap:wrap; }
+  .hero .meta span{ display:inline-flex; align-items:center; gap:6px; }
+
+  /* ---------- SECTION GENERIC ---------- */
+  section{ padding:44px 0 8px; }
+  .section-tag{
+    font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--accent);
+    font-weight:700; margin-bottom:10px;
+  }
+  h2.title{
+    font-family:'Playfair Display', serif; font-weight:700; font-size:24px; line-height:1.35;
+    margin-bottom:16px; color:var(--text);
+  }
+  h3.sub{
+    font-family:'Noto Sans KR'; font-weight:700; font-size:16.5px; margin:26px 0 10px;
+    color:var(--text); border-left:3px solid var(--accent); padding-left:10px;
+  }
+  p{ font-size:14.5px; color:#333; margin-bottom:14px; }
+  .text-soft{ color:var(--text-soft); }
+  strong.mark{ color:var(--accent); font-weight:700; }
+  .divider{ height:1px; background:var(--line); margin:40px 0; }
+
+  /* ---------- BRIEFING CARDS ---------- */
+  .brief-list{ display:flex; flex-direction:column; gap:0; margin-top:8px; }
+  .brief-item{
+    display:flex; gap:12px; padding:14px 0; border-bottom:1px solid var(--line);
+  }
+  .brief-item .dot{
+    flex:0 0 auto; width:6px; height:6px; border-radius:50%; background:var(--accent);
+    margin-top:7px;
+  }
+  .brief-item .txt{ font-size:13.5px; color:#333; }
+  .brief-item .txt b{ color:var(--text); font-weight:700; }
+
+  /* ---------- QUOTE / CALLOUT ---------- */
+  .callout{
+    background:var(--bg-soft); border-left:3px solid var(--accent);
+    padding:16px 18px; border-radius:0 6px 6px 0; margin:18px 0;
+  }
+  .callout p{ margin-bottom:0; font-size:14px; color:#333; }
+  .callout .label{ font-size:11px; font-weight:700; color:var(--accent); letter-spacing:.05em; margin-bottom:6px; display:block; }
+
+  .verdict{
+    display:flex; gap:10px; align-items:flex-start; padding:14px 16px; margin:14px 0;
+    border:1px solid var(--line); border-radius:8px; background:#fff;
+  }
+  .verdict.wrong{ border-color:#f4c2ca; background:#fff5f6; }
+  .verdict.right{ border-color:#c7e0c2; background:#f4fbf3; }
+  .verdict .icon{ font-size:16px; line-height:1.4; }
+  .verdict .body b{ display:block; font-size:13px; margin-bottom:2px; }
+  .verdict .body span{ font-size:13px; color:#444; }
+  .verdict.wrong b{ color:#c0223a; }
+  .verdict.right b{ color:#2c7a3d; }
+
+  /* ---------- FADE / CHART ---------- */
+  .fade-in{ opacity:0; transform:translateY(18px); transition:opacity .7s ease, transform .7s ease; }
+  .fade-in.visible{ opacity:1; transform:translateY(0); }
+  .chart-container{ position:relative; max-height:340px; margin:18px 0; background:var(--bg-soft); border-radius:10px; padding:14px 10px 8px; }
+  .chart-container canvas{ opacity:0; transition:opacity .4s ease; max-height:300px; }
+  .chart-container.chart-ready canvas{ opacity:1; }
+  .chart-title{ font-size:12.5px; font-weight:700; color:var(--text); margin-bottom:6px; padding-left:4px; }
+  .chart-note{ font-size:11.5px; color:var(--text-soft); padding:6px 4px 0; }
+
+  /* ---------- CALCULATOR ---------- */
+  .calc-box{
+    background:var(--bg-soft); border-radius:12px; padding:20px 18px; margin:20px 0;
+    border:1px solid var(--line);
+  }
+  .calc-box .calc-head{ display:flex; align-items:center; gap:8px; margin-bottom:14px; }
+  .calc-box .calc-head .ic{ font-size:18px; }
+  .calc-box .calc-head b{ font-size:14.5px; }
+  .calc-row{ margin-bottom:18px; }
+  .calc-row label{ display:flex; justify-content:space-between; font-size:13px; font-weight:500; margin-bottom:8px; }
+  .calc-row label .val{ color:var(--accent); font-weight:700; }
+  input[type=range]{
+    -webkit-appearance:none; width:100%; height:5px; border-radius:5px;
+    background:linear-gradient(to right, var(--accent) 0%, var(--accent) 50%, #e5e5e5 50%, #e5e5e5 100%);
+    outline:none; cursor:pointer;
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none; width:20px; height:20px; border-radius:50%;
+    background:#fff; border:3px solid var(--accent); cursor:pointer; box-shadow:0 1px 4px rgba(0,0,0,.25);
+  }
+  .calc-toggle{ display:flex; gap:8px; margin-bottom:4px; }
+  .calc-toggle button{
+    flex:1; padding:9px 6px; font-size:12.5px; font-weight:700; border-radius:8px;
+    border:1px solid var(--line); background:#fff; color:var(--text-soft); cursor:pointer;
+    transition:all .2s ease;
+  }
+  .calc-toggle button.active{ background:var(--text); color:#fff; border-color:var(--text); }
+  .calc-result{
+    margin-top:16px; padding:16px; background:#fff; border-radius:10px; text-align:center;
+    border:1px dashed var(--accent2);
+  }
+  .calc-result .num{ font-family:'Playfair Display', serif; font-size:32px; font-weight:900; color:var(--accent); }
+  .calc-result .unit{ font-size:13px; color:var(--text-soft); margin-top:2px; }
+  .calc-result .compare{ font-size:12px; margin-top:8px; color:#444; }
+  .reset-btn{
+    margin-top:12px; width:100%; padding:9px; font-size:12.5px; font-weight:700;
+    background:#fff; border:1px solid var(--line); border-radius:8px; color:var(--text-soft); cursor:pointer;
+  }
+
+  /* ---------- TABS DIAGRAM ---------- */
+  .tabs{ display:flex; gap:6px; margin:20px 0 0; }
+  .tab-btn{
+    flex:1; padding:10px 4px; font-size:12.5px; font-weight:700; text-align:center;
+    background:var(--bg-soft); border:1px solid var(--line); border-radius:8px 8px 0 0; cursor:pointer; color:var(--text-soft);
+  }
+  .tab-btn.active{ background:var(--text); color:#fff; border-color:var(--text); }
+  .tab-panel{
+    display:none; border:1px solid var(--line); border-top:none; border-radius:0 0 10px 10px;
+    padding:18px 16px; background:#fff;
+  }
+  .tab-panel.active{ display:block; }
+  .flow-row{ display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin:10px 0; }
+  .flow-box{
+    padding:8px 10px; font-size:12px; font-weight:700; border-radius:7px; background:var(--bg-soft);
+    border:1px solid var(--line); color:var(--text);
+  }
+  .flow-box.hi{ background:var(--accent); color:#fff; border-color:var(--accent); }
+  .flow-arrow{ color:var(--text-soft); font-size:14px; }
+
+  /* ---------- TABLE ---------- */
+  table{ width:100%; border-collapse:collapse; margin:16px 0; font-size:13px; }
+  th{ background:var(--accent); color:#fff; padding:9px 8px; text-align:left; font-weight:700; }
+  td{ padding:9px 8px; background:var(--bg-soft); border-bottom:1px solid var(--line); color:#333; }
+  tr:nth-child(even) td{ background:#f3f3f3; }
+
+  /* ---------- FOOTER ---------- */
+  .disclaimer{
+    background:var(--bg-soft); border-radius:10px; padding:16px; font-size:12px; color:var(--text-soft);
+    margin:24px 0; line-height:1.6; border:1px solid var(--line);
+  }
+  footer{ text-align:center; padding:36px 20px 10px; }
+  footer .brand{ font-family:'Playfair Display', serif; font-weight:900; font-size:16px; color:var(--text); }
+  footer .sub{ font-size:11.5px; color:var(--text-soft); margin-top:6px; }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="eyebrow">Gadget Seoul Live · 2026.07.02</div>
+  <h1>루빈 울트라 <em>‘HBM 반토막’</em> 쇼크,<br>사실은 반대다</h1>
+  <p class="lead">엔비디아 루빈 울트라의 HBM4E 용량이 1테라바이트에서 384기가바이트로 줄었다는 소식이 시장을 흔들었다. 다이는 절반, 스택은 16단에서 12단으로. 그런데 이걸 두고 “HBM 수요 하락”이라 결론짓는 리포트들은 왜 틀렸을까.</p>
+  <div class="meta">
+    <span>📺 Live_가젯서울</span>
+    <span>🏷️ 반도체 · AI인프라 · 거시</span>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- ===== TODAY'S BRIEFING ===== -->
+  <section>
+    <div class="section-tag">Today's Briefing</div>
+    <h2 class="title">본론 전 5분 브리핑</h2>
+    <div class="brief-list">
+      <div class="brief-item"><span class="dot"></span><span class="txt"><b>SK하이닉스</b> — 2029년 청주에 M17 팹 건설 발표.</span></div>
+      <div class="brief-item"><span class="dot"></span><span class="txt"><b>애플</b> — 2027년 봄 아이패드 프로, 보급형 맥북 프로 추가 출시설(마크 거먼).</span></div>
+      <div class="brief-item"><span class="dot"></span><span class="txt"><b>번스타인</b> — 삼성 HBM이 “제 위치”를 찾아가는 국면. 2027년 하이닉스 독주가 깨진다는 식으로 해석되지만, 실제 함의는 <strong class="mark">“둘 다 좋다”</strong>는 것.</span></div>
+      <div class="brief-item"><span class="dot"></span><span class="txt"><b>미국 CPI</b> — 3.2%로 최고치. 다만 헤드라인만으로 판단은 금물. 케빈 워시는 PCE도 절사평균으로 봐야 한다는 입장.</span></div>
+      <div class="brief-item"><span class="dot"></span><span class="txt"><b>블룸버그</b> — 애플이 중국 CXMT·YMTC로부터 메모리칩 구매 협상 진행 중이라고 보도.</span></div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ===== MAIN STORY ===== -->
+  <section>
+    <div class="section-tag">Main Story</div>
+    <h2 class="title">루빈 울트라, 무엇이 바뀌었나</h2>
+    <p>루빈 로드맵은 <strong class="mark">볼타 → 블랙웰 → 루빈 → 파인만</strong> 순으로 이어진다. 현재는 블랙웰 울트라(B300) 구간을 지나 루빈으로 넘어가는 길목이며, 메모리 규격은 HBM3E에서 HBM4로 전환된다.</p>
+
+    <h3 class="sub">루빈과 루빈 울트라의 구조 차이</h3>
+    <p>루빈은 기본 다이 2개를 패키징해 만든다. 과거 블랙웰 세대의 B100 같은 징검다리 모델 없이 곧바로 2다이로 간 것은 CoWoS 패키징에 대한 자신감 때문이다. 루빈 울트라는 이 2다이 조합을 CoWoS-L로 한 번 더 붙이는 방식으로, 원래 계획은 스택 16개(16하이) 구성으로 <strong class="mark">HBM4E 1테라바이트</strong>를 달성하는 것이었다.</p>
+
+    <p>그런데 최근 확인된 설계 변경은 두 가지다. <strong class="mark">① 4다이 구성이 2다이로, ② HBM4E가 16하이에서 12하이로</strong> 줄었다는 것. 이 두 가지는 이미 고객사에 통보되고 확정된 사안이라 거의 확실하다고 볼 수 있다. 문제는 이 두 가지 사실이 뒤섞이면서 “1테라바이트가 384기가바이트로 반토막 났다 → HBM 수요가 줄어든다”는 결론으로 비약했다는 점이다.</p>
+
+    <div class="chart-container fade-in">
+      <div class="chart-title">HBM4E 탑재 용량 변화 (스택 구성 기준, GB)</div>
+      <canvas id="capacityChart" height="230"></canvas>
+      <div class="chart-note">4다이×16하이 1,024GB 설계에서 2다이(-50%)·12하이(-25%) 변경이 겹치며 384GB로 감소. 다만 이는 개별 패키지 기준 수치이며, 실제 보드·랙 단위 총 HBM 용량과는 다른 이야기다.</div>
+    </div>
+
+    <h3 class="sub">직접 계산해보기: 다이 수 × 스택 하이로 보는 용량</h3>
+    <div class="calc-box">
+      <div class="calc-head"><span class="ic">🧮</span><b>HBM4E 패키지 용량 계산기</b></div>
+      <div class="calc-toggle" id="dieToggle">
+        <button data-val="4" class="active">4다이(기존)</button>
+        <button data-val="2">2다이(변경)</button>
+      </div>
+      <div class="calc-row">
+        <label>스택 하이 (Hi) <span class="val" id="hiLabel">16-Hi</span></label>
+        <input type="range" id="hiSlider" min="12" max="16" step="4" value="16">
+      </div>
+      <div class="calc-result">
+        <div class="num" id="calcOut">1,024</div>
+        <div class="unit">GB · 다이당 8스택 × 스택당 32GB 가정</div>
+        <div class="compare" id="calcCompare">기존 최초 설계안 기준</div>
+      </div>
+      <button class="reset-btn" id="calcReset">초기값으로 리셋</button>
+    </div>
+
+    <h3 class="sub">왜 “HBM 수요 감소”가 아닌가 — 세 가지 반박</h3>
+    <p>시장에 퍼진 결론의 근거는 크게 세 가지: <strong class="mark">CoWoS-L 병목(워피지), HBM4 16단 적층 수율 문제, 히트스프레더 워피지</strong>다. 하나씩 짚어보면 결론을 지지하기 어렵다.</p>
+
+    <div class="verdict wrong">
+      <span class="icon">✗</span>
+      <div class="body"><b>주장 1 — CoWoS-L 면적이 부족해 휘어짐(워피지)이 발생한다</b><span>CoWoS-L의 물리적 최대 면적은 8,150㎟. 4다이+16스택 구성에 필요한 면적은 6,750㎟로, 실제로는 여유가 있다. 워피지를 근거로 설계를 바꿨다는 논리는 근거가 약하다.</span></div>
+    </div>
+    <div class="verdict right">
+      <span class="icon">✓</span>
+      <div class="body"><b>사실 — 16단→12단 전환은 오히려 하이닉스에 유리</b><span>적층 수를 줄이면 열 설계 여유와 핀 속도 확보에 유리해 수율이 올라간다. 이는 루빈과 무관하게 업계가 원했던 방향이며, SK하이닉스가 직접적 수혜를 받을 수 있는 변화다.</span></div>
+    </div>
+    <div class="verdict wrong">
+      <span class="icon">✗</span>
+      <div class="body"><b>주장 3 — 듀얼 히트스프레더가 워피지 요건을 못 맞춰 싱글로 바뀐다</b><span>원문 리포트는 “고볼륨 양산 단계에서 패키지에 워피지가 생기니 듀얼 히트스프레더가 싱글로 바뀐다”는 것이 맞는 해석이나, 다수 리포트가 주술 관계를 뒤집어 “히트스프레더 자체 결함 때문에 설계를 바꿨다”고 오역했다. 히트스프레더 문제였다면 설계를 바꿀 게 아니라 부품 공급사를 교체하면 될 일이다.</span></div>
+    </div>
+
+    <div class="callout">
+      <span class="label">핵심 포인트</span>
+      <p>세 가지 근거 모두 “왜 설계가 바뀌었는가”에 대한 설명으로는 약하거나 오독에 기반한다. 실제 배경은 패키징 결함이 아니라, 추론 워크로드 자체가 재편되고 있다는 훨씬 근본적인 변화에 있다.</p>
+    </div>
+
+    <h3 class="sub">진짜 배경: 프리필·디코드가 다시 나뉜다</h3>
+    <p>과거 AI 추론은 훈련과 한 인프라를 공유했지만, 이제는 추론 비중이 9:1로 커지며 전용 인프라로 분리됐다. 엔비디아는 여기서 한 단계 더 나아가 추론을 <strong class="mark">프리필(Prefill)</strong>과 <strong class="mark">디코드(Decode)</strong>로 쪼갰다. 프리필은 입력 토큰을 병렬 처리하는 연산 위주(Compute-bound) 작업이고, 디코드는 문맥(KV 캐시)을 참조하는 메모리 위주(Memory-bound) 작업이라 요구되는 하드웨어 특성이 다르다.</p>
+
+    <div class="tabs" id="flowTabs">
+      <div class="tab-btn active" data-tab="t1">이전 구조</div>
+      <div class="tab-btn" data-tab="t2">CPX 계획</div>
+      <div class="tab-btn" data-tab="t3">현재 구조</div>
+    </div>
+    <div class="tab-panel active" id="t1">
+      <p style="font-size:13px; margin-bottom:8px;">훈련과 추론이 하나의 인프라를 공유하던 초기 단계.</p>
+      <div class="flow-row"><span class="flow-box hi">GPU (훈련+추론 통합)</span></div>
+    </div>
+    <div class="tab-panel" id="t2">
+      <p style="font-size:13px; margin-bottom:8px;">프리필 전용 가속기 “루빈 CPX”가 계획되어 있었으나, 로드맵에서 사라졌다.</p>
+      <div class="flow-row">
+        <span class="flow-box">디코드 · HBM</span><span class="flow-arrow">＋</span><span class="flow-box hi">CPX(프리필) · GDDR</span>
+      </div>
+    </div>
+    <div class="tab-panel" id="t3">
+      <p style="font-size:13px; margin-bottom:8px;">디코드가 다시 어텐션(Attention)과 FFN으로 분화되고, Groq 인수로 확보한 LPU가 FFN 연산을 전담한다.</p>
+      <div class="flow-row">
+        <span class="flow-box">어텐션 · 루빈(HBM)</span><span class="flow-arrow">＋</span><span class="flow-box hi">FFN · Groq LPU(SRAM)</span>
+      </div>
+      <div class="flow-row"><span class="flow-box">프리필 · 루빈(HBM 유지, GDDR 전환 철회)</span></div>
+    </div>
+
+    <p>여기서 어텐션은 “문맥 파악”을 담당한다. 예컨대 “A가 욕을 먹었다”는 문장만으론 누구인지 알 수 없지만, “전직 축구선수 후배로부터”라는 단서가 붙으면 후보가 좁혀진다 — 이 좁히는 과정이 어텐션이며, 문맥(KV 캐시)을 많이 쥐고 있을수록 정확도가 올라가기 때문에 HBM의 용량과 속도가 중요하다. 반면 FFN은 좁혀진 대상에 대한 “세부 지식”을 인출하는 결정론적 연산이라, 문맥을 다시 참조할 필요가 없다.</p>
+
+    <p>Groq LPU가 FFN 연산을 전담하면서 루빈 GPU가 갖고 있던 HBM 용량은 오히려 <strong class="mark">어텐션(문맥 처리)에 더 집중적으로 쓰일 수 있게 됐다.</strong> 즉 스택이 16단에서 12단으로 줄어 절대 용량은 작아졌지만, FFN이 차지하던 몫을 어텐션이 흡수하면서 실질 활용 효율은 오히려 올라간다는 것이 요지다. 다른 진영(TPU 등)은 아직 이런 수준의 워크로드 분화에 도달하지 못했다.</p>
+
+    <h3 class="sub">패키징 착시: “절반”이 아니라 “재배치”</h3>
+    <p>다이 구성이 4개에서 2개로 줄면 일반적으로 “전체 HBM도 절반”이라고 오해하기 쉽다. 하지만 루빈 울트라부터는 랙 아키텍처가 오베론(Oberon)에서 카이버(Kyber)로 바뀐다. 개별 패키지의 다이 수가 줄어든 만큼, 보드 단위에서는 패키지를 두 개 실장해 전체 다이 수를 맞추는 방식(NVL576 등)을 취한다. 패키징 단위가 아니라 <strong class="mark">보드·랙 단위의 총 다이 수</strong>가 핵심이라는 뜻이다.</p>
+
+    <div class="callout">
+      <span class="label">결론</span>
+      <p>HBM 수요가 줄어드는 것이 아니라, 다이 레벨의 계산 착시다. SK하이닉스의 “쇼트 시나리오”로 이어질 이유가 없다는 게 오늘 다뤄진 반박의 핵심이다. HBM4 세대에서는 SK하이닉스의 우위 구간이 2026년까지 유지되고, HBM4E부터는 삼성이 근소하게 앞설 수 있다는 관측도 나왔다.</p>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ===== MACRO ===== -->
+  <section>
+    <div class="section-tag">Macro</div>
+    <h2 class="title">6월 고용지표, 긴축 신호로 볼 수 없는 이유</h2>
+    <p>JOLTS 구인 건수와 비농업 고용 모두 컨센서스를 상회했다. 헤드라인만 보면 금리 인상 재료로 읽힐 법하지만, 세부 항목을 보면 결론이 달라진다.</p>
+
+    <div class="chart-container fade-in">
+      <div class="chart-title">비농업 고용 증가, 업종별 기여도(개념도)</div>
+      <canvas id="jobsChart" height="230"></canvas>
+      <div class="chart-note">레저·호스피탈리티(월드컵 특수), 지방정부, 헬스케어 중심 증가. 금융활동은 마이너스로, 긴축 근거로 쓰기 어려운 구성이다.</div>
+    </div>
+
+    <p>더 중요한 지표는 자발적 퇴직률(Quit Rate)로, 1.9%에 머물러 있다. 노동시장이 “축하할 만한 활황”이 아니라는 뜻이다. PCE 역시 헤드라인보다 절사평균으로 봐야 하며, 에너지 가격이 빠른 속도로 하락 중이라는 점도 함께 고려해야 한다.</p>
+
+    <div class="callout">
+      <span class="label">요약</span>
+      <p>금리를 올리더라도 많아야 한 차례이며, 그마저 가능성은 낮다는 관측이다. 긴축 국면으로 단정할 근거는 부족하다.</p>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ===== META ===== -->
+  <section>
+    <div class="section-tag">Corporate</div>
+    <h2 class="title">메타는 클라우드가 남아서 임대할까</h2>
+    <p>메타의 데이터센터 “프로메테우스”·“하이페리온”(각 1GW급 이상) 여유 용량을 외부에 개방한다는 소식이 “AI 수요 둔화의 증거”로 해석되며 시장에 충격을 줬다. 그러나 이 해석은 출발 전제부터 어긋난다.</p>
+
+    <table>
+      <tr><th>오해</th><th>실제</th></tr>
+      <tr><td>메타는 클라우드 기업이다</td><td>메타는 SNS 기업. 클라우드 인프라는 자사 추천 시스템 운영용으로 시작했다</td></tr>
+      <tr><td>남는 용량 = 수요 부진</td><td>애초 프로메테우스 인허가 자체가 클라우드 사업 진출을 염두에 둔 것</td></tr>
+      <tr><td>구형 GPU라 경쟁력 없다</td><td>볼타·호퍼로도 충분한 SNS 랭킹 작업이었고, 이미 AI 트랜지션은 완료 단계</td></tr>
+    </table>
+
+    <p>메타는 클라우드 기업들과 규모의 경제 싸움을 할 필요가 없고, 해서도 안 된다. 오히려 자체 광고 매출만으로 캐펙스를 감당하면서도 잉여 인프라를 확보했다는 점은 재무적 여력의 방증에 가깝다. 실제로 광고 비즈니스 매출 기준으로 메타는 구글을 제치고 1위 자리에 올라선 것으로 파악된다.</p>
+
+    <div class="callout">
+      <span class="label">포지션</span>
+      <p>“잉여”라는 단어에 매몰되면 숏으로 보이지만, 맥락을 보면 롱에 가깝다는 것이 오늘 논의의 결론이다.</p>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ===== APPLE ===== -->
+  <section>
+    <div class="section-tag">Corporate</div>
+    <h2 class="title">애플은 왜 욕먹어가며 CXMT와 협상하나</h2>
+    <p>파이낸셜타임스(6/26), 블룸버그가 잇달아 애플-CXMT·YMTC 협상 정황을 보도했다. 다만 이 물량은 <strong class="mark">2027년 이후 출시 모델</strong>을 겨냥한 것으로, 애플은 이미 LTA(장기공급계약)로 내년 상반기까지 물량을 확보한 상태다. 당장의 산출 부족과는 무관하다.</p>
+
+    <p>목적은 세 가지로 요약된다: <strong class="mark">① 원가 절감 협상 레버리지, ② 공급 다변화, ③ 중국 내수용(HOVX) 물량 견제.</strong> CXMT는 여전히 1z급 노드에 머물러 있어 삼성·하이닉스 대비 성능 격차가 뚜렷하지만, “동일 조건 비교”에서만 열위일 뿐 발열·면적을 일부 희생하면 자체 제품군에는 충분히 쓸 수 있다는 반론도 있다.</p>
+
+    <div class="chart-container fade-in">
+      <div class="chart-title">애플 분기별 관세 비용 부담(개념도, 억 달러)</div>
+      <canvas id="tariffChart" height="230"></canvas>
+      <div class="chart-note">누적 기준 약 2조 원 규모로 추정되는 관세 비용이 협상 카드 활용의 배경으로 지목된다.</div>
+    </div>
+
+    <p>더 근본적인 배경은 <strong class="mark">관세 협상</strong>이라는 관측이다. 트럼프發 관세로 애플이 분기마다 부담하는 비용은 수천억 원대에 달한다. 6월은 유예 조치의 150일 기한이 임박한 시점으로, 이 협상 국면에서 “대체 카드가 있다”는 신호를 정부에 보내려는 포석이라는 해석이다. 팀 쿡이 퇴임 전 정치적 부담을 지고, 후임 CEO가 새 판에서 협상을 이어갈 수 있게 정지작업을 한다는 시각도 있다.</p>
+
+    <p>6월에 단행된 아이패드 등 일부 제품 가격 인상 역시, 하반기 신제품 이벤트에서의 가격 인상 폭을 최소화하기 위한 선제 조치로 해석할 수 있다. 관세發 원가 상승분(약 150달러 추정)을 다른 제조사보다 유리하게 흡수할 수 있는 위치라는 평가다.</p>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ===== RISK ===== -->
+  <section>
+    <div class="section-tag">Risk Watch</div>
+    <h2 class="title">한국 증시, 지금은 변동성 확대 구간</h2>
+    <p>엔캐리 트레이드 청산이 지연되면서 투기적 순매도 규모가 오히려 확대되는 모습이다. 원래는 금리 인하와 함께 스프레드가 좁혀지며 완만하게 청산되는 그림이 예상됐지만, 지정학 이벤트와 금리 인하 지연이 겹치며 <strong class="mark">압력이 계속 누적</strong>되는 구간이라는 진단이다. 국민연금의 리밸런싱도 6월을 기점으로 마무리되며 수급 부담으로 작용했다.</p>
+
+    <div class="callout">
+      <span class="label">유의사항</span>
+      <p>반도체 업황과 별개로, 단기 레버리지 투자에는 신중함이 요구되는 국면이라는 경고가 반복해서 제기됐다. 이는 특정 종목에 대한 매수·매도 추천이 아니며, 투자 판단과 책임은 투자자 본인에게 있다.</p>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ===== ETC ===== -->
+  <section>
+    <div class="section-tag">Snapshot</div>
+    <h2 class="title">그 밖의 체크포인트</h2>
+
+    <h3 class="sub">마이크론을 함께 담는 이유</h3>
+    <p>기술력 자체는 삼성·하이닉스가 앞서지만, 마이크론은 미국 내 전공정(뉴욕·아이다호) 팹을 보유한 유일한 3위 사업자다. 하이퍼스케일러들이 공급망을 3원화하려는 유인과, 관세·지정학 리스크를 헤지하려는 목적이 맞물려 “인큐베이팅” 성격의 투자 수요가 꾸준하다는 설명이다.</p>
+
+    <h3 class="sub">파운드리 지형</h3>
+    <p>인텔 파운드리는 미국 정부 지분(9.9%, 추가 5% 여지)으로 사실상 국가 자산화 흐름에 있다. 삼성 파운드리는 2026년부터 AI5·AI6, HBM 로직다이, 퀄컴·AMD 일부 물량 이전 등으로 매출이 본격화되는 구간에 진입한다는 관측이다.</p>
+
+    <h3 class="sub">국내 정책 변수</h3>
+    <p>반도체 R&D 인력에 대한 주52시간 예외 적용, SK하이닉스 손자회사 지분율 규제 완화(100%→50%) 검토 등이 논의되고 있다. 이는 향후 하이퍼스케일러와의 합작법인(JV) 설립을 통한 투자 리스크 분산 가능성과 맞물려 있는 변화로 지목된다.</p>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ===== CLOSING ===== -->
+  <section>
+    <div class="section-tag">Outlook</div>
+    <h2 class="title">메모리 센트릭, 그리고 디바이스</h2>
+    <p>이번 루빈 울트라 논쟁을 관통하는 흐름은 “HBM 중심의 단일 GPU 아키텍처”에서 “다계층 2종 가속기 생태계”로의 전략적 전환이다. HBM에서 LPDDR, 낸드까지 이어지는 메모리 계층 다변화는 수요 감소가 아니라 <strong class="mark">역할 분담의 확장</strong>으로 읽어야 한다는 것이 오늘 논의의 핵심 메시지다.</p>
+    <p>온디바이스 AI 역시 “로컬 연산”이 본질이 아니라, 프론티어 모델을 향유하는 접점이 디바이스라는 데 방점이 있다. 기존 생태계(애플·메타)를 보유한 기업들의 헤게모니는 AI 트랜지션 이후에도 크게 희석되지 않을 것이라는 관측으로 브리핑을 마친다.</p>
+  </section>
+
+  <div class="disclaimer">
+    본 리포트는 2026년 7월 2일 유튜브 라이브 방송 “Live_가젯서울”의 발언 내용을 정리한 것으로, 특정 종목에 대한 매수·매도를 권유하지 않습니다. 투자 판단과 책임은 이용자 본인에게 있으며, 본 내용은 투자 자문이 아닙니다.
+  </div>
+
+</div>
+
+<footer>
+  <div class="brand">가젯서울</div>
+  <div class="sub">Gadget Seoul · Editorial Report</div>
+</footer>
+
+<script>
+  // ---- fade-in observer ----
+  const fadeObs = new IntersectionObserver((entries) => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        setTimeout(() => e.target.classList.add('visible'), i * 80);
+        fadeObs.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.fade-in').forEach(el => fadeObs.observe(el));
+
+  // ---- chart configs ----
+  const chartConfigs = {};
+
+  chartConfigs['capacityChart'] = () => {
+    new Chart(document.getElementById('capacityChart'), {
+      type: 'bar',
+      data: {
+        labels: ['최초 설계\n(4다이·16Hi)', '중간 단계\n(2다이·16Hi)', '최종 변경\n(2다이·12Hi)'],
+        datasets: [{
+          label: 'HBM4E 패키지 용량(GB)',
+          data: [1024, 512, 384],
+          backgroundColor: ['#1a1a1a', '#6b7280', '#e11d48'],
+          borderRadius: 6,
+          maxBarThickness: 60
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display:false }, tooltip: { callbacks: { label: (c)=> c.parsed.y + ' GB' } } },
+        scales: {
+          y: { beginAtZero:true, grid:{ color:'#e5e5e5' }, ticks:{ font:{ size:10 } } },
+          x: { grid:{ display:false }, ticks:{ font:{ size:9.5 } } }
+        }
+      }
+    });
+  };
+
+  chartConfigs['jobsChart'] = () => {
+    new Chart(document.getElementById('jobsChart'), {
+      type: 'bar',
+      data: {
+        labels: ['레저·호스피탈리티', '지방정부', '헬스케어', '금융활동'],
+        datasets: [{
+          label: '고용 증가 기여(개념도)',
+          data: [38, 22, 30, -8],
+          backgroundColor: ['#f43f5e','#f43f5e','#f43f5e','#2563eb'],
+          borderRadius: 6,
+          maxBarThickness: 50
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false, indexAxis: 'y',
+        plugins: { legend: { display:false } },
+        scales: {
+          x: { grid:{ color:'#e5e5e5' }, ticks:{ font:{ size:10 } } },
+          y: { grid:{ display:false }, ticks:{ font:{ size:10.5 } } }
+        }
+      }
+    });
+  };
+
+  chartConfigs['tariffChart'] = () => {
+    new Chart(document.getElementById('tariffChart'), {
+      type: 'line',
+      data: {
+        labels: ['1분기', '2분기', '3분기(추정)', '4분기(추정)'],
+        datasets: [{
+          label: '분기별 관세 비용(억 달러, 개념도)',
+          data: [8, 11, 13, 15],
+          borderColor: '#e11d48',
+          backgroundColor: 'rgba(225,29,72,0.12)',
+          fill: true, tension: .35,
+          pointBackgroundColor: '#e11d48', pointRadius: 4
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display:false } },
+        scales: {
+          y: { beginAtZero:true, grid:{ color:'#e5e5e5' }, ticks:{ font:{ size:10 } } },
+          x: { grid:{ display:false }, ticks:{ font:{ size:10 } } }
+        }
+      }
+    });
+  };
+
+  const chartObs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        const canvas = e.target.querySelector('canvas');
+        if (canvas && chartConfigs[canvas.id]) {
+          chartConfigs[canvas.id]();
+          e.target.classList.add('chart-ready');
+          chartObs.unobserve(e.target);
+        }
+      }
+    });
+  }, { threshold: 0.15 });
+  document.querySelectorAll('.chart-container').forEach(el => chartObs.observe(el));
+
+  // ---- HBM calculator ----
+  const dieButtons = document.querySelectorAll('#dieToggle button');
+  const hiSlider = document.getElementById('hiSlider');
+  const hiLabel = document.getElementById('hiLabel');
+  const calcOut = document.getElementById('calcOut');
+  const calcCompare = document.getElementById('calcCompare');
+  let selectedDie = 4;
+
+  function updateCalc(){
+    const hi = parseInt(hiSlider.value, 10);
+    hiLabel.textContent = hi + '-Hi';
+    // 8 stacks per die assumption, 2GB per layer (approx to hit 1024 at 4die/16hi)
+    const perStackGB = 2; // per layer GB
+    const stacksPerDie = 8;
+    const total = selectedDie * stacksPerDie * hi * perStackGB;
+    calcOut.textContent = total.toLocaleString();
+    if (selectedDie === 4 && hi === 16) {
+      calcCompare.textContent = '기존 최초 설계안 기준';
+    } else if (selectedDie === 2 && hi === 12) {
+      calcCompare.textContent = '최종 변경안 · 기존 대비 ' + Math.round((1 - total/1024)*100) + '% 감소';
+    } else {
+      calcCompare.textContent = '기존 1,024GB 대비 ' + Math.round((1 - total/1024)*100) + '% 변화';
+    }
+  }
+
+  dieButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      dieButtons.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      selectedDie = parseInt(btn.dataset.val, 10);
+      updateCalc();
+    });
+  });
+  hiSlider.addEventListener('input', () => {
+    const pct = ((hiSlider.value - hiSlider.min) / (hiSlider.max - hiSlider.min)) * 100;
+    hiSlider.style.background = `linear-gradient(to right, var(--accent) ${pct}%, #e5e5e5 ${pct}%)`;
+    updateCalc();
+  });
+  document.getElementById('calcReset').addEventListener('click', () => {
+    dieButtons.forEach(b => b.classList.remove('active'));
+    dieButtons[0].classList.add('active');
+    selectedDie = 4;
+    hiSlider.value = 16;
+    hiSlider.dispatchEvent(new Event('input'));
+  });
+  updateCalc();
+
+  // ---- tabs ----
+  const tabBtns = document.querySelectorAll('.tab-btn');
+  tabBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById(btn.dataset.tab).classList.add('active');
+    });
+  });
+</script>
+</body>
+</html>

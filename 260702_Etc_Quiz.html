@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>가젯서울 퀴즈 | 루빈 울트라 & 반도체 브리핑</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,600&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#ffffff; --bg-soft:#fafafa;
+    --text:#1a1a1a; --text-soft:#777777;
+    --accent:#e11d48; --accent2:#f43f5e;
+    --line:#e5e5e5; --blue:#2563eb; --gray:#6b7280;
+    --green:#1f9d55; --red:#e11d48;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{ background:var(--bg); color:var(--text); font-family:'Noto Sans KR', sans-serif; padding-bottom:60px; }
+  .wrap{ max-width:560px; margin:0 auto; padding:0 18px; }
+
+  .hero{ background:var(--text); color:#fff; padding:36px 18px 26px; }
+  .hero .eyebrow{ font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--accent2); font-weight:700; margin-bottom:10px; }
+  .hero h1{ font-family:'Playfair Display', serif; font-weight:900; font-size:24px; line-height:1.35; }
+  .hero p{ font-size:13px; color:#cfcfcf; margin-top:10px; }
+
+  /* ---- sticky scoreboard ---- */
+  .scoreboard{
+    position:sticky; top:0; z-index:50; background:#fff;
+    border-bottom:1px solid var(--line); padding:12px 18px;
+    box-shadow:0 2px 10px rgba(0,0,0,.05);
+  }
+  .score-row{ display:flex; justify-content:space-between; align-items:center; max-width:560px; margin:0 auto; }
+  .score-item{ text-align:center; flex:1; }
+  .score-item .num{ font-family:'Playfair Display', serif; font-weight:900; font-size:18px; color:var(--text); }
+  .score-item .lab{ font-size:10.5px; color:var(--text-soft); margin-top:1px; }
+  .score-item.pct .num{ color:var(--accent); }
+  .bar-track{ max-width:560px; margin:8px auto 0; height:6px; background:#eee; border-radius:6px; overflow:hidden; }
+  .bar-fill{ height:100%; width:0%; background:var(--red); transition:width .4s ease, background .4s ease; }
+
+  section{ padding:26px 0 4px; }
+
+  .q-card{
+    border:1px solid var(--line); border-radius:12px; padding:18px 16px; margin-bottom:18px; background:#fff;
+  }
+  .q-head{ display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+  .q-num{ font-family:'Playfair Display', serif; font-weight:900; font-size:14px; color:var(--accent); }
+  .q-badges{ display:flex; gap:6px; }
+  .badge{ font-size:10px; font-weight:700; padding:3px 8px; border-radius:20px; }
+  .badge.easy{ background:#e8f7ec; color:var(--green); }
+  .badge.medium{ background:#fff4e6; color:#c2760a; }
+  .badge.hard{ background:#fde8ea; color:var(--red); }
+  .badge.type{ background:var(--bg-soft); color:var(--text-soft); }
+  .q-text{ font-size:14.5px; font-weight:500; line-height:1.6; margin-bottom:14px; }
+
+  .options{ display:flex; flex-direction:column; gap:8px; }
+  .opt-btn{
+    text-align:left; padding:11px 12px; font-size:13.5px; border-radius:8px;
+    border:1px solid var(--line); background:var(--bg-soft); color:var(--text); cursor:pointer;
+    transition:all .15s ease; position:relative;
+  }
+  .opt-btn:hover:not(:disabled){ border-color:var(--accent2); }
+  .opt-btn:disabled{ cursor:default; }
+  .opt-btn.correct{ background:#e8f7ec; border-color:var(--green); color:#155724; }
+  .opt-btn.incorrect{ background:#fde8ea; border-color:var(--red); color:#7a1220; }
+  .opt-badge{ float:right; font-size:11px; font-weight:700; }
+  .opt-badge.c{ color:var(--green); }
+  .opt-badge.i{ color:var(--red); }
+
+  .ox-row{ display:flex; gap:10px; }
+  .ox-btn{
+    flex:1; padding:16px; font-size:20px; font-weight:900; border-radius:10px;
+    border:1px solid var(--line); background:var(--bg-soft); cursor:pointer; color:var(--text);
+    font-family:'Playfair Display', serif;
+  }
+  .ox-btn.correct{ background:#e8f7ec; border-color:var(--green); color:#155724; }
+  .ox-btn.incorrect{ background:#fde8ea; border-color:var(--red); color:#7a1220; }
+
+  .sa-row{ display:flex; gap:8px; }
+  .sa-row input{
+    flex:1; padding:11px 12px; font-size:14px; border-radius:8px; border:1px solid var(--line);
+    outline:none; background:var(--bg-soft);
+  }
+  .sa-row input:focus{ border-color:var(--accent2); }
+  .sa-row button{
+    padding:11px 16px; font-size:13px; font-weight:700; border-radius:8px; border:none;
+    background:var(--text); color:#fff; cursor:pointer;
+  }
+  .sa-row button:disabled{ background:#bbb; cursor:default; }
+  .sa-feedback{ margin-top:10px; font-size:13px; font-weight:700; }
+  .sa-feedback.correct{ color:var(--green); }
+  .sa-feedback.incorrect{ color:var(--red); }
+
+  .explain{
+    max-height:0; overflow:hidden; transition:max-height .35s ease, margin .35s ease, padding .35s ease;
+    background:var(--bg-soft); border-radius:8px; margin-top:0; padding:0 12px;
+    border-left:3px solid var(--accent);
+  }
+  .explain.open{ max-height:400px; margin-top:12px; padding:12px; }
+  .explain .lab{ font-size:11px; font-weight:700; color:var(--accent); letter-spacing:.05em; margin-bottom:6px; display:block; }
+  .explain p{ font-size:12.5px; color:#444; line-height:1.6; }
+
+  /* result section */
+  .result-card{
+    display:none; text-align:center; padding:36px 22px; border-radius:16px;
+    background:linear-gradient(135deg, #1a1a1a, #3a0d16); color:#fff; margin:22px 0;
+  }
+  .result-card.show{ display:block; }
+  .result-card .grade{ font-family:'Playfair Display', serif; font-weight:900; font-size:56px; color:var(--accent2); }
+  .result-card .score-txt{ font-size:15px; margin-top:6px; color:#e5e5e5; }
+  .result-card .msg{ font-size:13px; color:#c9c9c9; margin-top:14px; line-height:1.6; }
+  .retry-btn{
+    margin-top:20px; padding:12px 24px; border-radius:30px; border:none;
+    background:var(--accent); color:#fff; font-weight:700; font-size:13.5px; cursor:pointer;
+  }
+
+  footer{ text-align:center; padding:30px 20px 10px; }
+  footer .brand{ font-family:'Playfair Display', serif; font-weight:900; font-size:15px; }
+  footer .sub{ font-size:11px; color:var(--text-soft); margin-top:4px; }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="eyebrow">Gadget Seoul Quiz</div>
+  <h1>루빈 울트라 & 반도체 브리핑 퀴즈</h1>
+  <p>2026.07.02 라이브 방송 내용 기반, 총 10문제</p>
+</div>
+
+<div class="scoreboard">
+  <div class="score-row">
+    <div class="score-item"><div class="num" id="solvedNum">0/10</div><div class="lab">푼 문제</div></div>
+    <div class="score-item"><div class="num" id="correctNum">0</div><div class="lab">맞힌 문제</div></div>
+    <div class="score-item pct"><div class="num" id="pctNum">0%</div><div class="lab">정답률</div></div>
+  </div>
+  <div class="bar-track"><div class="bar-fill" id="barFill"></div></div>
+</div>
+
+<div class="wrap">
+  <section id="quizList"></section>
+
+  <div class="result-card" id="resultCard">
+    <div class="grade" id="resultGrade">A</div>
+    <div class="score-txt" id="resultScore">10 / 10 정답</div>
+    <div class="msg" id="resultMsg"></div>
+    <button class="retry-btn" id="retryBtn">🔄 다시 풀기</button>
+  </div>
+</div>
+
+<footer>
+  <div class="brand">가젯서울</div>
+  <div class="sub">Gadget Seoul · Quiz</div>
+</footer>
+
+<script>
+const QUIZ_DATA = [
+  {
+    id: 1, type: 'mc', difficulty: 'easy',
+    question: '엔비디아의 GPU 로드맵 순서로 올바른 것은?',
+    options: ['블랙웰 → 볼타 → 루빈 → 파인만', '볼타 → 블랙웰 → 루빈 → 파인만', '루빈 → 블랙웰 → 볼타 → 파인만', '볼타 → 루빈 → 블랙웰 → 파인만'],
+    answer: 1,
+    explanation: '방송에서 "볼타 블랙웰 루빈 파인만 이렇게 가고 있고"라고 설명하며, 현재는 블랙웰 울트라(B300) 구간을 지나 루빈으로 넘어가는 시점이라고 언급했다.'
+  },
+  {
+    id: 2, type: 'mc', difficulty: 'medium',
+    question: '루빈 울트라의 HBM4E 설계에서 실제로 확인된(거의 확정적인) 변경사항 두 가지는?',
+    options: ['3다이→2다이, 12하이→8하이', '4다이→2다이, 16하이→12하이', '2다이→4다이, 8하이→16하이', '4다이→3다이, 16하이→14하이'],
+    answer: 1,
+    explanation: '"4다이에서 2다이로 바뀌었다", "HBM4E가 16하이에서 12하이로 바뀐다" 두 가지는 고객사에 이미 통보되고 확정된 사안이라 확실하다고 설명했다.'
+  },
+  {
+    id: 3, type: 'ox', difficulty: 'easy',
+    question: '루빈 울트라의 HBM4E 용량이 1테라바이트에서 384기가바이트로 줄어든 것은 실제로 HBM 수요 감소로 이어진다.',
+    answer: 'X',
+    explanation: '방송에서는 이 결론이 잘못됐다고 강조했다. 패키지 다이 수는 줄었지만 보드·랙 단위에서는 패키지를 추가로 실장해 전체 다이 수를 맞추며, FFN 연산이 Groq LPU로 오프로딩되면서 남은 HBM은 오히려 어텐션(문맥 처리)에 더 효율적으로 쓰인다고 설명했다.'
+  },
+  {
+    id: 4, type: 'short', difficulty: 'medium',
+    question: 'CoWoS-L 패키징의 물리적 최대 면적은 몇 ㎟로 언급되었는가? (숫자만 입력)',
+    answer: ['8150', '8,150'],
+    explanation: '"코아스L의 물리적 최대치가 8150이야"라고 언급했으며, 4다이+16스택 구성에 필요한 면적(6,750㎟)보다 여유가 있어 워피지(휘어짐) 문제를 설계 변경의 주원인으로 보기 어렵다고 설명했다.'
+  },
+  {
+    id: 5, type: 'mc', difficulty: 'medium',
+    question: '엔비디아가 인수해 FFN(Feed Forward Network) 연산을 전담시키는 것으로 설명된 기업/제품은?',
+    options: ['Groq LPU', 'TPU', 'CXMT', '오베론'],
+    answer: 0,
+    explanation: '"그록 LPU가 들어옵니다"라며, 그록(Groq)의 LPU가 SRAM 기반으로 FFN 연산을 전담해 훨씬 빠르게 처리한다고 설명했다.'
+  },
+  {
+    id: 6, type: 'mc', difficulty: 'hard',
+    question: '방송에서 설명한 프리필(Prefill)과 디코드(Decode) 중, "컴퓨트 바운드(연산 위주)" 작업으로 분류된 것은?',
+    options: ['디코드', '프리필', '둘 다 메모리 바운드', '둘 다 컴퓨트 바운드'],
+    answer: 1,
+    explanation: '"프리필은 컴퓨티 바운드다"라고 설명했으며, 디코드는 문맥(KV 캐시)을 참조해야 하므로 HBM 용량이 중요한 메모리 바운드 작업으로 구분했다.'
+  },
+  {
+    id: 7, type: 'short', difficulty: 'medium',
+    question: '6월 고용지표에서 언급된 자발적 퇴직률(Quit Rate)은 몇 %였는가? (숫자만, 예: 1.9)',
+    answer: ['1.9', '1.9%'],
+    explanation: '"자발적 퇴직 퀴치율이거든요 1.9%"라며, 이 수치가 낮아 노동시장이 축하할 만한 활황은 아니라고 설명했다.'
+  },
+  {
+    id: 8, type: 'mc', difficulty: 'medium',
+    question: '메타의 대형 데이터센터로 언급된 두 곳의 이름은?',
+    options: ['콜로소스, 스타게이트', '프로메테우스, 하이페리온', '오베론, 카이버', '드래곤볼, 프로메테우스'],
+    answer: 1,
+    explanation: '"프로메테우스랑 하이페리온. 그게 1기가와트거든요"라며 두 데이터센터를 언급했고, 이는 원래 클라우드 사업 진출을 염두에 두고 지어진 것이라고 설명했다.'
+  },
+  {
+    id: 9, type: 'mc', difficulty: 'hard',
+    question: '애플이 CXMT·YMTC와 협상하는 "진짜 배경"으로 방송에서 지목한 것은?',
+    options: ['CXMT의 압도적 기술력', '삼성·하이닉스와의 계약 만료', '관세 협상 카드 확보', '애플 자체 메모리 사업 진출'],
+    answer: 2,
+    explanation: '애플이 분기마다 부담하는 관세 비용이 막대하며, 150일 유예 기한이 임박한 시점에 정부와의 관세 협상에서 "대체 카드가 있다"는 신호를 보내기 위한 포석이라고 설명했다.'
+  },
+  {
+    id: 10, type: 'short', difficulty: 'easy',
+    question: 'SK하이닉스가 2029년 청주에 건설한다고 발표한 팹의 이름은? (예: M○○)',
+    answer: ['M17', 'm17'],
+    explanation: '"SK 하이닉스 쪽에서 2029년에 M17 청주에 M17 팹 건설한다"는 내용이 오늘의 브리핑 항목 중 하나로 언급되었다.'
+  }
+];
+
+let state = { solved: 0, correct: 0 };
+
+function normalize(str){
+  return str.trim().toLowerCase().replace(/\s+/g,'');
+}
+
+function updateScoreboard(){
+  document.getElementById('solvedNum').textContent = state.solved + '/10';
+  document.getElementById('correctNum').textContent = state.correct;
+  const pct = state.solved > 0 ? Math.round((state.correct/state.solved)*100) : 0;
+  document.getElementById('pctNum').textContent = pct + '%';
+  const fill = document.getElementById('barFill');
+  fill.style.width = (state.solved/10*100) + '%';
+  let color = '#e11d48';
+  if (pct >= 70) color = '#1f9d55';
+  else if (pct >= 40) color = '#e08b1f';
+  fill.style.background = color;
+
+  if (state.solved === 10) showResult();
+}
+
+function markSolved(isCorrect){
+  state.solved++;
+  if (isCorrect) state.correct++;
+  updateScoreboard();
+}
+
+function openExplain(card){
+  const ex = card.querySelector('.explain');
+  ex.classList.add('open');
+}
+
+function renderQuestion(q){
+  const card = document.createElement('div');
+  card.className = 'q-card';
+  card.id = 'q' + q.id;
+
+  const diffLabel = { easy:'쉬움', medium:'보통', hard:'어려움' }[q.difficulty];
+  const typeLabel = { mc:'객관식', ox:'OX', short:'단답형' }[q.type];
+
+  let bodyHTML = `
+    <div class="q-head">
+      <span class="q-num">Q${q.id}</span>
+      <div class="q-badges">
+        <span class="badge type">${typeLabel}</span>
+        <span class="badge ${q.difficulty}">${diffLabel}</span>
+      </div>
+    </div>
+    <div class="q-text">${q.question}</div>
+  `;
+
+  if (q.type === 'mc') {
+    bodyHTML += `<div class="options">`;
+    q.options.forEach((opt, i) => {
+      bodyHTML += `<button class="opt-btn" data-idx="${i}">${opt}</button>`;
+    });
+    bodyHTML += `</div>`;
+  } else if (q.type === 'ox') {
+    bodyHTML += `<div class="ox-row">
+      <button class="ox-btn" data-val="O">O</button>
+      <button class="ox-btn" data-val="X">X</button>
+    </div>`;
+  } else if (q.type === 'short') {
+    bodyHTML += `<div class="sa-row">
+      <input type="text" placeholder="정답을 입력하세요" />
+      <button class="submit-btn">제출</button>
+    </div>
+    <div class="sa-feedback"></div>`;
+  }
+
+  bodyHTML += `<div class="explain">
+      <span class="lab">해설</span>
+      <p>${q.explanation}</p>
+    </div>`;
+
+  card.innerHTML = bodyHTML;
+  document.getElementById('quizList').appendChild(card);
+
+  // wire events
+  if (q.type === 'mc') {
+    const btns = card.querySelectorAll('.opt-btn');
+    btns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const idx = parseInt(btn.dataset.idx, 10);
+        const isCorrect = idx === q.answer;
+        btns.forEach((b, i) => {
+          b.disabled = true;
+          if (i === q.answer) {
+            b.classList.add('correct');
+            b.innerHTML += ' <span class="opt-badge c">✓ 정답!</span>';
+          } else if (i === idx && !isCorrect) {
+            b.classList.add('incorrect');
+            b.innerHTML += ' <span class="opt-badge i">✗ 오답</span>';
+          }
+        });
+        openExplain(card);
+        markSolved(isCorrect);
+      });
+    });
+  } else if (q.type === 'ox') {
+    const btns = card.querySelectorAll('.ox-btn');
+    btns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const val = btn.dataset.val;
+        const isCorrect = val === q.answer;
+        btns.forEach(b => {
+          b.disabled = true;
+          if (b.dataset.val === q.answer) b.classList.add('correct');
+          else if (b === btn) b.classList.add('incorrect');
+        });
+        openExplain(card);
+        markSolved(isCorrect);
+      });
+    });
+  } else if (q.type === 'short') {
+    const input = card.querySelector('input');
+    const submitBtn = card.querySelector('.submit-btn');
+    const feedback = card.querySelector('.sa-feedback');
+    const submit = () => {
+      if (input.disabled) return;
+      const val = input.value;
+      if (!val || val.trim() === '') { input.focus(); return; }
+      const norm = normalize(val);
+      const isCorrect = q.answer.some(a => normalize(a) === norm);
+      input.disabled = true;
+      submitBtn.disabled = true;
+      if (isCorrect) {
+        feedback.textContent = '✓ 정답!';
+        feedback.className = 'sa-feedback correct';
+      } else {
+        feedback.textContent = `✗ 오답 · 정답: ${q.answer[0]}`;
+        feedback.className = 'sa-feedback incorrect';
+      }
+      openExplain(card);
+      markSolved(isCorrect);
+    };
+    submitBtn.addEventListener('click', submit);
+    input.addEventListener('keydown', (e) => { if (e.key === 'Enter') submit(); });
+  }
+}
+
+function renderAll(){
+  document.getElementById('quizList').innerHTML = '';
+  QUIZ_DATA.forEach(renderQuestion);
+}
+
+function showResult(){
+  const pct = Math.round((state.correct/10)*100);
+  let grade = 'D', msg = '오늘 방송 내용을 다시 한번 복습해보는 건 어떨까요?';
+  if (pct >= 90){ grade='A'; msg='완벽에 가까운 이해도입니다! 핵심 논리를 정확히 짚었어요.'; }
+  else if (pct >= 70){ grade='B'; msg='꽤 탄탄하게 이해하고 있네요. 조금만 더 다지면 완벽해요.'; }
+  else if (pct >= 50){ grade='C'; msg='기본기는 갖췄어요. 해설을 다시 읽어보면 도움이 될 거예요.'; }
+
+  document.getElementById('resultGrade').textContent = grade;
+  document.getElementById('resultScore').textContent = `${state.correct} / 10 정답 (정답률 ${pct}%)`;
+  document.getElementById('resultMsg').textContent = msg;
+  document.getElementById('resultCard').classList.add('show');
+  document.getElementById('resultCard').scrollIntoView({ behavior:'smooth', block:'center' });
+}
+
+document.getElementById('retryBtn').addEventListener('click', () => {
+  state = { solved:0, correct:0 };
+  updateScoreboard();
+  document.getElementById('resultCard').classList.remove('show');
+  renderAll();
+  window.scrollTo({ top:0, behavior:'smooth' });
+});
+
+renderAll();
+updateScoreboard();
+</script>
+</body>
+</html>

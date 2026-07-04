@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>유리, 다시 쓰다 — 코닝이 AI 전쟁의 병목을 푸는 법</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;0,900;1,500&family=Noto+Sans+KR:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+:root{
+  --bg:#ffffff; --bg-sub:#fafafa; --ink:#1a1a1a; --ink-sub:#777777;
+  --accent:#e11d48; --accent-2:#f43f5e; --blue:#2563eb; --grey:#6b7280;
+  --line:#e5e5e5;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+body{
+  background:var(--bg); color:var(--ink);
+  font-family:'Noto Sans KR', sans-serif;
+  line-height:1.75; -webkit-font-smoothing:antialiased;
+  max-width:560px; margin:0 auto; overflow-x:hidden;
+}
+.serif{font-family:'Playfair Display', serif;}
+img,svg{max-width:100%; display:block;}
+
+/* ---------- HERO ---------- */
+.hero{
+  position:relative; padding:64px 26px 46px; background:var(--ink);
+  color:#fff; overflow:hidden;
+}
+.hero::before{
+  content:''; position:absolute; inset:0;
+  background:
+    radial-gradient(circle at 85% 10%, rgba(225,29,72,0.35), transparent 55%),
+    radial-gradient(circle at 10% 90%, rgba(37,99,235,0.25), transparent 50%);
+}
+.hero-eyebrow{
+  position:relative; font-size:12px; letter-spacing:.22em; text-transform:uppercase;
+  color:var(--accent-2); font-weight:600; margin-bottom:18px;
+}
+.hero-title{
+  position:relative; font-family:'Playfair Display', serif; font-weight:900;
+  font-size:40px; line-height:1.18; letter-spacing:-0.01em;
+}
+.hero-title em{ font-style:italic; color:var(--accent-2); }
+.hero-sub{
+  position:relative; margin-top:18px; font-size:15px; color:rgba(255,255,255,.72);
+  font-weight:300; line-height:1.7;
+}
+.hero-meta{
+  position:relative; margin-top:30px; display:flex; gap:14px; font-size:11px;
+  color:rgba(255,255,255,.5); letter-spacing:.05em;
+}
+.hero-meta span{border-left:1px solid rgba(255,255,255,.25); padding-left:14px;}
+.hero-meta span:first-child{border-left:none; padding-left:0;}
+
+/* ---------- SECTIONS ---------- */
+.section{padding:52px 26px;}
+.section.alt{background:var(--bg-sub);}
+.kicker{
+  display:flex; align-items:baseline; gap:10px; margin-bottom:16px;
+}
+.kicker .num{
+  font-family:'Playfair Display', serif; font-style:italic; font-weight:600;
+  font-size:14px; color:var(--accent);
+}
+.kicker .label{
+  font-size:11px; letter-spacing:.18em; text-transform:uppercase;
+  color:var(--ink-sub); font-weight:600;
+}
+h2{
+  font-family:'Playfair Display', serif; font-weight:700; font-size:27px;
+  line-height:1.32; margin-bottom:20px; letter-spacing:-0.01em;
+}
+h2 .accent{color:var(--accent);}
+p{ font-size:15.5px; color:#333; margin-bottom:16px; }
+p:last-child{margin-bottom:0;}
+.lead::first-letter{
+  font-family:'Playfair Display', serif; font-size:56px; font-weight:700;
+  float:left; line-height:0.8; padding:8px 10px 0 0; color:var(--accent);
+}
+.pull{
+  font-family:'Playfair Display', serif; font-style:italic; font-size:21px;
+  line-height:1.5; color:var(--ink); border-left:3px solid var(--accent);
+  padding:4px 0 4px 20px; margin:28px 0;
+}
+.pull span{display:block; margin-top:10px; font-family:'Noto Sans KR',sans-serif; font-style:normal; font-size:12px; color:var(--ink-sub); letter-spacing:.05em;}
+.tag-row{display:flex; flex-wrap:wrap; gap:8px; margin:18px 0;}
+.tag{
+  font-size:12px; padding:6px 12px; border-radius:100px; border:1px solid var(--line);
+  color:var(--ink-sub); background:#fff;
+}
+.stat-grid{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:22px 0;}
+.stat-box{
+  background:#fff; border:1px solid var(--line); border-radius:4px; padding:18px 16px;
+}
+.stat-box .n{font-family:'Playfair Display', serif; font-weight:800; font-size:26px; color:var(--accent); line-height:1;}
+.stat-box .l{font-size:12px; color:var(--ink-sub); margin-top:8px; line-height:1.4;}
+.divider{
+  display:flex; align-items:center; gap:12px; margin:8px 0 34px;
+}
+.divider .ln{flex:1; height:1px; background:var(--line);}
+.divider .dot{width:6px; height:6px; background:var(--accent); border-radius:50%;}
+
+/* ---------- CHART ---------- */
+.fade-in {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.fade-in.visible { opacity: 1; transform: translateY(0); }
+.chart-container { position: relative; max-height: 340px; margin:24px 0; background:#fff; border:1px solid var(--line); border-radius:6px; padding:16px 12px 8px;}
+.chart-container canvas { opacity: 0; transition: opacity 0.4s ease; max-height: 300px; }
+.chart-container.chart-ready canvas { opacity: 1; }
+.chart-cap{font-size:11.5px; color:var(--ink-sub); text-align:center; margin-top:4px;}
+
+/* ---------- SIGNATURE DIAGRAM ---------- */
+.diagram-wrap{
+  background:#fff; border:1px solid var(--line); border-radius:6px; padding:18px 10px 14px; margin:24px 0;
+}
+.diagram-cap{font-size:12px; color:var(--ink-sub); text-align:center; margin-top:10px; line-height:1.5;}
+
+/* ---------- SIMULATOR ---------- */
+.sim{
+  background:#fff; border:1px solid var(--line); border-radius:6px; padding:22px 18px; margin:26px 0;
+}
+.sim-title{font-size:13px; font-weight:700; color:var(--accent); text-transform:uppercase; letter-spacing:.06em; margin-bottom:4px;}
+.sim-desc{font-size:13px; color:var(--ink-sub); margin-bottom:18px;}
+.sim-readout{
+  display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:10px;
+}
+.sim-readout .val{font-family:'Playfair Display', serif; font-weight:800; font-size:30px; color:var(--ink);}
+.sim-readout .val small{font-size:14px; font-weight:500; color:var(--ink-sub);}
+.sim-readout .badge{
+  font-size:11px; padding:4px 10px; border-radius:100px; background:var(--bg-sub); color:var(--ink-sub);
+  border:1px solid var(--line);
+}
+.sim-readout .badge.hot{background:#fdecef; color:var(--accent); border-color:#f9c3ce;}
+input[type=range]{
+  width:100%; accent-color:var(--accent); height:4px; margin:14px 0 6px; cursor:pointer;
+}
+.sim-labels{display:flex; justify-content:space-between; font-size:11px; color:var(--ink-sub);}
+.sim-reset{
+  margin-top:16px; font-size:12px; color:var(--ink-sub); background:none; border:1px solid var(--line);
+  border-radius:100px; padding:7px 16px; cursor:pointer;
+}
+.sim-reset:hover{border-color:var(--accent); color:var(--accent);}
+.sim-note{font-size:11.5px; color:var(--ink-sub); margin-top:14px; line-height:1.6; border-top:1px dashed var(--line); padding-top:12px;}
+
+/* ---------- TABLE ---------- */
+table{width:100%; border-collapse:collapse; margin:20px 0; font-size:13.5px;}
+th{background:var(--accent); color:#fff; font-weight:600; padding:10px 8px; text-align:left;}
+td{padding:9px 8px; border-bottom:1px solid var(--line); background:var(--bg-sub); color:#333;}
+tr:last-child td{border-bottom:none;}
+
+/* ---------- TIMELINE ---------- */
+.tl{ margin:24px 0; }
+.tl-item{ display:flex; gap:14px; padding-bottom:22px; position:relative; }
+.tl-item:not(:last-child)::before{
+  content:''; position:absolute; left:5px; top:16px; bottom:-6px; width:1px; background:var(--line);
+}
+.tl-dot{width:11px; height:11px; border-radius:50%; background:var(--accent); flex-shrink:0; margin-top:4px;}
+.tl-year{font-family:'Playfair Display', serif; font-weight:700; font-size:14px; color:var(--accent); margin-bottom:3px;}
+.tl-text{font-size:13.5px; color:#333;}
+
+footer{
+  padding:40px 26px 56px; background:var(--ink); color:rgba(255,255,255,.55); text-align:center;
+}
+footer .mark{font-family:'Playfair Display', serif; font-style:italic; color:#fff; font-size:16px; margin-bottom:10px;}
+footer p{color:rgba(255,255,255,.4); font-size:11.5px;}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-eyebrow">Buy America · 바이 아메리카</div>
+  <h1 class="hero-title">모래에서<br>태어나 <em>AI</em>를<br>떠받치다</h1>
+  <p class="hero-sub">175년간 신중했던 유리 기업 코닝이 엔비디아·메타·아마존과 손잡고 데이터센터의 숨은 병목을 풀고 있다. 스마트폰 액정부터 광섬유, 차세대 반도체 유리기판까지 — 인류가 3,500년간 다뤄온 소재의 다음 챕터.</p>
+  <div class="hero-meta">
+    <span>CORNING · GLW</span>
+    <span>소재 · 반도체 인프라</span>
+    <span>2026.07.04</span>
+  </div>
+</div>
+
+<!-- 01 -->
+<div class="section">
+  <div class="kicker"><span class="num">01</span><span class="label">왜 지금 코닝인가</span></div>
+  <h2>하루 만에 <span class="accent">15%</span> 뛴 175살 기업</h2>
+  <p class="lead">지난 5월, 뉴욕 증권거래소 투자자 설명회장. 코닝은 엔비디아와 손잡고 미국 내 광연결 생산 능력을 10배로 키우는 다년간의 상업 파트너십을 전격 발표했다. 선급금과 지분 투자까지 오간 파격적인 계약으로, 세부 조건은 비밀에 부쳐질 만큼 비중이 컸다.</p>
+  <p>발표 당일 코닝 주가는 하루 만에 15% 넘게 급등했고, 같은 달 사상 처음으로 210달러를 돌파했다. 조용히 산업의 뒷단을 지켜온 소재 기업이 갑자기 AI 열풍의 한복판에 섰다.</p>
+  <div class="stat-grid">
+    <div class="stat-box"><div class="n">+15%</div><div class="l">엔비디아 계약 발표 당일<br>주가 상승폭</div></div>
+    <div class="stat-box"><div class="n">$210</div><div class="l">사상 최고가 최초 돌파<br>(2026년 5월)</div></div>
+    <div class="stat-box"><div class="n">×5</div><div class="l">3년간 기업가치 상승 배수</div></div>
+    <div class="stat-box"><div class="n">×3</div><div class="l">최근 1년간 주가 상승 배수</div></div>
+  </div>
+  <p>메타는 이미 2030년까지 최대 60억 달러(약 8조 원) 규모의 광케이블을 코닝으로부터 사들이기로 했고, 아마존도 AWS 데이터센터용 장기 공급 계약을 맺었다. 코닝은 1분기 실적 발표에서 메타에 맞먹는 규모의 하이퍼스케일러 두 곳과 추가 장기 계약이 있다는 사실도 공개했다.</p>
+</div>
+
+<!-- 02 -->
+<div class="section alt">
+  <div class="kicker"><span class="num">02</span><span class="label">소재의 재발견</span></div>
+  <h2>유리는 <span class="accent">하나</span>가 아니다</h2>
+  <p class="lead">우리는 유리를 하나의 균일한 물질로 생각하지만, 실제로는 섞는 성분과 굽는 방식에 따라 완전히 다른 소재가 된다. 그저 모래를 녹인 투명한 돌덩어리가 아니라, 금속산화물을 언제 어떻게 넣느냐에 따라 성질이 갈리는 정밀 화학 제품이다.</p>
+  <table>
+    <tr><th>배합·처리 방식</th><th>결과물</th></tr>
+    <tr><td>알루미늄 성분 + 화학 표면 강화</td><td>얇고 강한 스마트폰 화면 유리</td></tr>
+    <tr><td>붕소 성분 첨가</td><td>열에 늘어나거나 줄지 않는 실험실 그릇·오븐용 유리</td></tr>
+    <tr><td>미세 관통구멍(TGV) + 금속 충전</td><td>차세대 반도체 패키징 유리기판 후보</td></tr>
+  </table>
+  <p>제조 과정도 예민하다. 쿠키를 굽는 오븐은 섭씨 165~180도지만, 유리 반죽은 그 10배가 넘는 1,500도 초고온의 액체 상태로 녹인 뒤 기포와 불순물을 제거하고, 400~500도 선행 가마에서 서서히 식혀야 상품이 된다.</p>
+</div>
+
+<!-- 03 -->
+<div class="section">
+  <div class="kicker"><span class="num">03</span><span class="label">제조 기술의 정점</span></div>
+  <h2>공중에서 <span class="accent">침대만 한 유리</span>를 뽑아내다</h2>
+  <p class="lead">중력에 끌려 흘러내리는 액체 유리를 그대로 굳히면 상품이 될 수 없다. 평평한 판을 만드는 플로트 공법도 있지만, 위아래 두께가 달라지면 화면이 왜곡되고 응력이 남아 잘 깨진다. 코닝은 이 문제를 자체 개발한 '퓨전드로우' 공법으로 해결했다.</p>
+  <div class="diagram-wrap fade-in">
+    <svg viewBox="0 0 340 220" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="glassGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#f43f5e" stop-opacity="0.85"/>
+          <stop offset="100%" stop-color="#e11d48" stop-opacity="0.15"/>
+        </linearGradient>
+      </defs>
+      <!-- isopipe trough -->
+      <polygon points="120,20 220,20 200,55 140,55" fill="#1a1a1a"/>
+      <text x="170" y="14" text-anchor="middle" font-size="9" fill="#777777" font-family="Noto Sans KR, sans-serif">이소파이프 (V자형 통)</text>
+      <!-- overflow streams -->
+      <path d="M140,55 C130,90 118,120 108,150" stroke="url(#glassGrad)" stroke-width="4" fill="none"/>
+      <path d="M200,55 C210,90 222,120 232,150" stroke="url(#glassGrad)" stroke-width="4" fill="none"/>
+      <!-- fusion point -->
+      <path d="M108,150 C120,168 148,178 170,180" stroke="#e11d48" stroke-width="4" fill="none"/>
+      <path d="M232,150 C220,168 192,178 170,180" stroke="#e11d48" stroke-width="4" fill="none"/>
+      <!-- fused sheet -->
+      <rect x="158" y="180" width="24" height="34" fill="#e11d48" opacity="0.55"/>
+      <text x="170" y="212" text-anchor="middle" font-size="8" fill="#ffffff" font-family="Noto Sans KR, sans-serif">합류점</text>
+      <text x="60" y="120" font-size="9" fill="#777777" font-family="Noto Sans KR, sans-serif">양쪽 가장자리로</text>
+      <text x="60" y="132" font-size="9" fill="#777777" font-family="Noto Sans KR, sans-serif">균일하게 흘러내림</text>
+      <text x="170" y="240" text-anchor="middle" font-size="9" fill="#2563eb" font-family="Noto Sans KR, sans-serif" font-style="italic">↓ 손 한 번 대지 않고 정밀 재단</text>
+    </svg>
+    <div class="diagram-cap">V자형 이소파이프 양쪽으로 유리 용액이 폭포수처럼 흘러내려 맨 아래에서 합쳐진 뒤, 공중에서 굳으면서 명함보다 얇고 침대보다 큰 유리판이 표면에 손 한 번 안 대고 뽑혀 나온다.</div>
+  </div>
+  <p>같은 원리로 만든 광섬유는 노스캐롤라이나 세계 최대 공장에서 용융로에 유리를 넣고 당겨, 머리카락보다 가는 125마이크로미터 굵기로 한 번에 50킬로미터 이상 뽑아낸다.</p>
+  <div class="pull">시장이 열릴 때까지는 어느 기업보다 신중하지만, 한번 시작하면 어느 곳보다 확실한 상품으로 승부한다.<span>— 코닝의 175년을 관통하는 원칙</span></div>
+</div>
+
+<!-- 04 -->
+<div class="section alt">
+  <div class="kicker"><span class="num">04</span><span class="label">새로운 병목</span></div>
+  <h2>구리가 감당 못하는 <span class="accent">발열과 거리</span></h2>
+  <p class="lead">엔비디아의 최신 서버랙 블랙웰 NVL72 한 대는 120kW의 전력을 잡아먹는다. 전기난로 수십 대를 한 곳에 켠 것과 같은 열이 좁은 공간에 몰리면서, 서버가 비대해지고 데이터센터 구조 자체를 바꿔야 하는 지경에 이른다. 과열과 냉각의 반복은 솔더 접합부와 커넥터를 미세하게 수축·팽창시켜 장기적으로 수명을 갉아먹는다.</p>
+  <p>짧은 거리에선 구리 케이블이 여전히 가성비가 있지만, 장거리·고대역폭 구간에서는 발열 부담이 적은 광섬유가 시장을 잠식하고 있다. 코닝은 1970년 자사 연구소에서 세계 최초로 저손실 광섬유를 개발해 국가 기술 훈장을 받았고, 지금까지 만들어낸 광섬유는 전 세계 13억 마일이 넘는다 — 세계 시장의 5분의 1을 차지하는 힘의 근원이다.</p>
+  <p>올해 3월 공개한 신제품 '컨투어'는 오직 생성형 AI 데이터센터만을 위한 고밀도 광섬유로, 케이블 하나에 최대 6,900여 개의 광섬유가 들어간다. 메타의 루이지애나 데이터센터에 투입될 예정이다. '멀티코어 파이버' 기술로 머리카락 굵기 그대로의 유리 가닥 안에 신호 통로를 4배 늘려, 같은 성능을 내는 데 필요한 케이블 수를 75% 줄였다.</p>
+
+  <div class="sim fade-in">
+    <div class="sim-title">인터랙티브 계산기</div>
+    <div class="sim-desc">코닝이 공개한 기준(GPU 13만 대 = 광섬유 200만 가닥 이상)을 바탕으로, GPU 규모를 바꾸며 필요한 광섬유 가닥 수를 가늠해보세요.</div>
+    <div class="sim-readout">
+      <div class="val" id="gpuVal">130,000<small> 대</small></div>
+      <span class="badge" id="gpuBadge">기본 스케일아웃</span>
+    </div>
+    <input type="range" id="gpuSlider" min="50000" max="500000" step="10000" value="130000">
+    <div class="sim-labels"><span>5만 대</span><span>50만 대</span></div>
+    <div class="sim-readout" style="margin-top:22px;">
+      <div class="val" id="fiberVal" style="color:#e11d48;">2,000,000<small> 가닥</small></div>
+      <span class="badge hot" id="fiberBadge">필요 광섬유</span>
+    </div>
+    <button class="sim-reset" id="simReset">초기값으로 리셋</button>
+    <div class="sim-note">※ 코닝이 밝힌 "13만 개 GPU 클러스터 = 광섬유 200만 가닥 이상, 광학 레이어가 커지면 300만 가닥 이상" 기준 비율을 그대로 적용한 추정치입니다. 가닥별 길이를 모두 더하면 10만 킬로미터가 넘습니다.</div>
+  </div>
+</div>
+
+<!-- 05 -->
+<div class="section">
+  <div class="kicker"><span class="num">05</span><span class="label">넘을 수 없는 해자</span></div>
+  <h2>연 <span class="accent">10억 달러</span>의 연구개발비</h2>
+  <p class="lead">코닝은 매년 전체 예산 중 10억 달러를 연구개발에 쏟아붓는다. 전 세계 10여 곳의 연구시설에서 각각 수십 대의 실험용 유리 용해로(벤치탑)를 운영하는데, 용해로 하나를 새로 지어 안정화하는 데만 1년 반이 걸린다. 소규모 실험을 넘어 제품 라인마다 상업용 대량 생산까지 검증해야 하는 구조라, 오랜 시간 쌓인 데이터와 공정 노하우가 곧 후발주자가 넘기 힘든 진입장벽이 된다.</p>
+  <p>다음 병목은 반도체 패키징 단계다. 지금은 광모듈이 장비 앞쪽에 꽂혀 있어 스위치칩에서 나온 전기신호가 구리 배선을 타고 이동하지만, 광학 엔진을 스위치칩 바로 옆으로 끌어와 신호가 이동하는 거리를 줄이는 '코패키지드 옵틱스(CPO)' 기술이 올해 몇몇 기업들로부터 주목받고 있다.</p>
+  <p>더 먼 미래를 겨냥한 기술은 반도체 유리기판(글래스코어)이다. AI 반도체가 점점 무겁고 뜨거워지면서 기존 유기기판(PCB)만으로는 GPU와 HBM, 여러 칩렛을 지지하는 판이 신호를 100% 전달하지 못하는 문제가 생긴다. 열팽창에 강하고 평탄한 유리에 미세한 관통구멍(TGV)을 뚫어 금속을 채우면 이 문제를 보강할 수 있다. 반도체 기업들과의 협업이 진행 중이며, 완전 상용화 시점은 2030년 전후로 예상된다.</p>
+</div>
+
+<!-- 06 -->
+<div class="section alt">
+  <div class="kicker"><span class="num">06</span><span class="label">역사가 증명한 인내</span></div>
+  <h2>잡스가 설득한 <span class="accent">고릴라 글래스</span></h2>
+  <div class="tl">
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div><div class="tl-year">1860년대</div><div class="tl-text">매사추세츠에서 시작해 뉴욕주 코닝 마을로 이름을 얻은 '코닝 글래스웍스' 설립.</div></div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div><div class="tl-year">1960년대</div><div class="tl-text">강화유리 기술을 이미 개발했지만 마땅한 시장을 찾지 못해 방치.</div></div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div><div class="tl-year">2000년</div><div class="tl-text">인터넷 버블로 주가가 10배 가까이 뛰었다가, 광통신 시장 붕괴로 큰 타격을 입음 — 이후 확실한 수요가 보일 때만 움직이는 신중한 경영 문화 형성.</div></div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div><div class="tl-year">2007년</div><div class="tl-text">아이폰 출시 몇 달 전, 스티브 잡스가 긁힌 플라스틱 화면을 보고 웬델 윅스 회장을 집요하게 설득. 퓨전드로우 공법으로 만든 1.3mm 두께의 첫 고릴라 글래스 탄생.</div></div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div><div class="tl-year">2026년</div><div class="tl-text">엔비디아·메타·아마존과 대규모 광연결 파트너십 체결, 사상 최고가 경신.</div></div>
+    </div>
+  </div>
+  <p>두 기업의 협력은 20년 가까이 이어졌고, 이제는 애플 전용 생산 라인이 따로 세워질 정도가 됐다. 예전에는 코닝웨어·파이렉스 같은 주방유리로 더 익숙했지만, 지금은 그 사업을 떼어내고 자동차 배기가스 정화용 세라믹, 디스플레이 유리, 백신용 약병 유리, 태양광 유리판까지 만드는 소재 인프라 기업이 됐다.</p>
+</div>
+
+<!-- 07 -->
+<div class="section">
+  <div class="kicker"><span class="num">07</span><span class="label">숫자가 증명하는 전환</span></div>
+  <h2>실적이 뒷받침하는 <span class="accent">주가 랠리</span></h2>
+  <p class="lead">1분기 핵심 매출은 43억 5,000만 달러로 1년 전보다 18% 늘며 예상치를 넘겼고, 주당순이익은 30% 증가했다. 특히 광통신 부문은 8분기 연속 성장 중이며, 매출은 36% 늘고 부문 순이익은 무려 93% 증가해 전체 회사 이익의 절반 이상을 이 부문 혼자 책임지고 있다.</p>
+  <div class="chart-container fade-in">
+    <canvas id="q1Chart" height="230"></canvas>
+  </div>
+  <div class="chart-cap">2026년 1분기 실적 — 전년 동기 대비 성장률</div>
+</div>
+
+<!-- 08 -->
+<div class="section alt">
+  <div class="kicker"><span class="num">08</span><span class="label">상향된 미래 계획</span></div>
+  <h2>스프링보드 <span class="accent">2030</span></h2>
+  <p class="lead">코닝은 '스프링보드'라는 내부 성장 계획을 갖고 있다. 원래는 2023년 말 매출 기준으로 몇 년간 천천히 끌어올리는 보수적 계획이었지만, AI 데이터센터 수요가 폭발하면서 목표치를 큰 폭으로 상향했다.</p>
+  <div class="chart-container fade-in">
+    <canvas id="springChart" height="230"></canvas>
+  </div>
+  <div class="chart-cap">스프링보드 내부 계획 기준 연간 매출 목표 (단위: 억 달러)</div>
+  <div class="tag-row">
+    <span class="tag">미국·유럽·중국 분산 생산</span>
+    <span class="tag">한국 계열사 보유</span>
+    <span class="tag">사업 다각화로 관세 리스크 흡수</span>
+  </div>
+  <p>다만 하이퍼스케일러들의 현금 흐름이 이대로 지속될지, 데이터센터 구축 열기가 영원할지에 대한 불안감도 커지고 있다. 코닝은 대규모 투자에 참여하면서도 사업을 다각화하고 각 대륙에 생산시설을 분산시켜 지정학적 충격을 흡수할 준비를 해왔다는 평가를 받는다.</p>
+</div>
+
+<!-- 09 -->
+<div class="section">
+  <div class="kicker"><span class="num">09</span><span class="label">마무리</span></div>
+  <h2>3,500년 소재의 <span class="accent">다음 100년</span></h2>
+  <p class="lead">세계 최대 유리연구소 '설리번 파크'에서는 지금도 5년에서 10년 뒤를 준비하는 실험이 이어지고 있다. 무어의 법칙이 끝나가는 지금, 인류가 3,500년간 다뤄온 이 오래된 소재 기업이 다음 어떤 역사를 쓸지 지켜볼 시점이다.</p>
+</div>
+
+<footer>
+  <div class="mark">Corning</div>
+  <p>본 리포트는 바이 아메리카 방송 자막 내용을 기반으로 정리한 분석 자료입니다.</p>
+</footer>
+
+<script>
+const fadeObs = new IntersectionObserver((entries) => {
+  entries.forEach((e, i) => {
+    if (e.isIntersecting) {
+      setTimeout(() => e.target.classList.add('visible'), i * 80);
+      fadeObs.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.12 });
+document.querySelectorAll('.fade-in').forEach(el => fadeObs.observe(el));
+
+const chartConfigs = {};
+
+chartConfigs['q1Chart'] = () => {
+  new Chart(document.getElementById('q1Chart'), {
+    type: 'bar',
+    data: {
+      labels: ['전체 매출', 'EPS', '광통신 매출', '광통신 이익'],
+      datasets: [{
+        label: '전년 동기 대비 성장률(%)',
+        data: [18, 30, 36, 93],
+        backgroundColor: ['#6b7280', '#2563eb', '#1a1a1a', '#e11d48'],
+        borderRadius: 5,
+        maxBarThickness: 46
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => `+${ctx.parsed.y}%` } } },
+      scales: {
+        y: { beginAtZero: true, ticks: { callback: (v) => v + '%' }, grid: { color: '#e5e5e5' } },
+        x: { grid: { display: false }, ticks: { font: { size: 11 } } }
+      }
+    }
+  });
+};
+
+chartConfigs['springChart'] = () => {
+  new Chart(document.getElementById('springChart'), {
+    type: 'bar',
+    data: {
+      labels: ['2026년', '2028년', '2030년'],
+      datasets: [{
+        label: '목표 매출(억 달러)',
+        data: [200, 300, 400],
+        backgroundColor: '#e11d48',
+        borderRadius: 5,
+        maxBarThickness: 60
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => `${ctx.parsed.y}억 달러` } } },
+      scales: {
+        y: { beginAtZero: true, grid: { color: '#e5e5e5' }, ticks: { callback: (v) => v + '억' } },
+        x: { grid: { display: false } }
+      }
+    }
+  });
+};
+
+const chartObs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const canvas = e.target.querySelector('canvas');
+      if (canvas && chartConfigs[canvas.id]) {
+        chartConfigs[canvas.id]();
+        e.target.classList.add('chart-ready');
+        chartObs.unobserve(e.target);
+      }
+    }
+  });
+}, { threshold: 0.15 });
+document.querySelectorAll('.chart-container').forEach(el => chartObs.observe(el));
+
+/* GPU / fiber simulator */
+const gpuSlider = document.getElementById('gpuSlider');
+const gpuVal = document.getElementById('gpuVal');
+const fiberVal = document.getElementById('fiberVal');
+const fiberBadge = document.getElementById('fiberBadge');
+const gpuBadge = document.getElementById('gpuBadge');
+const BASE_GPU = 130000;
+const BASE_FIBER = 2000000;
+
+function updateSim(){
+  const gpu = parseInt(gpuSlider.value, 10);
+  const fiber = Math.round((gpu / BASE_GPU) * BASE_FIBER / 10000) * 10000;
+  gpuVal.innerHTML = gpu.toLocaleString('ko-KR') + '<small> 대</small>';
+  fiberVal.innerHTML = fiber.toLocaleString('ko-KR') + '<small> 가닥</small>';
+  if (fiber >= 3000000) {
+    fiberBadge.textContent = '광학 레이어 확장 규모';
+    gpuBadge.textContent = '대형 클러스터';
+  } else if (gpu === BASE_GPU) {
+    fiberBadge.textContent = '필요 광섬유';
+    gpuBadge.textContent = '기본 스케일아웃';
+  } else {
+    fiberBadge.textContent = '필요 광섬유';
+    gpuBadge.textContent = '추정 규모';
+  }
+}
+gpuSlider.addEventListener('input', updateSim);
+document.getElementById('simReset').addEventListener('click', () => {
+  gpuSlider.value = BASE_GPU;
+  updateSim();
+});
+updateSim();
+</script>
+</body>
+</html>

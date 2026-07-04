@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>코닝 퀴즈 — 유리가 바꾸는 AI 전쟁</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,900;1,600&family=Noto+Sans+KR:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#ffffff; --bg-sub:#fafafa; --ink:#1a1a1a; --ink-sub:#777777;
+  --accent:#e11d48; --accent-2:#f43f5e; --line:#e5e5e5;
+  --green:#16a34a; --green-bg:#eafaf0; --red:#dc2626; --red-bg:#fdecec;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+body{
+  background:var(--bg-sub); color:var(--ink); font-family:'Noto Sans KR',sans-serif;
+  max-width:560px; margin:0 auto; padding-bottom:60px;
+}
+.serif{font-family:'Playfair Display', serif;}
+
+header{
+  background:var(--ink); color:#fff; padding:36px 22px 26px; position:relative; overflow:hidden;
+}
+header::before{content:''; position:absolute; inset:0; background:radial-gradient(circle at 90% 0%, rgba(225,29,72,.4), transparent 55%);}
+header .eyebrow{position:relative; font-size:11px; letter-spacing:.2em; text-transform:uppercase; color:var(--accent-2); font-weight:600;}
+header h1{position:relative; font-family:'Playfair Display',serif; font-weight:800; font-size:24px; margin-top:10px; line-height:1.3;}
+header p{position:relative; font-size:12.5px; color:rgba(255,255,255,.6); margin-top:8px;}
+
+.scoreboard{
+  position:sticky; top:0; z-index:50; background:#fff; border-bottom:1px solid var(--line);
+  padding:12px 20px 14px; box-shadow:0 2px 10px rgba(0,0,0,.04);
+}
+.score-row{display:flex; justify-content:space-between; font-size:12.5px; color:var(--ink-sub); margin-bottom:8px;}
+.score-row b{color:var(--ink); font-size:13.5px;}
+.bar-track{height:7px; background:var(--bg-sub); border-radius:100px; overflow:hidden;}
+.bar-fill{height:100%; width:0%; background:var(--red); border-radius:100px; transition:width .4s ease, background .4s ease;}
+
+.quiz-list{padding:22px 18px 0;}
+.qcard{
+  background:#fff; border:1px solid var(--line); border-radius:10px; padding:20px 18px; margin-bottom:18px;
+}
+.qcard-head{display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;}
+.qnum{font-family:'Playfair Display',serif; font-style:italic; font-weight:700; color:var(--accent); font-size:14px;}
+.diff{font-size:10.5px; padding:3px 9px; border-radius:100px; font-weight:600; letter-spacing:.02em;}
+.diff.easy{background:#eafaf0; color:var(--green);}
+.diff.medium{background:#fff4e6; color:#c2740c;}
+.diff.hard{background:var(--red-bg); color:var(--accent);}
+.qtext{font-size:15px; font-weight:600; line-height:1.55; margin-bottom:16px;}
+
+.options{display:flex; flex-direction:column; gap:9px;}
+.opt{
+  text-align:left; padding:12px 14px; border:1px solid var(--line); border-radius:7px; background:#fff;
+  font-size:13.8px; color:#333; cursor:pointer; transition:all .15s ease; position:relative;
+}
+.opt:hover:not(:disabled){border-color:var(--accent); background:#fff9fa;}
+.opt:disabled{cursor:default;}
+.opt.correct{background:var(--green-bg); border-color:var(--green); color:#116631; font-weight:600;}
+.opt.wrong{background:var(--red-bg); border-color:var(--red); color:#8f1d1d; font-weight:600;}
+.badge-inline{float:right; font-size:11px; font-weight:700;}
+
+.ox-row{display:flex; gap:12px;}
+.ox-row .opt{flex:1; text-align:center; font-size:18px; font-weight:700; padding:16px;}
+
+.short-row{display:flex; gap:8px;}
+.short-row input{
+  flex:1; padding:11px 13px; border:1px solid var(--line); border-radius:7px; font-size:14px;
+  font-family:'Noto Sans KR', sans-serif;
+}
+.short-row input:disabled{background:var(--bg-sub); color:var(--ink-sub);}
+.short-row button{
+  padding:0 18px; border:none; border-radius:7px; background:var(--ink); color:#fff; font-size:13px;
+  font-weight:600; cursor:pointer;
+}
+.short-row button:disabled{background:#ccc; cursor:default;}
+.short-feedback{margin-top:10px; font-size:13px; font-weight:700;}
+.short-feedback.correct{color:var(--green);}
+.short-feedback.wrong{color:var(--red);}
+
+.explain{
+  margin-top:14px; padding:13px 14px; background:var(--bg-sub); border-left:3px solid var(--accent);
+  border-radius:4px; font-size:12.8px; color:#444; line-height:1.65; display:none;
+}
+.explain.show{display:block;}
+.explain b{color:var(--ink);}
+
+.result-wrap{padding:0 18px; display:none;}
+.result-wrap.show{display:block;}
+.result-card{
+  background:linear-gradient(135deg, #1a1a1a, #2a1620); color:#fff; border-radius:14px; padding:34px 24px;
+  text-align:center; margin-bottom:24px;
+}
+.result-grade{font-family:'Playfair Display',serif; font-weight:900; font-size:56px; color:var(--accent-2); line-height:1;}
+.result-score{font-size:14px; color:rgba(255,255,255,.75); margin-top:10px;}
+.result-msg{font-size:13.5px; margin-top:16px; color:rgba(255,255,255,.85); line-height:1.6;}
+.retry-btn{
+  margin-top:22px; padding:12px 26px; border:none; border-radius:100px; background:var(--accent);
+  color:#fff; font-size:13.5px; font-weight:700; cursor:pointer;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">Quiz · 코닝 이해도 확인</div>
+  <h1>유리가 바꾸는<br>AI 전쟁, 얼마나 아셨나요?</h1>
+  <p>총 10문제 · 정답 클릭 시 즉시 채점 및 해설 표시</p>
+</header>
+
+<div class="scoreboard">
+  <div class="score-row">
+    <span>푼 문제 <b id="solvedCount">0</b> / 10</span>
+    <span>맞힌 문제 <b id="correctCount">0</b></span>
+    <span>정답률 <b id="accuracyPct">0%</b></span>
+  </div>
+  <div class="bar-track"><div class="bar-fill" id="barFill"></div></div>
+</div>
+
+<div class="quiz-list" id="quizList"></div>
+
+<div class="result-wrap" id="resultWrap">
+  <div class="result-card">
+    <div class="result-grade" id="resultGrade">-</div>
+    <div class="result-score" id="resultScore">0 / 10 정답</div>
+    <div class="result-msg" id="resultMsg"></div>
+    <button class="retry-btn" id="retryBtn">다시 풀기</button>
+  </div>
+</div>
+
+<script>
+const QUIZ_DATA = [
+  {
+    id:1, type:'mc', difficulty:'easy',
+    question:'코닝(Corning)이라는 회사 이름은 어디에서 따온 것일까요?',
+    options:['뉴욕주 코닝 마을 이름','창업자 이름','매사추세츠주 지명','회사 창업 연도'],
+    answer:0,
+    explanation:'본래 매사추세츠에서 시작했지만 1860년대에 뉴욕주 코닝 마을 이름을 따서 코닝 글래스웍스로 불리게 되었습니다.'
+  },
+  {
+    id:2, type:'ox', difficulty:'easy',
+    question:'코닝은 원래 매사추세츠에서 시작한 회사다.',
+    answer:'O',
+    explanation:'"본래 매사추세추조에서 시작했지만 1860년대에 이곳 마을 이름 뉴욕주 코닝을 본따서 코닝 글래스웍스로 불렸던 이 기업" 이라는 내용이 자막에 등장합니다.'
+  },
+  {
+    id:3, type:'mc', difficulty:'easy',
+    question:'지난 5월 뉴욕증권거래소 투자자 설명회에서 코닝이 미국 내 광연결 생산 능력을 10배로 키우겠다고 파트너십을 발표한 상대 기업은?',
+    options:['애플','엔비디아','구글','마이크로소프트'],
+    answer:1,
+    explanation:'코닝은 엔비디아와 손잡고 미국 내 광연결 생산 능력을 10배로 키우는 다년간의 상업기술 파트너십을 전격 발표했습니다.'
+  },
+  {
+    id:4, type:'short', difficulty:'medium',
+    question:'엔비디아와의 파트너십 계약 사실이 공개된 당일, 코닝 주가는 하루 만에 몇 % 넘게 뛰었을까요? (숫자만 입력)',
+    answer:['15','15%'],
+    explanation:'"계약사실이 공개되자마자 코닝은 하루에 주가가 15% 넘게 뛰었고" 라고 자막에 명시되어 있습니다.'
+  },
+  {
+    id:5, type:'mc', difficulty:'medium',
+    question:'메타가 2030년까지 코닝으로부터 사들이기로 한 광케이블 규모는?',
+    options:['최대 10억 달러','최대 30억 달러','최대 60억 달러','최대 100억 달러'],
+    answer:2,
+    explanation:'"메타는 이미 코닝과 2030년까지 최대 60억 달러, 약 8조 원치의 광케이블을 자사 데이터 센터에 채우기로 했고"라고 언급됩니다.'
+  },
+  {
+    id:6, type:'short', difficulty:'medium',
+    question:'코닝이 침대 크기만 한 유리를 공중에서 손 하나 대지 않고 얇게 뽑아내는 자체 개발 공법의 이름은?',
+    answer:['퓨전드로우','퓨전드로우 공법','fusion draw'],
+    explanation:'V자형 이소파이프로 유리 용액을 흘려 합류시킨 뒤 공중에서 굳히는 이 공법을 "퓨전드로우 공법"이라 부르며, 아이폰 고릴라 글래스도 이 공법으로 만들어졌습니다.'
+  },
+  {
+    id:7, type:'ox', difficulty:'medium',
+    question:'코닝이 올해 3월 공개한 생성형 AI 전용 광섬유 케이블 "컨투어"는 케이블 하나에 최대 6,900여 개의 광섬유가 들어간다.',
+    answer:'O',
+    explanation:'"이 케이블 하나에 들어가는 광섬유가 최대 6,900여 개에 달하는데" 라고 자막에서 밝히고 있습니다.'
+  },
+  {
+    id:8, type:'mc', difficulty:'medium',
+    question:'스티브 잡스가 웬델 윅스 회장을 설득해 첫 고릴라 글래스를 만들어낸 해는?',
+    options:['2001년','2005년','2007년','2010년'],
+    answer:2,
+    explanation:'"2007년 스티브 잡스와 웬델윅스 지금 회장의 만남"이라는 내용에서, 아이폰 출시 몇 달 전인 2007년의 일화로 소개됩니다.'
+  },
+  {
+    id:9, type:'mc', difficulty:'hard',
+    question:'2026년 1분기 실적에서, 코닝 광통신 부문의 순이익 증가율(전년 동기 대비)은?',
+    options:['18%','30%','36%','93%'],
+    answer:3,
+    explanation:'"지난 분기 부문 순이익은 무려 93% 늘면서 전체 회사 이익을 절반 이상 혼자 책임지고 있죠"라고 언급되며, 36%는 광통신 부문의 매출 성장률입니다.'
+  },
+  {
+    id:10, type:'mc', difficulty:'hard',
+    question:'코닝의 내부 성장 계획 이름과, 그 계획상 2030년 목표 매출액을 올바르게 짝지은 것은?',
+    options:['스프링보드 – 300억 달러','스프링보드 – 400억 달러','문샷 – 400억 달러','넥스트젠 – 500억 달러'],
+    answer:1,
+    explanation:'"이 회사는 스프링보드라는 내부 성장 계획을 갖고 있는데… 2030년에는 내부 계획 기준 400억 달러까지 높여잡겠다고 말하고 있죠"라고 나옵니다.'
+  }
+];
+
+let state = { solved:0, correct:0 };
+
+function renderQuiz(){
+  const list = document.getElementById('quizList');
+  list.innerHTML = '';
+  QUIZ_DATA.forEach(q => {
+    const card = document.createElement('div');
+    card.className = 'qcard';
+    card.id = 'card-' + q.id;
+
+    const diffLabel = q.difficulty === 'easy' ? '쉬움' : q.difficulty === 'medium' ? '보통' : '어려움';
+
+    let bodyHtml = '';
+    if(q.type === 'mc'){
+      bodyHtml = `<div class="options">${q.options.map((opt,i) => `<button class="opt" data-idx="${i}">${opt}</button>`).join('')}</div>`;
+    } else if(q.type === 'ox'){
+      bodyHtml = `<div class="ox-row"><button class="opt" data-val="O">O</button><button class="opt" data-val="X">X</button></div>`;
+    } else if(q.type === 'short'){
+      bodyHtml = `<div class="short-row"><input type="text" placeholder="정답을 입력하세요" id="input-${q.id}"><button id="submit-${q.id}">제출</button></div><div class="short-feedback" id="feedback-${q.id}"></div>`;
+    }
+
+    card.innerHTML = `
+      <div class="qcard-head">
+        <span class="qnum">Q${q.id}</span>
+        <span class="diff ${q.difficulty}">${diffLabel}</span>
+      </div>
+      <div class="qtext">${q.question}</div>
+      ${bodyHtml}
+      <div class="explain" id="explain-${q.id}"><b>해설</b><br>${q.explanation}</div>
+    `;
+    list.appendChild(card);
+  });
+
+  QUIZ_DATA.forEach(q => {
+    if(q.type === 'mc'){
+      const card = document.getElementById('card-' + q.id);
+      card.querySelectorAll('.opt').forEach(btn => {
+        btn.addEventListener('click', () => handleMC(q, btn, card));
+      });
+    } else if(q.type === 'ox'){
+      const card = document.getElementById('card-' + q.id);
+      card.querySelectorAll('.opt').forEach(btn => {
+        btn.addEventListener('click', () => handleOX(q, btn, card));
+      });
+    } else if(q.type === 'short'){
+      const btn = document.getElementById('submit-' + q.id);
+      const input = document.getElementById('input-' + q.id);
+      btn.addEventListener('click', () => handleShort(q));
+      input.addEventListener('keydown', (e) => { if(e.key === 'Enter') handleShort(q); });
+    }
+  });
+}
+
+function markSolved(isCorrect){
+  state.solved += 1;
+  if(isCorrect) state.correct += 1;
+  updateScoreboard();
+  if(state.solved === QUIZ_DATA.length){
+    setTimeout(showResult, 400);
+  }
+}
+
+function updateScoreboard(){
+  document.getElementById('solvedCount').textContent = state.solved;
+  document.getElementById('correctCount').textContent = state.correct;
+  const pct = state.solved === 0 ? 0 : Math.round((state.correct / state.solved) * 100);
+  document.getElementById('accuracyPct').textContent = pct + '%';
+  const fill = document.getElementById('barFill');
+  fill.style.width = pct + '%';
+  if(pct < 40) fill.style.background = '#dc2626';
+  else if(pct < 70) fill.style.background = '#ea8c15';
+  else fill.style.background = '#16a34a';
+}
+
+function handleMC(q, btn, card){
+  if(card.dataset.answered) return;
+  card.dataset.answered = '1';
+  const idx = parseInt(btn.dataset.idx, 10);
+  const correctIdx = q.answer;
+  const opts = card.querySelectorAll('.opt');
+  opts.forEach(o => o.disabled = true);
+  const isCorrect = idx === correctIdx;
+  if(isCorrect){
+    btn.classList.add('correct');
+    btn.innerHTML += ' <span class="badge-inline">✓ 정답!</span>';
+  } else {
+    btn.classList.add('wrong');
+    btn.innerHTML += ' <span class="badge-inline">✗ 오답</span>';
+    opts[correctIdx].classList.add('correct');
+    opts[correctIdx].innerHTML += ' <span class="badge-inline">✓ 정답!</span>';
+  }
+  document.getElementById('explain-' + q.id).classList.add('show');
+  markSolved(isCorrect);
+}
+
+function handleOX(q, btn, card){
+  if(card.dataset.answered) return;
+  card.dataset.answered = '1';
+  const val = btn.dataset.val;
+  const opts = card.querySelectorAll('.opt');
+  opts.forEach(o => o.disabled = true);
+  const isCorrect = val === q.answer;
+  if(isCorrect){
+    btn.classList.add('correct');
+    btn.innerHTML += ' <span class="badge-inline">✓ 정답!</span>';
+  } else {
+    btn.classList.add('wrong');
+    btn.innerHTML += ' <span class="badge-inline">✗ 오답</span>';
+    opts.forEach(o => { if(o.dataset.val === q.answer){ o.classList.add('correct'); o.innerHTML += ' <span class="badge-inline">✓ 정답!</span>'; } });
+  }
+  document.getElementById('explain-' + q.id).classList.add('show');
+  markSolved(isCorrect);
+}
+
+function handleShort(q){
+  const card = document.getElementById('card-' + q.id);
+  if(card.dataset.answered) return;
+  const input = document.getElementById('input-' + q.id);
+  const submitBtn = document.getElementById('submit-' + q.id);
+  const raw = input.value.trim();
+  if(raw === '') return;
+  card.dataset.answered = '1';
+  input.disabled = true;
+  submitBtn.disabled = true;
+  const normalized = raw.toLowerCase().replace(/\s/g,'');
+  const isCorrect = q.answer.some(a => a.toLowerCase().replace(/\s/g,'') === normalized);
+  const feedback = document.getElementById('feedback-' + q.id);
+  if(isCorrect){
+    feedback.textContent = '✓ 정답!';
+    feedback.classList.add('correct');
+  } else {
+    feedback.textContent = `✗ 오답 (정답: ${q.answer[0]})`;
+    feedback.classList.add('wrong');
+  }
+  document.getElementById('explain-' + q.id).classList.add('show');
+  markSolved(isCorrect);
+}
+
+function showResult(){
+  const wrap = document.getElementById('resultWrap');
+  wrap.classList.add('show');
+  const pct = Math.round((state.correct / QUIZ_DATA.length) * 100);
+  let grade, msg;
+  if(pct >= 90){ grade='A'; msg='코닝의 유리 기술과 AI 전략을 완벽하게 이해하셨네요!'; }
+  else if(pct >= 70){ grade='B'; msg='핵심 내용을 잘 파악하셨습니다. 조금만 더 다지면 완벽해요.'; }
+  else if(pct >= 50){ grade='C'; msg='기본 흐름은 이해하셨어요. 해설을 다시 읽어보면 좋겠습니다.'; }
+  else { grade='D'; msg='리포트를 한 번 더 훑어보고 다시 도전해보세요!'; }
+  document.getElementById('resultGrade').textContent = grade;
+  document.getElementById('resultScore').textContent = `${state.correct} / ${QUIZ_DATA.length} 정답 (정답률 ${pct}%)`;
+  document.getElementById('resultMsg').textContent = msg;
+  wrap.scrollIntoView({ behavior:'smooth', block:'start' });
+}
+
+document.getElementById('retryBtn').addEventListener('click', () => {
+  state = { solved:0, correct:0 };
+  updateScoreboard();
+  document.getElementById('resultWrap').classList.remove('show');
+  renderQuiz();
+  window.scrollTo({ top:0, behavior:'smooth' });
+});
+
+renderQuiz();
+updateScoreboard();
+</script>
+</body>
+</html>

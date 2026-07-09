@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>삼성 2분기 실적 & 반도체 시장 퀴즈</title>
+<style>
+  :root{
+    --bg:#ffffff; --bg-alt:#fafafa; --text:#1a1a1a; --text-sub:#777777;
+    --accent:#e11d48; --accent2:#f43f5e; --border:#e5e5e5;
+    --ok:#16a34a; --ok-bg:#eafbee; --bad:#dc2626; --bad-bg:#fdecec;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--bg-alt); color:var(--text);
+    font-family:'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+  .wrap{max-width:600px; margin:0 auto; padding:0 16px 60px;}
+
+  .topbar{
+    position:sticky; top:0; z-index:50; background:#1a1a1a; color:#fff;
+    padding:12px 16px; box-shadow:0 2px 10px rgba(0,0,0,.15);
+  }
+  .topbar-inner{max-width:600px; margin:0 auto;}
+  .topbar-row{display:flex; justify-content:space-between; align-items:center; font-size:13px; margin-bottom:8px;}
+  .topbar-row b{color:#fff; font-size:14px;}
+  .stat{color:#ccc;}
+  .stat b{color:var(--accent2);}
+  .barbg{background:#333; border-radius:20px; height:8px; overflow:hidden;}
+  .barfill{height:100%; width:0%; border-radius:20px; background:#dc2626; transition:width .4s ease, background .4s ease;}
+
+  .title-block{padding:26px 4px 18px; text-align:center;}
+  .title-block h1{
+    font-family:'Playfair Display', Georgia, serif; font-size:23px; margin:0 0 8px;
+  }
+  .title-block p{color:var(--text-sub); font-size:13px; margin:0;}
+
+  .qcard{
+    background:#fff; border-radius:14px; padding:18px 16px; margin:14px 0;
+    border:1px solid var(--border); box-shadow:0 1px 4px rgba(0,0,0,.03);
+  }
+  .qhead{display:flex; align-items:center; gap:8px; margin-bottom:10px; flex-wrap:wrap;}
+  .qnum{
+    background:var(--accent); color:#fff; font-size:12px; font-weight:700;
+    width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    flex-shrink:0;
+  }
+  .diff{font-size:10.5px; padding:3px 8px; border-radius:12px; font-weight:700;}
+  .diff.easy{background:#e0f2ea; color:#0f7a4a;}
+  .diff.mid{background:#fff2dc; color:#b8770a;}
+  .diff.hard{background:#fde3e6; color:var(--accent);}
+  .qtype{font-size:10.5px; color:#999; padding:3px 8px; border:1px solid var(--border); border-radius:12px;}
+  .qtext{font-size:15px; font-weight:600; line-height:1.55; margin:6px 0 14px;}
+
+  .options{display:flex; flex-direction:column; gap:8px;}
+  .opt{
+    text-align:left; padding:12px 14px; border-radius:10px; border:1.5px solid var(--border);
+    background:#fff; font-size:14px; cursor:pointer; transition:all .15s ease; position:relative;
+  }
+  .opt:active{transform:scale(0.98);}
+  .opt.correct{background:var(--ok-bg); border-color:var(--ok); color:#0f5c28;}
+  .opt.wrong{background:var(--bad-bg); border-color:var(--bad); color:#8a1c1c;}
+  .opt.disabled{cursor:default; opacity:.85;}
+  .badge{
+    float:right; font-size:11px; font-weight:700; padding:2px 8px; border-radius:10px;
+  }
+  .badge.ok{background:var(--ok); color:#fff;}
+  .badge.no{background:var(--bad); color:#fff;}
+
+  .ox-row{display:flex; gap:10px;}
+  .ox-row .opt{flex:1; text-align:center; font-weight:700; font-size:16px;}
+
+  .short-row{display:flex; gap:8px;}
+  .short-row input{
+    flex:1; padding:12px 14px; border-radius:10px; border:1.5px solid var(--border);
+    font-size:14px; font-family:inherit;
+  }
+  .short-row button{
+    background:var(--accent); color:#fff; border:none; padding:0 18px; border-radius:10px;
+    font-size:13.5px; font-weight:700; cursor:pointer;
+  }
+  .short-row input:disabled{background:#f2f2f2;}
+  .short-row button:disabled{background:#ccc;}
+
+  .explain{
+    margin-top:14px; padding:13px 14px; background:var(--bg-alt); border-radius:10px;
+    font-size:13px; line-height:1.65; color:#333; display:none; border-left:3px solid var(--accent);
+  }
+  .explain.show{display:block;}
+  .explain b{color:var(--accent);}
+
+  .final{
+    display:none; text-align:center; background:#1a1a1a; color:#fff; border-radius:16px;
+    padding:32px 20px; margin:24px 0;
+  }
+  .final.show{display:block;}
+  .final .grade{font-size:52px; font-weight:800; color:var(--accent2); margin-bottom:6px; font-family:'Playfair Display', Georgia, serif;}
+  .final .score{font-size:16px; margin-bottom:6px;}
+  .final .msg{font-size:13.5px; color:#ccc; margin-bottom:20px;}
+  .final button{
+    background:var(--accent); color:#fff; border:none; padding:12px 26px; border-radius:24px;
+    font-size:14px; font-weight:700; cursor:pointer;
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="topbar-row">
+      <span>푼 문제 <b id="solvedCount">0</b> / 10</span>
+      <span class="stat">맞힌 문제 <b id="correctCount">0</b></span>
+      <span class="stat">정답률 <b id="rateCount">0%</b></span>
+    </div>
+    <div class="barbg"><div class="barfill" id="barfill"></div></div>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="title-block">
+    <h1>📖 삼성 2분기 실적 · 반도체 퀴즈</h1>
+    <p>Gadget Seoul 라이브 내용 기반 · 총 10문제</p>
+  </div>
+
+  <div id="quizArea"></div>
+
+  <div class="final" id="finalCard">
+    <div class="grade" id="finalGrade">A</div>
+    <div class="score" id="finalScore">10 / 10</div>
+    <div class="msg" id="finalMsg">완벽합니다! 반도체 시장의 오해를 모두 꿰뚫어 보셨네요.</div>
+    <button id="retryBtn">다시 풀기</button>
+  </div>
+</div>
+
+<script>
+const QUIZ_DATA = [
+  {
+    id:1, type:'mc', difficulty:'easy',
+    question:'삼성전자의 2026년 2분기 잠정 영업이익은 얼마였는가?',
+    options:['57.2조원','74.4조원','89.4조원','110조원'],
+    answer:2,
+    explanation:'삼성전자 2분기 잠정 영업이익은 <b>89.4조원</b>(매출 171조)으로 발표됐다. 원문: "89조, 삼성 2분기 잠정 매출... 영업이익 89.4조". 일부는 100조 이상을 기대했다가 실망 매물을 냈지만, 컨센서스(84.8조)는 실제로 상회했다.'
+  },
+  {
+    id:2, type:'ox', difficulty:'mid',
+    question:'세미애널리시스는 루빈 울트라 관련 카이버(Kyber) NVL144 랙이 2028년까지 12개월 이상 지연됐다고 주장했다.',
+    answer:'O',
+    explanation:'원문 트윗: "delayed by more than 12 months, pushing it back to 2028." 세미애널리시스는 7월 5일 이런 내용을 발표했다. 다만 발표자는 이 주장의 논리적 모순(애초 2028년이 메인 타깃이었다는 점)을 지적하며 반박했다.'
+  },
+  {
+    id:3, type:'mc', difficulty:'easy',
+    question:"브로드컴의 '일곱 번째 거대 고객'으로 이번 방송에서 밝혀진 기업은?",
+    options:['구글','메타','애플','바이트댄스'],
+    answer:2,
+    explanation:'"브로드컴의 일곱 번째 거대 고객... 애플이었다. 애플." 프로젝트 발트라(Baltra)를 통해 애플이 브로드컴의 새로운 대형 AI 고객으로 확인됐다.'
+  },
+  {
+    id:4, type:'short', difficulty:'mid',
+    question:'애플이 브로드컴과 함께 자체 AI 데이터센터용 칩을 개발하는 프로젝트의 이름을 한글 또는 영문으로 쓰시오.',
+    answer:['발트라','baltra','프로젝트 발트라','project baltra'],
+    explanation:'"이게 이제 프로젝트 발트라예요. 발트라... 애플표 AI 클라우드 데이터센터용 자체 칩." HBM 대신 LPDDR을 사용하며 2027년부터 매출에 반영될 것으로 언급됐다.'
+  },
+  {
+    id:5, type:'mc', difficulty:'hard',
+    question:'발표자가 설명한, 삼성전자 OPM(영업이익률)이 낮아 보이는 이유로 언급되지 않은 것은?',
+    options:['DS부문만 분리하지 않고 판단','LSI·파운드리 적자를 계산하지 않음','낸드(NAND) 비중이 커서 블렌딩 효과','원-달러 환율 급등으로 인한 손실'],
+    answer:3,
+    explanation:'발표자는 OPM 저평가 오해의 원인으로 ①DS부문만 따로 봐야 하는데 안 그럼, ②LSI·파운드리 적자(약 3조)까지 계산해도 여전히 낮다고 오해, ③낸드 OPM(60%대)이 디램(80%대)보다 낮아 블렌딩된다는 점을 들었다. 환율 관련 언급은 없었다.'
+  },
+  {
+    id:6, type:'ox', difficulty:'mid',
+    question:'발표자는 HBM4 초도 물량은 SK하이닉스가 더 많이 가져가고, 이후 삼성과 하이닉스가 5대5로 수렴한다고 설명했다.',
+    answer:'O',
+    explanation:'"초동 물량은 하이닉스... 그 다음부터는 뭐냐? TSV 캐파를 기준으로 가게 된다. 그럼 5대5예요." 6월 기준 삼성·하이닉스 모두 공식 퀄이 났기 때문에 이후엔 TSV 캐파 기준으로 물량이 수렴한다는 설명이다.'
+  },
+  {
+    id:7, type:'short', difficulty:'mid',
+    question:'삼성전자 2분기 실적에 반영된 충당금 규모는 대략 몇 조원으로 언급되었는가? (숫자만 또는 "OO조" 형태로 입력)',
+    answer:['15','20','15~20','15-20','17','17.2','17.6','15조','20조','17조'],
+    explanation:'"충당금이 얼마였다고 생각하십니까? 15에서 20조 정도?"라는 대목과, "1분기 2분기 합쳐서 충당금이 17.2조가 빠진 거야"라는 언급이 나온다. 즉 15~20조원 규모로 이해하면 된다.'
+  },
+  {
+    id:8, type:'mc', difficulty:'mid',
+    question:'삼성전자·SK하이닉스 외국인 지분율이 역사적으로 잘 내려가지 않는 하한선으로 언급된 수치는?',
+    options:['30%','40%','50%','60%'],
+    answer:2,
+    explanation:'"이게 외국인 지분율인데요... 여기가 50% 50% 지점이에요... 히스토리컬하게 50% 정도 구간 밑으로 잘 안 내려가고." 극단적 글로벌 위기가 아니라면 이 선 아래로 크게 내려가긴 어렵다는 설명이다.'
+  },
+  {
+    id:9, type:'short', difficulty:'easy',
+    question:'세미애널리시스가 주장한 카이버(Kyber) NVL144 랙의 새로운 출하 목표 연도는?',
+    answer:['2028','2028년'],
+    explanation:'세미애널리시스 트윗: "pushing it back to 2028." 발표자는 이 2028년이라는 타깃 자체가 원래 루빈 울트라 메인 물량의 계획된 시점과 일치한다며 "12개월 지연"이라는 프레이밍이 모순이라고 반박했다.'
+  },
+  {
+    id:10, type:'ox', difficulty:'hard',
+    question:'발표자는 향후 HBM 수요가 HBF(낸드 기반)로 완전히 대체되며, D램의 밸류가 낸드로 이동한다는 시장의 지배적 견해에 동의한다.',
+    answer:'X',
+    explanation:'발표자는 이 견해에 명확히 반대한다. "D램이 NAND로 밸류가 넘어가는 게 아니에요... NAND가 못 받던 밸류를 DRAM이 받는 그런 구조가 되는 거예요." 오히려 HBF를 활용하기 위한 중간 레이어(LPDDR 등)의 확장이 필요해 D램 수요가 늘어난다는 논리다.'
+  }
+];
+
+let state = { solved:0, correct:0 };
+
+function renderQuiz(){
+  const area = document.getElementById('quizArea');
+  area.innerHTML = '';
+  QUIZ_DATA.forEach(q => {
+    const card = document.createElement('div');
+    card.className = 'qcard';
+    card.id = 'q'+q.id;
+
+    const diffLabel = q.difficulty === 'easy' ? '쉬움' : (q.difficulty === 'mid' ? '보통' : '어려움');
+    const typeLabel = q.type === 'mc' ? '객관식' : (q.type === 'ox' ? 'OX' : '단답형');
+
+    let html = `
+      <div class="qhead">
+        <div class="qnum">${q.id}</div>
+        <span class="diff ${q.difficulty === 'easy' ? 'easy' : (q.difficulty === 'mid' ? 'mid' : 'hard')}">${diffLabel}</span>
+        <span class="qtype">${typeLabel}</span>
+      </div>
+      <div class="qtext">${q.question}</div>
+    `;
+
+    if(q.type === 'mc'){
+      html += `<div class="options">`;
+      q.options.forEach((opt, idx) => {
+        html += `<button class="opt" data-idx="${idx}" onclick="handleMC(${q.id}, ${idx})">${opt}</button>`;
+      });
+      html += `</div>`;
+    } else if(q.type === 'ox'){
+      html += `<div class="ox-row">
+        <button class="opt" data-val="O" onclick="handleOX(${q.id}, 'O')">⭕ O</button>
+        <button class="opt" data-val="X" onclick="handleOX(${q.id}, 'X')">❌ X</button>
+      </div>`;
+    } else if(q.type === 'short'){
+      html += `<div class="short-row">
+        <input type="text" id="input-${q.id}" placeholder="정답을 입력하세요" onkeydown="if(event.key==='Enter') handleShort(${q.id})">
+        <button onclick="handleShort(${q.id})">제출</button>
+      </div>`;
+    }
+
+    html += `<div class="explain" id="explain-${q.id}"><b>해설</b><br>${q.explanation}</div>`;
+
+    card.innerHTML = html;
+    area.appendChild(card);
+  });
+}
+
+function updateStats(){
+  document.getElementById('solvedCount').textContent = state.solved;
+  document.getElementById('correctCount').textContent = state.correct;
+  const rate = state.solved > 0 ? Math.round((state.correct/state.solved)*100) : 0;
+  document.getElementById('rateCount').textContent = rate + '%';
+  const bar = document.getElementById('barfill');
+  bar.style.width = rate + '%';
+  if(rate < 40) bar.style.background = '#dc2626';
+  else if(rate < 70) bar.style.background = '#f59e0b';
+  else bar.style.background = '#16a34a';
+
+  if(state.solved === QUIZ_DATA.length){
+    showFinal();
+  }
+}
+
+function lockCard(qid){
+  const card = document.getElementById('q'+qid);
+  card.querySelectorAll('.opt').forEach(b => { b.classList.add('disabled'); b.disabled = true; });
+  const input = document.getElementById('input-'+qid);
+  const btn = card.querySelector('.short-row button');
+  if(input){ input.disabled = true; }
+  if(btn){ btn.disabled = true; }
+}
+
+function showExplain(qid){
+  document.getElementById('explain-'+qid).classList.add('show');
+}
+
+function markSolved(isCorrect){
+  state.solved++;
+  if(isCorrect) state.correct++;
+  updateStats();
+}
+
+function handleMC(qid, idx){
+  const q = QUIZ_DATA.find(x => x.id === qid);
+  const card = document.getElementById('q'+qid);
+  if(card.dataset.answered) return;
+  card.dataset.answered = '1';
+
+  const opts = card.querySelectorAll('.opt');
+  const isCorrect = idx === q.answer;
+
+  opts.forEach((b, i) => {
+    if(i === q.answer){
+      b.classList.add('correct');
+      b.innerHTML += ' <span class="badge ok">✓ 정답!</span>';
+    } else if(i === idx && !isCorrect){
+      b.classList.add('wrong');
+      b.innerHTML += ' <span class="badge no">✗ 오답</span>';
+    }
+  });
+  lockCard(qid);
+  showExplain(qid);
+  markSolved(isCorrect);
+}
+
+function handleOX(qid, val){
+  const q = QUIZ_DATA.find(x => x.id === qid);
+  const card = document.getElementById('q'+qid);
+  if(card.dataset.answered) return;
+  card.dataset.answered = '1';
+
+  const opts = card.querySelectorAll('.opt');
+  const isCorrect = val === q.answer;
+
+  opts.forEach(b => {
+    const bv = b.getAttribute('data-val');
+    if(bv === q.answer){
+      b.classList.add('correct');
+      b.innerHTML += ' <span class="badge ok">✓ 정답!</span>';
+    } else if(bv === val && !isCorrect){
+      b.classList.add('wrong');
+      b.innerHTML += ' <span class="badge no">✗ 오답</span>';
+    }
+  });
+  lockCard(qid);
+  showExplain(qid);
+  markSolved(isCorrect);
+}
+
+function handleShort(qid){
+  const card = document.getElementById('q'+qid);
+  if(card.dataset.answered) return;
+  const input = document.getElementById('input-'+qid);
+  const val = input.value.trim().toLowerCase();
+  if(val === ''){ input.focus(); return; }
+  card.dataset.answered = '1';
+
+  const q = QUIZ_DATA.find(x => x.id === qid);
+  const isCorrect = q.answer.some(a => a.toLowerCase() === val);
+
+  const row = card.querySelector('.short-row');
+  const badge = document.createElement('div');
+  badge.style.marginTop = '10px';
+  badge.style.fontSize = '13px';
+  if(isCorrect){
+    badge.innerHTML = `<span class="badge ok">✓ 정답!</span> 입력: "${input.value}"`;
+    row.style.borderRadius = '10px';
+  } else {
+    badge.innerHTML = `<span class="badge no">✗ 오답</span> 입력: "${input.value}" · 정답: ${q.answer[0]}`;
+  }
+  row.after(badge);
+
+  lockCard(qid);
+  showExplain(qid);
+  markSolved(isCorrect);
+}
+
+function showFinal(){
+  const finalCard = document.getElementById('finalCard');
+  const pct = Math.round((state.correct/QUIZ_DATA.length)*100);
+  let grade = 'D', msg = '괜찮아요, 리포트를 다시 한번 읽어보면 금방 완벽해질 거예요!';
+  if(pct >= 90){ grade='A'; msg='완벽합니다! 반도체 시장의 오해를 모두 꿰뚫어 보셨네요.'; }
+  else if(pct >= 70){ grade='B'; msg='훌륭해요! 핵심 논리를 잘 짚어내셨습니다.'; }
+  else if(pct >= 50){ grade='C'; msg='절반 이상 맞히셨어요. 조금만 더 다지면 완벽할 것 같아요.'; }
+
+  document.getElementById('finalGrade').textContent = grade;
+  document.getElementById('finalScore').textContent = state.correct + ' / ' + QUIZ_DATA.length;
+  document.getElementById('finalMsg').textContent = msg;
+  finalCard.classList.add('show');
+  finalCard.scrollIntoView({behavior:'smooth', block:'center'});
+}
+
+document.getElementById('retryBtn').addEventListener('click', () => {
+  state = { solved:0, correct:0 };
+  document.getElementById('finalCard').classList.remove('show');
+  updateStats();
+  renderQuiz();
+  window.scrollTo({top:0, behavior:'smooth'});
+});
+
+renderQuiz();
+updateStats();
+</script>
+</body>
+</html>

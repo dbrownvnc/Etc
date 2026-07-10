@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>빅테크의 '맞춤형 무기상', 브로드컴 [시가총액 10대 기업]</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+  :root{
+    --bg:#ffffff; --bg-soft:#fafafa;
+    --text:#1a1a1a; --text-soft:#777777;
+    --accent:#e11d48; --accent2:#f43f5e;
+    --border:#e5e5e5;
+    --c1:#e11d48; --c2:#1a1a1a; --c3:#6b7280; --c4:#2563eb;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--bg); color:var(--text);
+    font-family:'Noto Sans KR',sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:680px;margin:0 auto;padding:0 22px 80px;}
+  .hero{
+    padding:52px 22px 34px; max-width:680px; margin:0 auto;
+    border-bottom:1px solid var(--border);
+  }
+  .kicker{
+    font-size:12px; letter-spacing:3px; color:var(--accent);
+    font-weight:700; text-transform:uppercase; margin-bottom:14px;
+  }
+  h1.title{
+    font-family:'Playfair Display',serif; font-weight:900;
+    font-size:34px; line-height:1.28; margin:0 0 16px; letter-spacing:-0.5px;
+  }
+  .subtitle{ font-size:15px; color:var(--text-soft); line-height:1.7; margin-bottom:18px;}
+  .meta{font-size:12px;color:var(--text-soft);display:flex;gap:14px;flex-wrap:wrap;}
+  .meta span{border-left:2px solid var(--accent);padding-left:8px;}
+
+  h2.section{
+    font-family:'Playfair Display',serif; font-style:italic; font-weight:700;
+    font-size:24px; margin:52px 0 6px; color:var(--text);
+  }
+  .section-num{
+    font-family:'Playfair Display',serif; font-weight:900; color:var(--accent);
+    font-size:13px; letter-spacing:2px; display:block; margin-bottom:6px;
+  }
+  p{font-size:15.5px; line-height:1.85; color:#2a2a2a; margin:14px 0;}
+  strong{color:var(--accent); font-weight:700;}
+  .term{color:var(--text-soft); font-size:13.5px;}
+
+  .pull{
+    font-family:'Playfair Display',serif; font-style:italic; font-weight:600;
+    font-size:20px; line-height:1.6; color:var(--accent);
+    border-left:3px solid var(--accent); padding:4px 0 4px 18px; margin:28px 0;
+  }
+  .callout{
+    background:var(--bg-soft); border:1px solid var(--border); border-radius:4px;
+    padding:18px 20px; margin:22px 0;
+  }
+  .callout .lab{font-size:11px;font-weight:700;letter-spacing:2px;color:var(--accent);margin-bottom:8px;}
+  .callout p{margin:6px 0;font-size:14.5px;}
+
+  table{width:100%;border-collapse:collapse;margin:20px 0;font-size:13.5px;}
+  th{background:var(--accent);color:#fff;padding:10px 8px;text-align:left;font-weight:500;}
+  td{padding:10px 8px;background:var(--bg-soft);border-bottom:1px solid var(--border);}
+
+  .fade-in{opacity:0;transform:translateY(18px);transition:opacity .7s ease, transform .7s ease;}
+  .fade-in.visible{opacity:1;transform:translateY(0);}
+  .chart-container{position:relative;max-height:340px;background:var(--bg-soft);border:1px solid var(--border);border-radius:6px;padding:16px 10px 6px;margin:20px 0;}
+  .chart-container canvas{opacity:0;transition:opacity .4s ease;max-height:280px;}
+  .chart-container.chart-ready canvas{opacity:1;}
+  .chart-title{font-size:12px;color:var(--text-soft);font-weight:700;letter-spacing:1px;text-align:center;margin-bottom:6px;}
+
+  .sim-box{
+    background:var(--bg-soft); border:1px solid var(--border); border-radius:8px;
+    padding:22px 18px; margin:22px 0;
+  }
+  .sim-title{font-weight:700;font-size:14px;margin-bottom:14px;color:var(--text);}
+  .sim-row{display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px;color:var(--text-soft);}
+  input[type=range]{width:100%;accent-color:var(--accent);margin:8px 0 18px;}
+  .sim-result{
+    display:flex; gap:10px; flex-wrap:wrap;
+  }
+  .sim-metric{
+    flex:1; min-width:120px; background:#fff; border:1px solid var(--border); border-radius:6px;
+    padding:12px; text-align:center;
+  }
+  .sim-metric .v{font-family:'Playfair Display',serif;font-weight:900;font-size:22px;color:var(--accent);}
+  .sim-metric .l{font-size:11px;color:var(--text-soft);margin-top:4px;}
+  .sim-reset{
+    margin-top:14px; background:none; border:1px solid var(--accent); color:var(--accent);
+    padding:8px 16px; border-radius:20px; font-size:12px; cursor:pointer; font-weight:700;
+  }
+  .sim-reset:active{background:var(--accent);color:#fff;}
+
+  .keypoints{list-style:none;padding:0;margin:20px 0;}
+  .keypoints li{
+    padding:14px 0 14px 30px; border-bottom:1px solid var(--border); position:relative; font-size:14.5px; line-height:1.7;
+  }
+  .keypoints li:before{
+    content:counter(kp); counter-increment:kp;
+    position:absolute; left:0; top:14px; color:var(--accent); font-family:'Playfair Display',serif; font-weight:900; font-size:16px;
+  }
+  .keypoints{counter-reset:kp;}
+
+  .footer{
+    text-align:center; padding:40px 0 10px; color:var(--text-soft); font-size:12px; border-top:1px solid var(--border); margin-top:50px;
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="kicker">시가총액 10대 기업 시리즈 · 반도체</div>
+  <h1 class="title">오픈AI도, 구글도 줄 선다<br>빅테크의 '맞춤형 무기상', 브로드컴</h1>
+  <div class="subtitle">서로 죽일 듯이 싸우는 오픈AI와 앤트로픽, 구글과 메타. 그런데 이 원수 같은 회사들이 매년 수십조 원을 같은 회사에 갖다 바친다. 조용한 무기상, 브로드컴의 이야기.</div>
+  <div class="meta">
+    <span>2026.07.10</span>
+    <span>홍성용 특파원</span>
+    <span>분석 리포트</span>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <h2 class="section"><span class="section-num">CHAPTER 01</span>발명가가 아니라 사냥꾼</h2>
+  <p>브로드컴을 이해하려면 CEO 혹탄(Hock Tan)이라는 인물부터 알아야 한다. 그는 말레이시아의 가난한 집 소년이었지만, 장학금을 받고 미국으로 건너가 지금은 시가총액 수천조 원짜리 회사를 이끌고 있다.</p>
+  <p>혹탄이 회사를 키운 방식은 독특하다. 직접 무언가를 <strong>발명</strong>하지 않고 대신 <strong>사들였다</strong>. 통신칩 회사를 사고, 소프트웨어 회사를 사고, 2023년에는 VM웨어(기업용 서버 관리 소프트웨어 회사)를 610억 달러(약 85조 원)에 통째로 인수했다.</p>
+  <div class="callout">
+    <div class="lab">별명: 냉혹한 비용 절감사</div>
+    <p>회사를 인수한 다음엔 연구개발이든 마케팅이든 돈 안 되는 사업을 가차없이 잘라낸다. 직원을 대규모로 내보내고 가격을 올린다. 인정은 없지만 이익은 확실하다. 그가 사들인 회사들은 하나같이 현금을 뿜어내는 기계로 바뀌었다.</p>
+  </div>
+  <p class="pull">"발명가가 아니라 사냥꾼. 이것이 브로드컴이라는 회사의 DNA다."</p>
+
+  <h2 class="section"><span class="section-num">CHAPTER 02</span>2015년, 아무도 주목 안 한 사냥감</h2>
+  <p>2015년 브로드컴은 그냥 통신 칩(와이파이, 블루투스, 인터넷 연결용 반도체) 회사였다. 이 무렵 구글이 조용히 브로드컴을 찾아왔다. "우리가 쓸 AI 칩을 같이 만들어줄 수 있겠냐"고. 이것이 지금 구글 자체 AI 칩인 <strong>TPU</strong>의 시작이다.</p>
+  <p>대부분의 회사라면 이걸 작은 부업으로 봤을 것이다. 그러나 혹탄은 달랐다. 앞으로 모든 빅테크가 자기만의 AI 칩을 원하게 될 것이고, 그걸 혼자 만들 수 있는 회사는 없으니 누군가는 그 칩을 대신 설계해줘야 한다고 본 것이다. 혹탄은 통신 칩 회사를 빅테크의 AI 칩을 대신 지어주는 회사로 통째로 방향 전환시켰다. 반도체 역사상 가장 과감한 전환 중 하나였다.</p>
+  <p>10년이 지난 지금, 구글·아마존·메타가 엔비디아에서 벗어나기 위해 자체 칩을 만들기 시작했다는 소식이 들린다. 그런데 그 자체 칩, 빅테크 혼자 만드는 게 아니다. <strong>브로드컴과 함께</strong> 만든다. 혹탄이 10년 전에 본 미래가 그대로 온 것이다.</p>
+
+  <h2 class="section"><span class="section-num">CHAPTER 03</span>기성복 vs 맞춤 정장</h2>
+  <p>여기서 엔비디아와 브로드컴의 차이가 갈린다. 엔비디아는 <strong>기성복</strong>을 판다. 누구에게나 똑같은 최고 성능의 GPU(그래픽 처리장치, AI 연산에 쓰이는 반도체)를 대량으로 파는 것이다. 브로드컴은 <strong>맞춤 정장</strong>을 짓는다. 구글에는 구글만을 위한 칩, 메타에는 메타만을 위한 칩을 만든다.</p>
+  <p>빅테크가 굳이 맞춤을 원하는 이유는 돈 때문이다. 엔비디아 칩은 최고지만 비싸다. 아무나 쓰게 만든 범용 제품이라 필요 없는 기능값까지 낸다. 반면 빅테크는 자기 AI 모델 하나만 잘 돌리면 되니, 범용을 버리고 자기 모델에만 맞춘 칩을 지으면 전기도 덜 먹고 값도 훨씬 싸진다.</p>
+
+  <div class="chart-container fade-in">
+    <div class="chart-title">기성복(엔비디아) vs 맞춤정장(브로드컴) 비교</div>
+    <canvas id="chartCompare" height="230"></canvas>
+  </div>
+
+  <div class="callout">
+    <div class="lab">오해하면 안 되는 것</div>
+    <p>브로드컴이 엔비디아를 밀어내는 게 아니다. 새로운 AI를 밑바닥부터 가르치는 일은 여전히 엔비디아 칩이 압도적이다. 브로드컴의 칩은 이미 학습이 끝난 AI를 값싸고 효율적으로 굴리는 데 특화돼 있다. <strong>엔비디아는 AI를 기르고, 브로드컴은 그 AI를 싼 값에 부려먹는 공장</strong>인 셈이다. 둘은 싸우는 게 아니라 역할을 나눠 가졌다.</p>
+  </div>
+
+  <h2 class="section"><span class="section-num">CHAPTER 04</span>같은 무기상에서 총을 사는 원수들</h2>
+  <p>엔트로픽이 최근 브로드컴의 약 100억 달러(약 14조 원)어치 칩을 주문했다. 그런데 엔트로픽의 철천지 원수인 오픈AI도 브로드컴의 고객이다. 서로 죽일 듯 싸우는 두 회사가 같은 무기상에서 총을 사고 있는 것이다. 누가 이기든 상관없다. 전쟁이 계속되는 한 무기상은 돈을 번다.</p>
+  <p>고객들이 이 무기상을 못 떠나는 이유는 <strong>맞춤이라는 관계 그 자체</strong> 때문이다. 맞춤 정장을 지으려면 고객의 몸을 구석구석 재야 한다. 브로드컴은 고객의 AI 설계에 깊숙이 들어가 몇 년에 걸쳐 함께 칩을 만든다. 한번 몸을 맞추고 나면 다른 재봉사(경쟁사)에게 가는 게 사실상 불가능하다. 처음부터 다시 몇 년을 함께 설계해야 하기 때문이다. 그래서 한번 고객은 몇 년짜리 고객이 된다. 브로드컴은 이미 <strong>730억 달러(약 101조 원)</strong>어치 주문을 미리 받아뒀다. 아직 만들지도 않은 칩에 이미 돈이 걸려있는 것이다.</p>
+
+  <h2 class="section"><span class="section-num">CHAPTER 05</span>총만 파는 게 아니라 길목마다 통행료</h2>
+  <p>브로드컴이 무서운 진짜 이유는 따로 있다. AI 데이터센터 하나엔 칩이 수십만 개 들어가는데, 이 칩들이 서로 대화하려면 초고속 통로가 필요하다. 그 통로를 만드는 <strong>이더넷 스위치</strong>(반도체 간 데이터를 주고받게 해주는 네트워크 장비)를 브로드컴이 사실상 장악하고 있다.</p>
+  <p>엔비디아 칩을 쓰든 브로드컴 칩을 쓰든, 그 칩들을 연결하는 길은 결국 브로드컴을 지나간다. 무기뿐 아니라 도로까지 쥐고 있는 셈이다. 그리고 이 모든 칩은 대만 TSMC의 가장 앞선 3나노 공정에서 만들어진다. 엔비디아도 브로드컴도 결국 대만에서 만난다. 무기상조차 대장간은 대만에 있는 것이다.</p>
+
+  <h2 class="section"><span class="section-num">CHAPTER 06</span>완벽한 성적표, 그런데 주가는 폭락</h2>
+  <p>탄탄하던 이 회사에 2026년 6월 이상한 일이 벌어졌다. 6월 3일 브로드컴이 사상 최고 실적을 발표했다. AI 반도체에서만 <strong>108억 달러(약 15조 원)</strong>를 벌었고, 1년 전보다 <strong>143%</strong>가 늘었다. 창사 이래 이런 성장은 없었고 모든 숫자가 신기록이었다. 그런데 실적 발표 직후 주가가 폭락했다.</p>
+
+  <div class="chart-container fade-in">
+    <div class="chart-title">브로드컴 AI 반도체 매출 추이 (억 달러)</div>
+    <canvas id="chartRevenue" height="230"></canvas>
+  </div>
+
+  <p>완벽한 성적표를 받았는데 왜 주가가 무너졌을까. 이유는 두 가지다.</p>
+
+  <ul class="keypoints">
+    <li><strong>VM웨어 매출 부진.</strong> 혹탄이 인수 직후 VM웨어의 판매 방식을 한 번 팔고 끝나는 방식에서 매달 돈이 들어오는 <strong>구독 방식</strong>으로 통째로 바꿨다. 구독으로 바꾸면 길게 보면 훨씬 남는 장사지만, 바꾸는 동안엔 매출이 일시적으로 꺾인다. 사냥꾼이 당장의 매출을 희생하며 미래의 현금 흐름을 만드는 중인데, 시장은 이 진통을 실적 부진으로 읽었다.</li>
+    <li><strong>혹탄 CEO의 침묵.</strong> 혹탄은 2027년 AI 칩 매출 목표로 <strong>1000억 달러</strong>를 제시해왔다. 시장은 이번 실적이 워낙 좋았으니 목표를 올려 부를 거라 기대했지만, 혹탄은 목표를 그대로 유지했다. 시장은 이걸 실망으로 읽었다.</li>
+  </ul>
+
+  <h2 class="section"><span class="section-num">CHAPTER 07</span>침묵 속에 숨은 진짜 이유: VIP 6명</h2>
+  <p>이 침묵에는 더 깊은 이유가 있다. 무기상의 고객은 사실 <strong>6명뿐</strong>이다. 구글, 메타, 오픈AI, 앤트로픽, 그리고 혹탄이 언급하지 않은 두 곳을 더한 여섯 곳이 브로드컴 AI 매출의 거의 전부다.</p>
+  <p>약점처럼 들리지만 사실 이건 구조 자체다. 수십조 원을 들여 자기만의 칩을 만들 수 있는 회사는 전 세계에 이 정도밖에 없다. 브로드컴의 고객은 애초에 최상위 VIP들뿐이다. 문제는 VIP가 여섯뿐이라 그중 하나만 마음을 바꿔도 목표가 흔들린다는 데 있다. 엔비디아는 고객이 수천 곳이라 수요를 자신하지만, 브로드컴은 그럴 수가 없다.</p>
+
+  <div class="sim-box fade-in">
+    <div class="sim-title">🔢 고객 집중도 시뮬레이터 — 고객 수가 줄어들면?</div>
+    <div class="sim-row"><span>고객사 수</span><span id="custLabel">6개사</span></div>
+    <input type="range" id="custSlider" min="2" max="30" value="6" step="1">
+    <div class="sim-result">
+      <div class="sim-metric"><div class="v" id="custShare">16.7%</div><div class="l">고객 1곳당 매출 비중</div></div>
+      <div class="sim-metric"><div class="v" id="custRisk">높음</div><div class="l">이탈 리스크 수준</div></div>
+    </div>
+    <button class="sim-reset" onclick="resetCustSim()">초기값(6개사)으로 리셋</button>
+    <p style="font-size:12px;color:var(--text-soft);margin-top:14px;">※ AI 반도체 매출을 고객사 수로 균등 분배했다고 가정한 단순 모델입니다. 엔비디아처럼 고객 수(수천 곳)가 늘어날수록 특정 고객 이탈의 충격은 작아집니다.</p>
+  </div>
+
+  <p class="pull">"무기상의 가장 큰 힘이 동시에 가장 큰 약점이었다."</p>
+
+  <h2 class="section"><span class="section-num">CHAPTER 08</span>지켜봐야 할 세 가지</h2>
+  <p>이제 시장은 'AI가 진짜냐'를 묻지 않는다. '얼마나 많은 미래가 이미 값에 들어갔냐'를 묻는다. 브로드컴을 볼 때는 세 가지를 봐야 한다.</p>
+
+  <div class="chart-container fade-in">
+    <div class="chart-title">브로드컴 매출 목표 vs 실적 vs 다음 분기 가이던스 (억 달러)</div>
+    <canvas id="chartTarget" height="230"></canvas>
+  </div>
+
+  <table>
+    <tr><th>체크포인트</th><th>내용</th></tr>
+    <tr><td>① 6명의 고객</td><td>소수 VIP가 주문을 줄이거나 스스로 칩을 만들면 타격이 크다. 소수에 기댄 만큼 소수에 흔들린다.</td></tr>
+    <tr><td>② 마벨의 추격</td><td>맞춤 칩 설계 시장은 브로드컴과 마벨 둘이 95%를 나눠 가진 과점 구조다. 브로드컴이 앞서 있지만 마벨이 바짝 쫓고 있다. 무기상이 하나가 아니게 되면 값을 부르는 힘도 줄어든다.</td></tr>
+    <tr><td>③ 다음 분기 AI 매출</td><td>브로드컴은 160억 달러까지 보고 있다. 이 숫자가 실제로 나오는지가 핵심이다.</td></tr>
+  </table>
+
+  <div class="chart-container fade-in">
+    <div class="chart-title">맞춤 AI 칩 설계 시장 점유율</div>
+    <canvas id="chartShare" height="230"></canvas>
+  </div>
+
+  <h2 class="section"><span class="section-num">CLOSING</span>전쟁의 승자는 몰라도, 무기상은 이미 이겼다</h2>
+  <p>브로드컴을 엔비디아의 대체재라고 부르면 안 된다. 엔비디아가 전면에서 싸우는 왕이라면, 브로드컴은 그 뒤에서 양쪽 모두에게 총을 파는 상인이다. 엔비디아가 이겨도 브로드컴은 번다. 빅테크가 자체 칩으로 엔비디아를 이겨도, 그 칩을 설계한 건 브로드컴이다.</p>
+  <p class="pull">"전쟁의 승자는 아직 아무도 모른다. 그런데 무기상은 이미 이겼다."</p>
+
+  <div class="footer">시가총액 10대 기업 시리즈 · 브로드컴 편<br>원본: 오픈AI도, 구글도 줄 선다 빅테크의 '맞춤형 무기상' 브로드컴 (홍성용 특파원)</div>
+</div>
+
+<script>
+  const fadeObs = new IntersectionObserver((entries) => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        setTimeout(() => e.target.classList.add('visible'), i * 80);
+        fadeObs.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.fade-in').forEach(el => fadeObs.observe(el));
+
+  const chartConfigs = {};
+
+  chartConfigs['chartCompare'] = () => {
+    new Chart(document.getElementById('chartCompare'), {
+      type: 'bar',
+      data: {
+        labels: ['가격', '전력 효율', '범용성', '맞춤 최적화'],
+        datasets: [
+          { label: '엔비디아 (기성복)', data: [90, 55, 95, 40], backgroundColor: '#2563eb' },
+          { label: '브로드컴 (맞춤정장)', data: [55, 88, 35, 95], backgroundColor: '#e11d48' }
+        ]
+      },
+      options: {
+        responsive:true, maintainAspectRatio:false,
+        plugins:{ legend:{ position:'bottom', labels:{ font:{size:11}, color:'#1a1a1a' } } },
+        scales:{ y:{ beginAtZero:true, max:100, ticks:{color:'#777777'}, grid:{color:'#e5e5e5'} },
+                 x:{ ticks:{color:'#1a1a1a', font:{size:10}}, grid:{display:false} } }
+      }
+    });
+  };
+
+  chartConfigs['chartRevenue'] = () => {
+    new Chart(document.getElementById('chartRevenue'), {
+      type: 'bar',
+      data: {
+        labels: ['1년 전', '2026년 6월(최신)'],
+        datasets: [{ label: 'AI 반도체 매출 (억 달러)', data: [44.4, 108], backgroundColor: ['#6b7280', '#e11d48'] }]
+      },
+      options: {
+        responsive:true, maintainAspectRatio:false,
+        plugins:{ legend:{ display:false },
+          tooltip:{ callbacks:{ label: (ctx)=> ctx.raw + '억 달러' } } },
+        scales:{ y:{ beginAtZero:true, ticks:{color:'#777777'}, grid:{color:'#e5e5e5'} },
+                 x:{ ticks:{color:'#1a1a1a'}, grid:{display:false} } }
+      }
+    });
+  };
+
+  chartConfigs['chartTarget'] = () => {
+    new Chart(document.getElementById('chartTarget'), {
+      type: 'bar',
+      data: {
+        labels: ['이번 분기 실적', '다음 분기 가이던스', '2027년 목표'],
+        datasets: [{ data: [108, 160, 1000], backgroundColor: ['#1a1a1a', '#f43f5e', '#e11d48'] }]
+      },
+      options: {
+        responsive:true, maintainAspectRatio:false,
+        plugins:{ legend:{ display:false },
+          tooltip:{ callbacks:{ label: (ctx)=> ctx.raw + '억 달러' } } },
+        scales:{ y:{ beginAtZero:true, ticks:{color:'#777777'}, grid:{color:'#e5e5e5'} },
+                 x:{ ticks:{color:'#1a1a1a', font:{size:10}}, grid:{display:false} } }
+      }
+    });
+  };
+
+  chartConfigs['chartShare'] = () => {
+    new Chart(document.getElementById('chartShare'), {
+      type: 'doughnut',
+      data: {
+        labels: ['브로드컴 + 마벨 (과점)', '기타'],
+        datasets: [{ data: [95, 5], backgroundColor: ['#e11d48', '#e5e5e5'] }]
+      },
+      options: {
+        responsive:true, maintainAspectRatio:false,
+        plugins:{ legend:{ position:'bottom', labels:{ font:{size:11}, color:'#1a1a1a' } } }
+      }
+    });
+  };
+
+  const chartObs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        const canvas = e.target.querySelector('canvas');
+        if (canvas && chartConfigs[canvas.id]) {
+          chartConfigs[canvas.id]();
+          e.target.classList.add('chart-ready');
+          chartObs.unobserve(e.target);
+        }
+      }
+    });
+  }, { threshold: 0.15 });
+  document.querySelectorAll('.chart-container').forEach(el => chartObs.observe(el));
+
+  // 고객 집중도 시뮬레이터
+  const custSlider = document.getElementById('custSlider');
+  const custLabel = document.getElementById('custLabel');
+  const custShare = document.getElementById('custShare');
+  const custRisk = document.getElementById('custRisk');
+
+  function updateCustSim(){
+    const n = parseInt(custSlider.value);
+    custLabel.textContent = n + '개사';
+    const share = (100 / n);
+    custShare.textContent = share.toFixed(1) + '%';
+    let riskText, riskColor;
+    if(n <= 8){ riskText = '매우 높음'; riskColor = '#e11d48'; }
+    else if(n <= 16){ riskText = '중간'; riskColor = '#f43f5e'; }
+    else { riskText = '낮음 (엔비디아형)'; riskColor = '#2563eb'; }
+    custRisk.textContent = riskText;
+    custRisk.style.color = riskColor;
+  }
+  custSlider.addEventListener('input', updateCustSim);
+  function resetCustSim(){ custSlider.value = 6; updateCustSim(); }
+  updateCustSim();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>퀴즈: 빅테크의 '맞춤형 무기상' 브로드컴</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#ffffff; --bg-soft:#fafafa; --text:#1a1a1a; --text-soft:#777777;
+    --accent:#e11d48; --accent2:#f43f5e; --border:#e5e5e5;
+    --green:#16a34a; --green-bg:#ecfdf3;
+    --red:#dc2626; --red-bg:#fef2f2;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-serif;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:680px;margin:0 auto;padding:0 18px 70px;}
+
+  .head{padding:34px 18px 20px;max-width:680px;margin:0 auto;text-align:center;}
+  .kicker{font-size:11px;letter-spacing:3px;color:var(--accent);font-weight:700;text-transform:uppercase;margin-bottom:10px;}
+  h1{font-family:'Playfair Display',serif;font-weight:900;font-size:24px;margin:0 0 8px;letter-spacing:-0.3px;}
+  .desc{font-size:13px;color:var(--text-soft);}
+
+  .scoreboard{
+    position:sticky; top:0; z-index:50; background:#fff; border-bottom:1px solid var(--border);
+    padding:12px 18px; box-shadow:0 2px 8px rgba(0,0,0,0.04);
+  }
+  .sb-row{display:flex;justify-content:space-between;font-size:12.5px;font-weight:700;margin-bottom:8px;color:var(--text);}
+  .sb-row span.acc{color:var(--accent);}
+  .bar-bg{height:8px;background:var(--border);border-radius:4px;overflow:hidden;}
+  .bar-fill{height:100%;width:0%;background:#dc2626;transition:width .4s ease, background .4s ease;border-radius:4px;}
+
+  .qcard{
+    background:var(--bg-soft); border:1px solid var(--border); border-radius:10px;
+    padding:20px 18px; margin:20px 0;
+  }
+  .qtop{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+  .qnum{font-family:'Playfair Display',serif;font-weight:900;color:var(--accent);font-size:14px;}
+  .badge{font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:12px;letter-spacing:0.5px;}
+  .badge.easy{background:#e0f2fe;color:#0369a1;}
+  .badge.medium{background:#fef3c7;color:#92400e;}
+  .badge.hard{background:#fee2e2;color:#b91c1c;}
+  .qtext{font-size:15.5px;font-weight:500;line-height:1.6;margin-bottom:16px;}
+
+  .options{display:flex;flex-direction:column;gap:8px;}
+  .opt{
+    background:#fff;border:1.5px solid var(--border);border-radius:8px;padding:12px 14px;
+    font-size:14px;cursor:pointer;transition:all .15s ease;text-align:left;position:relative;
+  }
+  .opt:active{transform:scale(0.98);}
+  .opt.disabled{cursor:not-allowed;}
+  .opt.correct{background:var(--green-bg);border-color:var(--green);color:#166534;font-weight:700;}
+  .opt.wrong{background:var(--red-bg);border-color:var(--red);color:#991b1b;font-weight:700;}
+  .opt .tag{float:right;font-size:11px;font-weight:900;}
+
+  .ox-row{display:flex;gap:12px;}
+  .ox-btn{
+    flex:1;padding:16px;font-size:20px;font-weight:900;border-radius:8px;border:1.5px solid var(--border);
+    background:#fff;cursor:pointer;font-family:'Playfair Display',serif;
+  }
+  .ox-btn.correct{background:var(--green-bg);border-color:var(--green);color:var(--green);}
+  .ox-btn.wrong{background:var(--red-bg);border-color:var(--red);color:var(--red);}
+
+  .short-row{display:flex;gap:8px;}
+  .short-row input{
+    flex:1;padding:12px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;
+    font-family:'Noto Sans KR',sans-serif;
+  }
+  .short-row input:disabled{background:#f0f0f0;}
+  .short-row button{
+    background:var(--accent);color:#fff;border:none;border-radius:8px;padding:0 18px;font-size:13px;
+    font-weight:700;cursor:pointer;
+  }
+  .short-row button:disabled{background:#ccc;cursor:not-allowed;}
+
+  .fb-badge{
+    display:inline-block;margin-top:10px;font-size:12px;font-weight:900;padding:4px 10px;border-radius:6px;
+  }
+  .fb-badge.correct{background:var(--green);color:#fff;}
+  .fb-badge.wrong{background:var(--red);color:#fff;}
+
+  .explain{
+    max-height:0; overflow:hidden; transition:max-height .4s ease, opacity .4s ease, margin .4s ease;
+    opacity:0; margin-top:0;
+  }
+  .explain.show{max-height:400px; opacity:1; margin-top:14px;}
+  .explain-inner{
+    background:#fff; border-left:3px solid var(--accent); border-radius:6px; padding:12px 14px;
+    font-size:13px; line-height:1.7; color:#333;
+  }
+  .explain-inner .lab{font-size:11px;font-weight:900;color:var(--accent);letter-spacing:1px;margin-bottom:6px;}
+  .explain-inner .src{font-size:11.5px;color:var(--text-soft);margin-top:8px;border-top:1px dashed var(--border);padding-top:8px;}
+
+  .result-modal{
+    display:none; position:fixed; inset:0; background:rgba(0,0,0,0.55); z-index:100;
+    align-items:center; justify-content:center; padding:20px;
+  }
+  .result-modal.show{display:flex;}
+  .result-card{
+    background:#fff; border-radius:16px; padding:36px 26px; max-width:340px; width:100%; text-align:center;
+  }
+  .result-grade{font-family:'Playfair Display',serif;font-weight:900;font-size:56px;color:var(--accent);line-height:1;}
+  .result-score{font-size:15px;font-weight:700;margin:10px 0 4px;}
+  .result-msg{font-size:13px;color:var(--text-soft);margin-bottom:22px;line-height:1.6;}
+  .retry-btn{
+    background:var(--accent);color:#fff;border:none;border-radius:24px;padding:12px 28px;
+    font-size:14px;font-weight:700;cursor:pointer;
+  }
+</style>
+</head>
+<body>
+
+<div class="head">
+  <div class="kicker">인터랙티브 퀴즈</div>
+  <h1>브로드컴 편 — 이해도 체크</h1>
+  <div class="desc">시가총액 10대 기업 시리즈 · 총 10문제</div>
+</div>
+
+<div class="scoreboard">
+  <div class="sb-row">
+    <span>푼 문제 <span id="solvedNum">0</span> / 10</span>
+    <span>맞힌 문제 <span id="correctNum">0</span></span>
+    <span class="acc">정답률 <span id="accNum">0</span>%</span>
+  </div>
+  <div class="bar-bg"><div class="bar-fill" id="barFill"></div></div>
+</div>
+
+<div class="wrap" id="quizList"></div>
+
+<div class="result-modal" id="resultModal">
+  <div class="result-card">
+    <div class="result-grade" id="resultGrade">A</div>
+    <div class="result-score" id="resultScore">10 / 10</div>
+    <div class="result-msg" id="resultMsg"></div>
+    <button class="retry-btn" onclick="resetQuiz()">다시 풀기</button>
+  </div>
+</div>
+
+<script>
+const QUIZ_DATA = [
+  {
+    id:1, type:'ox', difficulty:'easy',
+    question:"브로드컴은 원래 와이파이·블루투스 같은 통신용 칩을 만들던 회사였다.",
+    answer:"O",
+    explanation:"2015년 이전까지 브로드컴은 20년 동안 와이파이, 블루투스, 인터넷 연결 칩을 만들던 평범한 통신 칩 회사였습니다.",
+    source:"\"2015년으로 돌려보면... 그때 브로드컴은 그냥 통신 칩 회사였습니다. 와이파이, 블루투스, 인터넷 연결 칩 20년 동안 이런 걸 만들던 평범한 회사였죠\""
+  },
+  {
+    id:2, type:'mc', difficulty:'easy',
+    question:"브로드컴의 CEO는 누구인가?",
+    options:["젠슨 황","혹탄","순다르 피차이","사티아 나델라"],
+    answer:1,
+    explanation:"혹탄은 말레이시아의 가난한 집 소년이었으나 장학금으로 미국에 건너와 지금은 브로드컴을 이끄는 CEO가 되었습니다.",
+    source:"\"브로드컴을 이해하려면 한 사람을 알아야 합니다. 혹탄, 브로드컴의 CEO입니다.\""
+  },
+  {
+    id:3, type:'mc', difficulty:'easy',
+    question:"2023년 브로드컴이 610억 달러에 통째로 인수한 회사는?",
+    options:["ARM","인텔","VM웨어","퀄컴"],
+    answer:2,
+    explanation:"혹탄은 2023년 서버 관리 소프트웨어 회사인 VM웨어를 610억 달러에 인수했습니다.",
+    source:"\"2023년에는 VM웨어라는 회사를 610억 달러에 통째로 삼켰습니다.\""
+  },
+  {
+    id:4, type:'short', difficulty:'medium',
+    question:"2015년 구글의 요청으로 브로드컴이 함께 만들기 시작한, 구글의 자체 AI 칩 이름은? (영문 약자로 답하세요)",
+    answer:"TPU",
+    explanation:"2015년 구글이 브로드컴에 AI 칩 공동 개발을 요청한 것이 지금의 구글 TPU(Tensor Processing Unit)의 시작이었습니다.",
+    source:"\"우리가 쓸 AI 칩을 같이 만들어줄 수 있겠냐 하고요. 이게 지금 구글 TPU의 시작입니다\""
+  },
+  {
+    id:5, type:'mc', difficulty:'medium',
+    question:"본문에서 엔비디아와 브로드컴을 비유한 방식으로 옳은 것은?",
+    options:[
+      "엔비디아=맞춤정장, 브로드컴=기성복",
+      "엔비디아=기성복, 브로드컴=맞춤정장",
+      "둘 다 기성복",
+      "둘 다 맞춤정장"
+    ],
+    answer:1,
+    explanation:"엔비디아는 누구에게나 같은 최고 성능 GPU를 대량으로 파는 '기성복', 브로드컴은 회사마다 다르게 맞춤 설계하는 '맞춤정장'에 비유됩니다.",
+    source:"\"엔비디아는 기성복을 팝니다... 브로드컴은 맞춤 정장을 짓습니다\""
+  },
+  {
+    id:6, type:'ox', difficulty:'medium',
+    question:"브로드컴은 엔비디아를 완전히 밀어내고 대체하려는 경쟁 관계에 있다.",
+    answer:"X",
+    explanation:"둘은 경쟁이 아니라 역할 분담 관계입니다. 엔비디아는 새로운 AI를 학습시키는 데 압도적이고, 브로드컴은 이미 학습된 AI를 값싸게 운영하는 데 특화되어 있습니다.",
+    source:"\"브로드컴이 엔비디아를 밀어내는 건 아닙니다... 둘은 싸우는 게 아니라 역할을 나눠갔습니다\""
+  },
+  {
+    id:7, type:'mc', difficulty:'medium',
+    question:"브로드컴이 사실상 장악하고 있는, AI 데이터센터 내 칩들 사이의 초고속 통로 역할을 하는 장비는?",
+    options:["GPU","이더넷 스위치","HBM 메모리","CPU"],
+    answer:1,
+    explanation:"AI 데이터센터의 칩 수십만 개가 서로 통신하려면 초고속 통로가 필요한데, 이 통로를 만드는 이더넷 스위치를 브로드컴이 사실상 장악하고 있습니다.",
+    source:"\"그 통로를 만드는 이더넷 스위치라는 장비 이걸 브로드컴이 사실상 장악하고 있습니다\""
+  },
+  {
+    id:8, type:'short', difficulty:'hard',
+    question:"2026년 6월 발표된 브로드컴의 AI 반도체 매출은 전년 대비 몇 % 증가했나? (숫자만 입력)",
+    answer:"143",
+    explanation:"브로드컴은 AI 반도체에서만 108억 달러를 벌었고, 이는 1년 전보다 143% 증가한 수치로 창사 이래 최고 성장이었습니다.",
+    source:"\"AI 반도체에서만 108억 달러를 벌었습니다 1년 전보다 143%가 늘어난 겁니다\""
+  },
+  {
+    id:9, type:'mc', difficulty:'hard',
+    question:"브로드컴의 완벽한 실적 발표 이후 주가가 폭락한 이유로 본문에 직접 언급되지 않은 것은?",
+    options:[
+      "VM웨어 매출이 시장 기대에 못 미침",
+      "2027년 매출 목표를 올리지 않고 그대로 유지함",
+      "오픈AI가 브로드컴과의 계약을 전면 취소함",
+      "구독 전환 과정에서 일시적으로 매출이 꺾임"
+    ],
+    answer:2,
+    explanation:"본문에서 언급된 주가 폭락 이유는 VM웨어 매출 부진(구독 전환에 따른 일시적 매출 감소)과 혹탄의 침묵(2027년 목표를 올리지 않은 것) 두 가지였습니다. 오픈AI의 계약 취소는 언급되지 않았습니다.",
+    source:"\"첫째, 사냥꾼의 소프트웨어입니다... 둘째, 이게 진짜인데 혹탄 CEO의 침묵입니다\""
+  },
+  {
+    id:10, type:'mc', difficulty:'medium',
+    question:"브로드컴 AI 매출의 거의 전부를 차지한다고 언급된 고객사는 몇 곳인가?",
+    options:["3곳","6곳","12곳","수천 곳"],
+    answer:1,
+    explanation:"구글, 메타, 오픈AI, 앤트로픽 등 혹탄이 직접 언급한 곳에 두 곳을 더한 총 6곳이 브로드컴 AI 매출의 거의 전부를 차지합니다. (엔비디아는 고객이 수천 곳입니다.)",
+    source:"\"무기상의 고객은 사실 6명 뿐입니다... 여기에 두 곳을 더한 여섯 곳이 브로드컴 AI 매출의 거의 전부입니다\""
+  }
+];
+
+let state = { solved: 0, correct: 0 };
+
+function renderQuiz(){
+  const list = document.getElementById('quizList');
+  list.innerHTML = '';
+  QUIZ_DATA.forEach((q, idx) => {
+    const card = document.createElement('div');
+    card.className = 'qcard';
+    card.id = 'q-' + q.id;
+
+    const diffLabel = { easy:'쉬움', medium:'보통', hard:'어려움' }[q.difficulty];
+
+    let bodyHtml = '';
+    if(q.type === 'mc'){
+      bodyHtml = `<div class="options">` + q.options.map((opt,i) =>
+        `<button class="opt" data-idx="${i}" onclick="answerMC(${q.id},${i})">${opt}</button>`
+      ).join('') + `</div>`;
+    } else if(q.type === 'ox'){
+      bodyHtml = `<div class="ox-row">
+        <button class="ox-btn" data-val="O" onclick="answerOX(${q.id},'O')">O</button>
+        <button class="ox-btn" data-val="X" onclick="answerOX(${q.id},'X')">X</button>
+      </div>`;
+    } else if(q.type === 'short'){
+      bodyHtml = `<div class="short-row">
+        <input type="text" id="short-${q.id}" placeholder="정답을 입력하세요">
+        <button id="submit-${q.id}" onclick="answerShort(${q.id})">제출</button>
+      </div>`;
+    }
+
+    card.innerHTML = `
+      <div class="qtop">
+        <span class="qnum">Q${idx+1}</span>
+        <span class="badge ${q.difficulty}">${diffLabel}</span>
+      </div>
+      <div class="qtext">${q.question}</div>
+      ${bodyHtml}
+      <div class="fb-wrap" id="fb-${q.id}"></div>
+      <div class="explain" id="explain-${q.id}">
+        <div class="explain-inner">
+          <div class="lab">💡 해설</div>
+          <div>${q.explanation}</div>
+          <div class="src">📌 원본 자막 근거: ${q.source}</div>
+        </div>
+      </div>
+    `;
+    list.appendChild(card);
+  });
+}
+
+function updateScoreboard(){
+  document.getElementById('solvedNum').textContent = state.solved;
+  document.getElementById('correctNum').textContent = state.correct;
+  const acc = state.solved === 0 ? 0 : Math.round((state.correct/state.solved)*100);
+  document.getElementById('accNum').textContent = acc;
+  const bar = document.getElementById('barFill');
+  bar.style.width = acc + '%';
+  if(acc < 40) bar.style.background = '#dc2626';
+  else if(acc < 70) bar.style.background = '#f59e0b';
+  else bar.style.background = '#16a34a';
+
+  if(state.solved === QUIZ_DATA.length){
+    setTimeout(showResult, 400);
+  }
+}
+
+function showFeedback(qid, isCorrect){
+  const fb = document.getElementById('fb-' + qid);
+  fb.innerHTML = `<span class="fb-badge ${isCorrect ? 'correct' : 'wrong'}">${isCorrect ? '✓ 정답!' : '✗ 오답'}</span>`;
+  document.getElementById('explain-' + qid).classList.add('show');
+}
+
+function answerMC(qid, idx){
+  const q = QUIZ_DATA.find(x => x.id === qid);
+  const card = document.getElementById('q-' + qid);
+  if(card.dataset.answered) return;
+  card.dataset.answered = "1";
+
+  const opts = card.querySelectorAll('.opt');
+  opts.forEach((o,i) => {
+    o.classList.add('disabled');
+    o.disabled = true;
+    o.onclick = null;
+    if(i === q.answer){
+      o.classList.add('correct');
+      o.innerHTML += `<span class="tag">✓ 정답!</span>`;
+    } else if(i === idx){
+      o.classList.add('wrong');
+      o.innerHTML += `<span class="tag">✗ 오답</span>`;
+    }
+  });
+
+  const isCorrect = idx === q.answer;
+  registerAnswer(isCorrect);
+  showFeedback(qid, isCorrect);
+}
+
+function answerOX(qid, val){
+  const q = QUIZ_DATA.find(x => x.id === qid);
+  const card = document.getElementById('q-' + qid);
+  if(card.dataset.answered) return;
+  card.dataset.answered = "1";
+
+  const btns = card.querySelectorAll('.ox-btn');
+  btns.forEach(b => {
+    b.disabled = true;
+    b.onclick = null;
+    if(b.dataset.val === q.answer) b.classList.add('correct');
+    else if(b.dataset.val === val && val !== q.answer) b.classList.add('wrong');
+  });
+
+  const isCorrect = val === q.answer;
+  registerAnswer(isCorrect);
+  showFeedback(qid, isCorrect);
+}
+
+function answerShort(qid){
+  const q = QUIZ_DATA.find(x => x.id === qid);
+  const card = document.getElementById('q-' + qid);
+  if(card.dataset.answered) return;
+
+  const input = document.getElementById('short-' + qid);
+  const val = input.value.trim();
+  if(val === ''){ input.focus(); return; }
+
+  card.dataset.answered = "1";
+  input.disabled = true;
+  document.getElementById('submit-' + qid).disabled = true;
+
+  const normalize = s => s.toLowerCase().replace(/\s/g,'');
+  const isCorrect = normalize(val) === normalize(q.answer);
+
+  input.style.borderColor = isCorrect ? '#16a34a' : '#dc2626';
+  input.style.background = isCorrect ? '#ecfdf3' : '#fef2f2';
+
+  if(!isCorrect){
+    input.insertAdjacentHTML('afterend', '');
+    const hint = document.createElement('div');
+    hint.style.cssText = "font-size:12px;color:#16a34a;font-weight:700;margin-top:8px;";
+    hint.textContent = "정답: " + q.answer;
+    card.querySelector('.short-row').insertAdjacentElement('afterend', hint);
+  }
+
+  registerAnswer(isCorrect);
+  showFeedback(qid, isCorrect);
+}
+
+function registerAnswer(isCorrect){
+  state.solved += 1;
+  if(isCorrect) state.correct += 1;
+  updateScoreboard();
+}
+
+function showResult(){
+  const total = QUIZ_DATA.length;
+  const pct = Math.round((state.correct/total)*100);
+  let grade, msg;
+  if(pct >= 90){ grade='A'; msg='완벽합니다! 브로드컴의 맞춤형 AI 칩 비즈니스를 완전히 이해하셨네요.'; }
+  else if(pct >= 70){ grade='B'; msg='훌륭해요! 핵심 내용을 잘 파악하셨습니다.'; }
+  else if(pct >= 50){ grade='C'; msg='나쁘지 않아요. 리포트를 한 번 더 훑어보면 완벽해질 거예요.'; }
+  else { grade='D'; msg='괜찮아요, 분석 리포트를 다시 읽고 재도전해보세요!'; }
+
+  document.getElementById('resultGrade').textContent = grade;
+  document.getElementById('resultScore').textContent = `${state.correct} / ${total}`;
+  document.getElementById('resultMsg').textContent = msg;
+  document.getElementById('resultModal').classList.add('show');
+}
+
+function resetQuiz(){
+  state = { solved: 0, correct: 0 };
+  document.getElementById('resultModal').classList.remove('show');
+  updateScoreboard();
+  renderQuiz();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+renderQuiz();
+updateScoreboard();
+</script>
+
+</body>
+</html>

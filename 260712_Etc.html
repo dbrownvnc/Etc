@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>메타가 칼을 갈고 돌아왔다 — 분석 리포트</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&family=Noto+Sans+KR:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+  :root{
+    --bg:#ffffff;
+    --bg-alt:#fafafa;
+    --text:#1a1a1a;
+    --text-soft:#777777;
+    --accent:#e11d48;
+    --accent-2:#f43f5e;
+    --border:#e5e5e5;
+    --c1:#e11d48;
+    --c2:#1a1a1a;
+    --c3:#6b7280;
+    --c4:#2563eb;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0; background:var(--bg); color:var(--text);
+    font-family:'Noto Sans KR',sans-serif;
+    line-height:1.75; font-weight:400;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:640px; margin:0 auto; padding:0 22px 80px;}
+
+  /* ---- Hero ---- */
+  .hero{
+    padding:56px 22px 44px; background:var(--text); color:#fff;
+    position:relative; overflow:hidden;
+  }
+  .hero::after{
+    content:""; position:absolute; right:-60px; top:-60px; width:220px; height:220px;
+    border:1px solid rgba(255,255,255,0.12); border-radius:50%;
+  }
+  .hero::before{
+    content:""; position:absolute; right:-10px; bottom:-90px; width:160px; height:160px;
+    border:1px solid rgba(255,255,255,0.08); border-radius:50%;
+  }
+  .eyebrow{
+    font-size:12px; letter-spacing:0.16em; text-transform:uppercase;
+    color:var(--accent-2); font-weight:600; margin-bottom:18px; display:block;
+  }
+  .hero h1{
+    font-family:'Playfair Display',serif; font-weight:700; font-size:34px;
+    line-height:1.28; margin:0 0 16px; letter-spacing:-0.01em;
+  }
+  .hero p.sub{
+    font-size:15px; color:rgba(255,255,255,0.68); margin:0 0 26px; max-width:480px;
+  }
+  .hero-meta{
+    display:flex; gap:18px; font-size:12px; color:rgba(255,255,255,0.5);
+    border-top:1px solid rgba(255,255,255,0.15); padding-top:16px; flex-wrap:wrap;
+  }
+
+  /* ---- Typography ---- */
+  h2.chapter{
+    font-family:'Playfair Display',serif; font-weight:600; font-size:26px;
+    margin:60px 0 6px; letter-spacing:-0.01em; color:var(--text);
+  }
+  .chapter-num{
+    font-family:'Playfair Display',serif; font-style:italic; font-size:13px;
+    color:var(--accent); display:block; margin-bottom:8px; letter-spacing:0.02em;
+  }
+  h3{
+    font-family:'Noto Sans KR',sans-serif; font-weight:700; font-size:17px;
+    margin:28px 0 10px; color:var(--text);
+  }
+  p{font-size:15.5px; margin:0 0 16px; color:var(--text);}
+  .lead{font-size:17px; color:var(--text); font-weight:500;}
+  strong{font-weight:700; color:var(--text);}
+  .muted{color:var(--text-soft);}
+
+  /* ---- Fade-in ---- */
+  .fade-in{opacity:0; transform:translateY(18px); transition:opacity .7s ease, transform .7s ease;}
+  .fade-in.visible{opacity:1; transform:translateY(0);}
+
+  /* ---- Callout / box ---- */
+  .box{
+    background:var(--bg-alt); border-left:3px solid var(--accent);
+    padding:18px 20px; margin:22px 0; border-radius:2px;
+  }
+  .box .box-title{font-weight:700; font-size:13px; color:var(--accent); margin-bottom:6px; letter-spacing:0.02em;}
+  .box p{font-size:14.5px; margin-bottom:0; color:var(--text);}
+  .term{
+    display:inline; background:rgba(225,29,72,0.08); border-radius:3px; padding:0 3px;
+  }
+
+  /* ---- quote ---- */
+  .quote{
+    font-family:'Playfair Display',serif; font-style:italic; font-size:19px;
+    line-height:1.55; color:var(--text); margin:28px 0; padding:0 0 0 18px;
+    border-left:2px solid var(--accent);
+  }
+  .quote cite{display:block; font-family:'Noto Sans KR',sans-serif; font-style:normal;
+    font-size:12px; color:var(--text-soft); margin-top:8px;}
+
+  /* ---- table ---- */
+  .table-wrap{overflow-x:auto; margin:22px 0; border-radius:4px; border:1px solid var(--border);}
+  table{width:100%; border-collapse:collapse; background:var(--bg-alt); font-size:13.5px; min-width:480px;}
+  th{background:var(--accent); color:#fff; font-weight:600; padding:10px 12px; text-align:left; white-space:nowrap;}
+  td{padding:10px 12px; border-top:1px solid var(--border); color:var(--text);}
+  tr:nth-child(even) td{background:#f5f5f5;}
+
+  /* ---- chart container ---- */
+  .chart-container{position:relative; max-height:340px; margin:14px 0 8px; background:var(--bg-alt); border-radius:6px; padding:16px 10px 6px; border:1px solid var(--border);}
+  .chart-container canvas{opacity:0; transition:opacity .4s ease; max-height:300px;}
+  .chart-container.chart-ready canvas{opacity:1;}
+  .chart-caption{font-size:12px; color:var(--text-soft); text-align:center; margin:6px 0 20px;}
+
+  /* ---- timeline ---- */
+  .timeline{margin:24px 0; position:relative; padding-left:22px;}
+  .timeline::before{content:""; position:absolute; left:5px; top:4px; bottom:4px; width:1px; background:var(--border);}
+  .t-item{position:relative; padding-bottom:20px;}
+  .t-item::before{content:""; position:absolute; left:-22px; top:4px; width:9px; height:9px; border-radius:50%; background:var(--c3); border:2px solid var(--bg);}
+  .t-item.hot::before{background:var(--accent); width:11px; height:11px; left:-23px;}
+  .t-date{font-size:11.5px; color:var(--accent); font-weight:700; letter-spacing:0.03em;}
+  .t-body{font-size:14px; margin-top:2px;}
+  .t-body b{color:var(--text);}
+  .t-item.hot .t-body{font-weight:700;}
+
+  /* ---- calculator ---- */
+  .calc{
+    background:var(--text); color:#fff; border-radius:10px; padding:26px 20px; margin:26px 0;
+  }
+  .calc h3{color:#fff; margin-top:0; font-size:16px;}
+  .calc-sub{font-size:12.5px; color:rgba(255,255,255,0.55); margin-bottom:18px;}
+  .calc-row{margin-bottom:18px;}
+  .calc-row label{display:flex; justify-content:space-between; font-size:13px; margin-bottom:8px; color:rgba(255,255,255,0.85);}
+  .calc-row label span.val{color:var(--accent-2); font-weight:700;}
+  input[type=range]{
+    -webkit-appearance:none; width:100%; height:4px; border-radius:2px;
+    background:rgba(255,255,255,0.2); outline:none;
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none; width:16px; height:16px; border-radius:50%;
+    background:var(--accent); cursor:pointer; border:3px solid #fff;
+  }
+  .model-select{display:flex; flex-wrap:wrap; gap:8px; margin-top:6px;}
+  .model-btn{
+    flex:1 1 calc(50% - 8px); min-width:120px; background:rgba(255,255,255,0.06);
+    border:1px solid rgba(255,255,255,0.15); color:#fff; padding:9px 8px; border-radius:6px;
+    font-size:12px; font-family:'Noto Sans KR',sans-serif; cursor:pointer; text-align:center;
+    transition:all .15s ease;
+  }
+  .model-btn.active{background:var(--accent); border-color:var(--accent); font-weight:700;}
+  .calc-result{
+    margin-top:20px; padding-top:18px; border-top:1px solid rgba(255,255,255,0.15);
+    display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:10px;
+  }
+  .calc-result .label{font-size:12px; color:rgba(255,255,255,0.55);}
+  .calc-result .price{font-family:'Playfair Display',serif; font-size:30px; font-weight:700; color:var(--accent-2);}
+  .calc-result .krw{font-size:12.5px; color:rgba(255,255,255,0.6);}
+  .reset-btn{
+    background:none; border:1px solid rgba(255,255,255,0.25); color:rgba(255,255,255,0.7);
+    font-size:11.5px; padding:6px 12px; border-radius:20px; cursor:pointer; margin-top:14px;
+  }
+
+  /* ---- divider ---- */
+  .divider{width:36px; height:2px; background:var(--accent); margin:0 0 18px;}
+  .end-mark{text-align:center; font-family:'Playfair Display',serif; font-style:italic; color:var(--text-soft); font-size:14px; margin:60px 0 20px;}
+
+  /* ---- footer ---- */
+  footer{
+    background:var(--bg-alt); padding:30px 22px; margin-top:40px; border-top:1px solid var(--border);
+  }
+  footer .brand{font-family:'Playfair Display',serif; font-weight:700; font-size:15px; color:var(--accent); margin-bottom:8px;}
+  footer p{font-size:11.5px; color:var(--text-soft); margin:0 0 6px;}
+
+  @media(max-width:420px){
+    .hero h1{font-size:27px;}
+    h2.chapter{font-size:21px;}
+    .quote{font-size:16.5px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <span class="eyebrow">CIA.chat · Market Report</span>
+  <h1>메타가 칼을 갈고 돌아왔다</h1>
+  <p class="sub">LLM 가격 경쟁의 판을 키운 메타, 본업 없는 OpenAI·Anthropic은 이 싸움을 버틸 수 있을까</p>
+  <div class="hero-meta">
+    <span>2026.07.12</span>
+    <span>SEMICONDUCTOR · AI · MARKET</span>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <p class="lead" style="margin-top:40px;">7월 11일, SK하이닉스가 나스닥에 상장(ADR, 국내 주식을 해외 증시에서 거래할 수 있게 만든 증서)해서 13% 오른 채로 마감했습니다. 다들 하이닉스를 보고 있을 때, 정작 더 중요한 사건은 메타에서 터졌습니다. 메타가 내부 메모를 통해 "우리는 컴퓨팅을 두 배로 늘린다"고 밝혔고, 동시에 처음으로 자기 AI 모델에 가격을 매겨 팔기 시작했습니다. 이 두 가지가 지난 열흘간 반도체·AI 시장을 뒤흔든 소동의 결말입니다.</p>
+
+  <h2 class="chapter fade-in"><span class="chapter-num">Chapter 01</span>메모가 공개되다</h2>
+  <p>7월 9일 밤, 로이터가 메타 내부 메모를 단독 입수했다고 보도했습니다. 핵심 내용은 세 가지입니다.</p>
+
+  <div class="box fade-in">
+    <div class="box-title">로이터가 확인한 메타 내부 메모</div>
+    <p>① 내년까지 <strong>14기가와트(GW)</strong> 규모 컴퓨팅을 배치한다 — 현재 목표인 7GW의 정확히 두 배<br>
+    ② 9월부터 자체 AI 칩 <strong>'아이리스'</strong> 생산에 들어간다<br>
+    ③ 삼성전자·샌디스크·스미토모와 메모리·저장장치·광섬유 분야 <strong>장기 공급 계약</strong>을 체결했다</p>
+  </div>
+
+  <p>다만 메모 원문이 공개된 건 아니고, 기자가 열람했다는 수준의 보도입니다. 메타, 브로드컴, TSMC, 샌디스크 모두 공식 확인은 거부했습니다. 그런데도 이 소식이 시장을 크게 흔든 이유가 있습니다. 바로 직전까지 시장을 짓누르던 '컴퓨팅 공급 과잉'이라는 소문을 정면으로 반박하는 내용이었기 때문입니다.</p>
+
+  <h2 class="chapter fade-in"><span class="chapter-num">Chapter 02</span>왜 8거래일 동안 계좌가 녹았나</h2>
+  <p>이야기는 7월 1일로 거슬러 올라갑니다. 블룸버그가 "메타가 남는 AI 컴퓨팅을 외부에 파는 클라우드 사업, 내부 명칭 '메타 컴퓨트'를 준비 중"이라고 보도했습니다. 그날 하루 만에 시장은 이렇게 움직였습니다.</p>
+
+  <div class="table-wrap fade-in">
+    <table>
+      <tr><th>종목/지수</th><th>7월 1일 반응</th></tr>
+      <tr><td>메타</td><td>+9~10%</td></tr>
+      <tr><td>마이크론</td><td>-10%</td></tr>
+      <tr><td>코어위브</td><td>-14%</td></tr>
+      <tr><td>네비우스</td><td>-17%</td></tr>
+      <tr><td>삼성전자 (다음날 국장)</td><td>-7%</td></tr>
+      <tr><td>SK하이닉스 (다음날 국장)</td><td>-9%</td></tr>
+      <tr><td>코스피</td><td>서킷브레이커 발동</td></tr>
+    </table>
+  </div>
+
+  <p>시장이 읽은 논리는 단순했습니다. <span class="muted">"컴퓨팅이 남는다 → 데이터센터를 더 안 짓는다 → 메모리도 안 산다 → 메모리 회사를 팔아야 한다."</span> 이후 8거래일 동안 나스닥100 지수는 하루 오르고 하루 내리기를 반복하며 흘러내렸습니다. 7월 8일에는 저커버그가 "AI 에이전트가 기대만큼 가속되지 않았다"고 인정하며 한 번 더 빠졌고, 7월 9일 아침 기준으로는 전 고점 대비 5~6% 낮은 수준까지 밀렸습니다.</p>
+
+  <div class="chart-container fade-in">
+    <canvas id="nasdaqChart" height="230"></canvas>
+  </div>
+  <p class="chart-caption">나스닥100 지수 흐름 (7/1 고점 → 7/9 아침 저점 → 메모 공개 후 마감)</p>
+
+  <div class="box fade-in">
+    <div class="box-title">참고 — 왜 하필 '유휴 컴퓨팅 임대'라는 말이 먼저 나왔나</div>
+    <p>스페이스X 상장 서류(S-1)에는 앤트로픽이 일론 머스크의 xAI 데이터센터 공간을 빌리는 대가로 매달 12억 5천만 달러를, 구글도 매달 9억 2천만 달러를 낸다는 내용이 담겨 있었습니다. IPO 서류는 이를 "유휴 컴퓨팅 캐파시티의 수익화"라고 표현했는데, 이 사례가 시장에 "컴퓨팅을 빌려주는 게 유행이구나"라는 인식을 심어놓은 상태였습니다.</p>
+  </div>
+
+  <h2 class="chapter fade-in"><span class="chapter-num">Chapter 03</span>과잉공급설은 왜 틀렸나</h2>
+  <p>사실 시장이 근거로 삼은 발언은 5월 27일 메타 주주총회로 거슬러 올라갑니다. "아마존·MS와 클라우드 사업에서 경쟁할 생각이 있느냐"는 질문에 저커버그는 이렇게 답했습니다.</p>
+
+  <div class="quote fade-in">
+    "아직 그렇게 하지 않은 이유는 그 컴퓨팅을 우리가 쓸 때가 있다고 보기 때문입니다. 다만 AI 인프라를 과잉 건설하는 지점에 이르면, 그건 우리에게는 선택지가 있습니다."
+    <cite>— 마크 저커버그, 2026년 5월 27일 주주총회</cite>
+  </div>
+
+  <p>분명히 "아직 그렇게 하지 않은 이유는 컴퓨팅이 필요하기 때문"이라는 <strong>조건절</strong>이었습니다. 그런데 7월 1일 블룸버그 보도가 나오자 시장은 이 조건절을 결론으로 읽어버렸고, 두 단계를 더 건너뛰어 "컴퓨팅이 남는다 → 메모리 발주가 준다"는 결론까지 도달했습니다. 근거는 익명 보도 하나였습니다.</p>
+
+  <p>이 추론이 이상했던 진짜 이유는 따로 있습니다. 같은 기간, 메모리 값이 오르고 있다는 증거가 곳곳에서 쏟아지고 있었기 때문입니다. 삼성전자·SK하이닉스·마이크론이 HBM(고대역폭 메모리, AI 서버용 고성능 메모리) 생산에 캐파를 몰아주면서, 일반 소비자용 D램·낸드 생산이 줄었고 PC·게임기용 메모리 값이 치솟았습니다.</p>
+
+  <div class="table-wrap fade-in">
+    <table>
+      <tr><th>기업</th><th>조치</th><th>사유</th></tr>
+      <tr><td>애플</td><td>맥북·아이패드 인상 (맥북 네오 +$150)</td><td>메모리·스토리지 가격</td></tr>
+      <tr><td>마이크로소프트</td><td>8/1부터 Xbox 전세계 $100~150 인상</td><td>"하드웨어 부품 위기"</td></tr>
+      <tr><td>소니</td><td>PS5 유럽 €100 인상 → €650</td><td>부품 원가</td></tr>
+      <tr><td>닌텐도</td><td>스위치2, 9/1부터 6% 이상 인상</td><td>중장기 시장 여건</td></tr>
+      <tr><td>밸브</td><td>스팀덱 OLED 512GB $549 → $789</td><td>부품 원가·물류</td></tr>
+      <tr><td>고프로</td><td>폐업 가능성 경고</td><td>메모리 원가 80~115% 상승</td></tr>
+    </table>
+  </div>
+
+  <p>마이크론 CEO 산제이 메로트라는 "2027년 이후까지 타이트한 상황이 지속될 것이고, 2028년에 공급이 개선되더라도 수요를 따라잡을 시점은 보이지 않는다"고 밝혔습니다. 공급이 정말 과잉이라면 왜 몇 년 치씩 <span class="term">테이크오어페이(take-or-pay, 물량을 안 받아가도 계약금을 내야 하는 구속력 있는 장기 계약)</span> 계약을 맺을까요? 마이크론이 실적 콜에서 언급한 이런 장기 계약만 16건이었습니다.</p>
+
+  <p>7월 9일, 메모 공개 이후 시장은 빠르게 되돌아왔습니다. 나스닥100은 1.6% 올라 29,727로 마감했고, 공포지수(VIX)는 15.9에서 6.16% 하락했습니다. 공포·탐욕 지수도 47(중립)로 돌아섰습니다. 메타 주가는 장중 -2.6%까지 밀렸다가 +4.7%로 마감했고, 마이크론·샌디스크·브로드컴도 3~7% 올랐습니다. 다만 컴퓨팅을 빌려주는 코어위브·네비우스·아이렌 등은 함께 오르지 못했는데, 메타가 컴퓨팅을 2배로 짓는다는 건 이들의 잠재 고객이 하나 줄어드는 의미이기도 하기 때문입니다.</p>
+
+  <h2 class="chapter fade-in"><span class="chapter-num">Chapter 04</span>가격 전쟁의 서막</h2>
+  <p>7월 9일, 메타는 두 번째 발표를 했습니다. 자체 AI 모델 <strong>뮤즈 스파크 1.1</strong>을 처음으로 유료 API로 공개한 겁니다. 페이스북·인스타그램처럼 늘 공짜였던 메타가 자기 모델에 값을 매긴 건 이번이 처음입니다.</p>
+
+  <div class="box fade-in">
+    <div class="box-title">저커버그, 블룸버그 인터뷰</div>
+    <p>"다른 랩들의 LLM 모델 가격은 매우 극단적이고 마진이 아주 높습니다. 우리는 프론티어급 지능을 훨씬 더 저렴한 가격에 제공할 수 있는 진짜 여지가 있다고 봅니다."</p>
+  </div>
+
+  <p>가격은 100만 토큰 기준 입력 1.25달러, 출력 4.25달러(어제 환율로 약 입력 1,880원 / 출력 6,400원)입니다. 같은 기준으로 다른 모델들과 비교해보면 이렇습니다.</p>
+
+  <div class="chart-container fade-in">
+    <canvas id="priceChart" height="240"></canvas>
+  </div>
+  <p class="chart-caption">100만 토큰당 가격 비교 (달러, 입력/출력)</p>
+
+  <p>표를 보면 가장 싼 모델은 구글 제미나이 3 플래시(입력 $0.5 / 출력 $3)이고, 뮤즈 스파크 1.1은 두 번째로 저렴합니다. 저커버그가 말한 "경쟁사 대비 25% 수준"이라는 표현은 GPT-5.6 소울이나 앤트로픽 오퍼스급 모델과 비교했을 때 얘기고, 최상위 모델(입력 $10 / 출력 $50)과 비교하면 6~7분의 1 가격입니다.</p>
+
+  <h3>가격만이 아니다 — 성능도 함께 내밀었다</h3>
+  <p>메타가 자체 공개한 벤치마크에 따르면, 뮤즈 스파크 1.1은 구글 제미나이 3.1 프로보다 거의 모든 영역에서 점수가 높습니다. 다만 메타가 직접 낸 자료라 독립적인 검증은 아직 없다는 점은 감안해야 합니다.</p>
+
+  <div class="chart-container fade-in">
+    <canvas id="benchChart" height="260"></canvas>
+  </div>
+  <p class="chart-caption">주요 벤치마크 비교 (메타 자체 공개 자료 기준)</p>
+
+  <h3>가격 전쟁은 이미 진행 중이었다</h3>
+  <p>사실 메타보다 먼저 움직인 곳들이 있습니다. 시간 순으로 보면 이렇습니다.</p>
+
+  <div class="timeline fade-in">
+    <div class="t-item"><div class="t-date">상시</div><div class="t-body">중국 <b>딥시크</b> — V4-Pro API 가격 75% 인하 영구화</div></div>
+    <div class="t-item"><div class="t-date">상시</div><div class="t-body"><b>구글</b> — 제미나이 3 플래시 $0.50/$3.00, 젬마4 무료 공개</div></div>
+    <div class="t-item"><div class="t-date">6/30</div><div class="t-body"><b>앤트로픽</b> — 클로드 소넷5 도입가 (8/31까지 한시적, 정가의 1/5)</div></div>
+    <div class="t-item"><div class="t-date">7/8</div><div class="t-body"><b>xAI</b> — 그록 4.5 $2/$6 (캐시 $0.5)</div></div>
+    <div class="t-item"><div class="t-date">7/9</div><div class="t-body"><b>오픈AI</b> — GPT-5.6 루나 $1/$6</div></div>
+    <div class="t-item hot"><div class="t-date">7/9</div><div class="t-body"><b>메타</b> — 뮤즈 스파크 1.1 $1.25/$4.25 (하루 늦은 마지막 주자, 루나보다 더 저렴)</div></div>
+  </div>
+
+  <p>여기에 메타는 무기를 하나 더 얹었습니다. 개발자 문서를 보면 메타 모델 API가 <span class="term">오픈AI SDK와 앤트로픽 메시지 포맷을 둘 다 지원</span>합니다. 즉 오픈AI나 앤트로픽 API를 쓰던 개발자가 주소 한 줄과 키 값만 바꾸면 메타로 갈아탈 수 있다는 뜻입니다. 예전에 메타가 내놨던 라마(Llama)는 오픈웨이트(모델을 공개해 개발자가 직접 GPU를 빌려 돌려야 하는 방식) 형태라 진입장벽이 높았고, 결과적으로 크게 흥행하지 못했습니다. 이번엔 그 실패 원인을 '유통 방식'으로 진단하고, API 형태 + 낮은 가격 + 손쉬운 전환이라는 조합으로 다시 도전하는 모습입니다.</p>
+
+  <div class="calc fade-in">
+    <h3>💰 토큰 비용 계산기</h3>
+    <p class="calc-sub">사용할 토큰 양을 정하고 모델을 골라, 실제 API 비용이 얼마나 차이 나는지 비교해보세요.</p>
+    <div class="calc-row">
+      <label>입력 토큰 <span class="val" id="inTokVal">100만</span></label>
+      <input type="range" id="inTokSlider" min="10" max="1000" value="100" step="10">
+    </div>
+    <div class="calc-row">
+      <label>출력 토큰 <span class="val" id="outTokVal">50만</span></label>
+      <input type="range" id="outTokSlider" min="10" max="1000" value="50" step="10">
+    </div>
+    <div class="calc-row">
+      <label style="margin-bottom:10px;">모델 선택</label>
+      <div class="model-select" id="modelSelect"></div>
+    </div>
+    <div class="calc-result">
+      <div>
+        <div class="label">예상 비용</div>
+        <div class="price" id="calcPrice">$0.00</div>
+        <div class="krw" id="calcKrw">≈ 0원</div>
+      </div>
+      <button class="reset-btn" id="calcReset">초기화</button>
+    </div>
+  </div>
+
+  <h2 class="chapter fade-in"><span class="chapter-num">Chapter 05</span>본업이 있는 자, 없는 자</h2>
+  <p>이 시점에서 메타의 1분기 실적을 봐야 합니다. 매출은 전년 대비 33% 성장(2021년 이후 최고 성장률)했고, 영업이익률은 40%를 훌쩍 넘었습니다. 조정주당순이익(EPS)도 7.31달러로 시장 예상치 6.79달러를 약 10% 웃돌았습니다. 그런데도 주가는 크게 빠졌습니다. 실적 발표 직전 주에 전체 직원의 10%인 8,000명 감원을 발표했고, 설비투자(캐펙스) 가이던스가 높게 나온 점이 부담으로 작용했기 때문입니다. 메타 주가는 1년 전 대비 11% 넘게 빠진 상태였습니다.</p>
+
+  <p>여기서 핵심은 이겁니다. <strong>메타는 상장기업이고, 본업(광고 사업)이 있습니다.</strong> 오픈AI와 앤트로픽에는 이게 없습니다. 구글도 검색광고라는 캐시카우, 자체 추론칩 TPU, 프론티어 모델(제미나이), 클라우드 사업까지 다 갖추고 있습니다. 반면 오픈AI와 앤트로픽은 지금 당장 LLM 하나로 수익을 만들어내야 하는 구조입니다.</p>
+
+  <div class="quote fade-in">
+    "가격 경쟁이 시작된 순간, 구글·메타·스페이스X는 다 산소통을 차고 물에 들어가는 셈이다. 오픈AI와 앤트로픽만 맨몸으로 숨을 참아야 한다."
+    <cite>— 원본 영상 논평 요약</cite>
+  </div>
+
+  <p>실제로 앤트로픽은 흑자 전환이 예상된다고 알려졌지만, 스스로도 "이 흑자가 지속되지 않을 수 있다"고 언급한 바 있습니다. 스페이스X 데이터센터 임대에서 할인을 받은 효과가 반영된 결과라는 설명입니다. 반대로 메타는 산소통을 메고 들어가는 입장이면서도 올 하반기 현금흐름이 마이너스로 돌아설 수 있다는 전망이 나옵니다. 3월에는 회사채로 약 300억 달러를 조달하기도 했습니다. 다만 본업이 있고 없고의 차이는 결국 '현금 창출 능력'의 차이이고, 이것이 가격 경쟁을 얼마나 오래 주도할 수 있는지를 가르는 기준이 됩니다.</p>
+
+  <p>정리하면, 그동안 오픈AI와 앤트로픽이 LLM이라는 시장의 길을 닦아놓았지만, 이제 이 싸움이 '누가 더 싸게, 더 오래 버티는가'라는 현금 체력전으로 넘어가고 있습니다. 그리고 이 체력전에는 본업을 가진 빅테크들이 하나둘 참전하고 있습니다.</p>
+
+  <div class="end-mark">— fin —</div>
+
+</div>
+
+<footer>
+  <div class="brand">CIA.chat</div>
+  <p>본 리포트는 원본 방송 콘텐츠를 바탕으로 재구성한 요약·분석 자료이며, 특정 종목이나 자산의 매수·매도를 권유하는 투자 자문이 아닙니다.</p>
+  <p>모든 투자 판단과 책임은 투자자 본인에게 귀속되며, 참고 자료로만 활용하시기 바랍니다.</p>
+  <p>© 2026 CIA.chat</p>
+</footer>
+
+<script>
+  // ---- Fade-in observer ----
+  const fadeObs = new IntersectionObserver((entries) => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        setTimeout(() => e.target.classList.add('visible'), i * 80);
+        fadeObs.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.fade-in').forEach(el => fadeObs.observe(el));
+
+  // ---- Chart configs ----
+  const chartConfigs = {};
+
+  chartConfigs['nasdaqChart'] = () => {
+    new Chart(document.getElementById('nasdaqChart'), {
+      type: 'line',
+      data: {
+        labels: ['7/1 고점권', '7/7 반도체 셀럽', '7/8 저커버그 발언', '7/9 아침 저점', '7/9 메모 공개 후 마감'],
+        datasets: [{
+          label: '나스닥100',
+          data: [30600, 28900, 28500, 28900, 29727],
+          borderColor: '#e11d48',
+          backgroundColor: 'rgba(225,29,72,0.08)',
+          borderWidth: 2.5,
+          pointBackgroundColor: '#e11d48',
+          pointRadius: 4,
+          tension: 0.3,
+          fill: true
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          y: { ticks: { color: '#777777', font: { size: 10 } }, grid: { color: '#e5e5e5' } },
+          x: { ticks: { color: '#777777', font: { size: 9 } }, grid: { display: false } }
+        }
+      }
+    });
+  };
+
+  chartConfigs['priceChart'] = () => {
+    new Chart(document.getElementById('priceChart'), {
+      type: 'bar',
+      data: {
+        labels: ['제미나이3 플래시', '뮤즈스파크1.1', 'GPT-5.6 루나', '그록4.5', 'GPT-5.6 소울', '오퍼스급(최상위)'],
+        datasets: [
+          { label: '입력($)', data: [0.5, 1.25, 1, 2, 5, 10], backgroundColor: '#1a1a1a', borderRadius: 3 },
+          { label: '출력($)', data: [3, 4.25, 6, 6, 30, 50], backgroundColor: '#e11d48', borderRadius: 3 }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { position: 'top', labels: { color: '#1a1a1a', font: { size: 11 } } } },
+        scales: {
+          y: { ticks: { color: '#777777', font: { size: 10 } }, grid: { color: '#e5e5e5' } },
+          x: { ticks: { color: '#777777', font: { size: 9 } }, grid: { display: false } }
+        }
+      }
+    });
+  };
+
+  chartConfigs['benchChart'] = () => {
+    new Chart(document.getElementById('benchChart'), {
+      type: 'bar',
+      data: {
+        labels: ['MCP Atlas', 'JobBench', "Humanity's Last Exam", 'SWE-Bench Pro'],
+        datasets: [
+          { label: '뮤즈스파크1.1', data: [88.1, 54.7, 62.1, 61.5], backgroundColor: '#e11d48' },
+          { label: '제미나이3.1프로', data: [78.2, 15.9, 51.4, 54.2], backgroundColor: '#6b7280' },
+          { label: '오퍼스4.8', data: [82.2, 48.4, 57.9, 69.2], backgroundColor: '#2563eb' },
+          { label: 'GPT-5.5', data: [75.3, 38.3, 52.2, 58.6], backgroundColor: '#1a1a1a' }
+        ]
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { position: 'bottom', labels: { color: '#1a1a1a', font: { size: 10 }, boxWidth: 10 } } },
+        scales: {
+          x: { ticks: { color: '#777777', font: { size: 9 } }, grid: { color: '#e5e5e5' }, max: 100 },
+          y: { ticks: { color: '#1a1a1a', font: { size: 10 } }, grid: { display: false } }
+        }
+      }
+    });
+  };
+
+  const chartObs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        const canvas = e.target.querySelector('canvas');
+        if (canvas && chartConfigs[canvas.id]) {
+          chartConfigs[canvas.id]();
+          e.target.classList.add('chart-ready');
+          chartObs.unobserve(e.target);
+        }
+      }
+    });
+  }, { threshold: 0.15 });
+  document.querySelectorAll('.chart-container').forEach(el => chartObs.observe(el));
+
+  // ---- Token cost calculator ----
+  const MODELS = [
+    { id:'gemini', name:'제미나이3 플래시', in:0.5, out:3 },
+    { id:'muse', name:'뮤즈스파크1.1', in:1.25, out:4.25 },
+    { id:'luna', name:'GPT-5.6 루나', in:1, out:6 },
+    { id:'grok', name:'그록4.5', in:2, out:6 },
+    { id:'soul', name:'GPT-5.6 소울', in:5, out:30 },
+    { id:'opus', name:'오퍼스급(최상위)', in:10, out:50 }
+  ];
+  let selectedModel = 'muse';
+  const modelSelectEl = document.getElementById('modelSelect');
+  MODELS.forEach(m => {
+    const btn = document.createElement('div');
+    btn.className = 'model-btn' + (m.id === selectedModel ? ' active' : '');
+    btn.textContent = m.name;
+    btn.dataset.id = m.id;
+    btn.addEventListener('click', () => {
+      selectedModel = m.id;
+      document.querySelectorAll('.model-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      updateCalc();
+    });
+    modelSelectEl.appendChild(btn);
+  });
+
+  const inSlider = document.getElementById('inTokSlider');
+  const outSlider = document.getElementById('outTokSlider');
+  const inVal = document.getElementById('inTokVal');
+  const outVal = document.getElementById('outTokVal');
+  const calcPrice = document.getElementById('calcPrice');
+  const calcKrw = document.getElementById('calcKrw');
+  const EXRATE = 1465.68;
+
+  function fmtTok(v){
+    return (v/100).toFixed(v % 100 === 0 ? 0 : 1) + '00만';
+  }
+
+  function updateCalc(){
+    const inTok = parseInt(inSlider.value, 10);
+    const outTok = parseInt(outSlider.value, 10);
+    inVal.textContent = (inTok/100).toFixed(1).replace('.0','') + '00만';
+    outVal.textContent = (outTok/100).toFixed(1).replace('.0','') + '00만';
+    const model = MODELS.find(m => m.id === selectedModel);
+    if (!model) return;
+    const cost = (inTok/100) * model.in + (outTok/100) * model.out;
+    calcPrice.textContent = '$' + cost.toFixed(2);
+    calcKrw.textContent = '≈ ' + Math.round(cost * EXRATE).toLocaleString('ko-KR') + '원';
+  }
+
+  inSlider.addEventListener('input', updateCalc);
+  outSlider.addEventListener('input', updateCalc);
+  document.getElementById('calcReset').addEventListener('click', () => {
+    inSlider.value = 100; outSlider.value = 50; selectedModel = 'muse';
+    document.querySelectorAll('.model-btn').forEach(b => b.classList.toggle('active', b.dataset.id === 'muse'));
+    updateCalc();
+  });
+  updateCalc();
+</script>
+</body>
+</html>

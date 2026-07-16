@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>고점을 가려내는 법 | 김효진 박사 2부 · 인터랙티브 퀴즈</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,500&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#ffffff; --bg2:#fafafa; --ink:#1a1a1a; --sub:#777777;
+    --accent:#e11d48; --accent2:#f43f5e; --line:#e5e5e5;
+    --ok:#16a34a; --okbg:#dcfce7; --no:#dc2626; --nobg:#fee2e2;
+  }
+  *{box-sizing:border-box; margin:0; padding:0}
+  body{background:var(--bg2); color:var(--ink); font-family:'Noto Sans KR',sans-serif; line-height:1.7; -webkit-font-smoothing:antialiased}
+  .wrap{max-width:680px; margin:0 auto; padding:0 16px 80px}
+
+  /* ---- HEADER ---- */
+  header{text-align:center; padding:44px 20px 26px}
+  .kicker{font-size:11px; letter-spacing:3px; color:var(--accent); font-weight:700; text-transform:uppercase; margin-bottom:14px}
+  header h1{font-family:'Playfair Display',serif; font-weight:900; font-size:30px; line-height:1.25; letter-spacing:-.5px}
+  header p{font-size:14px; color:var(--sub); margin-top:12px}
+
+  /* ---- STICKY SCOREBOARD ---- */
+  .score-bar{position:sticky; top:0; z-index:50; background:rgba(255,255,255,.96); backdrop-filter:blur(8px); border-bottom:1px solid var(--line); padding:12px 16px; box-shadow:0 4px 14px rgba(0,0,0,.05)}
+  .score-inner{max-width:680px; margin:0 auto}
+  .score-nums{display:flex; justify-content:space-between; align-items:center; margin-bottom:8px}
+  .sn{text-align:center; flex:1}
+  .sn .v{font-family:'Playfair Display',serif; font-weight:900; font-size:22px; line-height:1; color:var(--ink)}
+  .sn .v.acc{color:var(--accent)}
+  .sn .k{font-size:10.5px; color:var(--sub); margin-top:3px}
+  .sn .div{width:1px; height:26px; background:var(--line)}
+  .pbar{height:7px; background:var(--line); border-radius:4px; overflow:hidden}
+  .pfill{height:100%; width:0%; background:var(--no); border-radius:4px; transition:width .4s ease, background .4s ease}
+
+  /* ---- QUESTION CARD ---- */
+  .q-card{background:#fff; border:1px solid var(--line); border-radius:16px; padding:24px 20px; margin:18px 0; box-shadow:0 3px 14px rgba(0,0,0,.03)}
+  .q-top{display:flex; align-items:center; gap:10px; margin-bottom:16px; flex-wrap:wrap}
+  .q-no{font-family:'Playfair Display',serif; font-weight:900; font-size:26px; color:var(--accent); line-height:1}
+  .badge{font-size:11px; font-weight:700; padding:3px 10px; border-radius:20px}
+  .badge.easy{background:#dcfce7; color:#15803d}
+  .badge.mid{background:#fef3c7; color:#b45309}
+  .badge.hard{background:#fee2e2; color:#b91c1c}
+  .badge.type{background:#f1f5f9; color:#475569}
+  .q-text{font-size:16.5px; font-weight:500; line-height:1.6; margin-bottom:18px}
+
+  /* choices */
+  .opt{display:block; width:100%; text-align:left; padding:14px 16px; margin:9px 0; font-size:15px; font-family:inherit; font-weight:500; color:var(--ink); background:#fff; border:1.6px solid var(--line); border-radius:11px; cursor:pointer; transition:.15s; line-height:1.5}
+  .opt:hover:not(:disabled){border-color:var(--accent); background:rgba(225,29,72,.03)}
+  .opt:disabled{cursor:default}
+  .opt .mark{display:inline-block; width:24px; height:24px; line-height:22px; text-align:center; border:1.6px solid var(--line); border-radius:50%; font-size:13px; font-weight:700; margin-right:10px; color:var(--sub); vertical-align:middle}
+  .opt.correct{background:var(--okbg); border-color:var(--ok); color:#14532d; font-weight:700}
+  .opt.correct .mark{background:var(--ok); color:#fff; border-color:var(--ok)}
+  .opt.wrong{background:var(--nobg); border-color:var(--no); color:#7f1d1d; font-weight:700}
+  .opt.wrong .mark{background:var(--no); color:#fff; border-color:var(--no)}
+  .opt .tag{float:right; font-size:12px; font-weight:800; margin-top:2px}
+  .opt.correct .tag{color:var(--ok)}
+  .opt.wrong .tag{color:var(--no)}
+
+  /* OX */
+  .ox-row{display:flex; gap:12px}
+  .ox-btn{flex:1; padding:22px; font-size:26px; font-weight:900; font-family:'Playfair Display',serif; border:1.6px solid var(--line); border-radius:13px; background:#fff; cursor:pointer; transition:.15s}
+  .ox-btn:hover:not(:disabled){border-color:var(--accent)}
+  .ox-btn:disabled{cursor:default}
+  .ox-btn.correct{background:var(--okbg); border-color:var(--ok); color:var(--ok)}
+  .ox-btn.wrong{background:var(--nobg); border-color:var(--no); color:var(--no)}
+
+  /* short answer */
+  .sa-row{display:flex; gap:8px}
+  .sa-input{flex:1; padding:13px 14px; font-size:15px; font-family:inherit; border:1.6px solid var(--line); border-radius:11px}
+  .sa-input:focus{outline:none; border-color:var(--accent)}
+  .sa-input:disabled{background:var(--bg2)}
+  .sa-btn{padding:13px 22px; font-size:14px; font-weight:700; font-family:inherit; color:#fff; background:var(--accent); border:none; border-radius:11px; cursor:pointer; white-space:nowrap}
+  .sa-btn:disabled{background:var(--sub); cursor:default}
+  .sa-fb{margin-top:12px; font-size:14px; font-weight:700; display:none}
+  .sa-fb.correct{color:var(--ok); display:block}
+  .sa-fb.wrong{color:var(--no); display:block}
+
+  /* explanation */
+  .exp{max-height:0; overflow:hidden; transition:max-height .45s ease; margin-top:0}
+  .exp.open{max-height:600px; margin-top:16px}
+  .exp-in{background:var(--bg2); border:1px solid var(--line); border-left:4px solid var(--accent); border-radius:10px; padding:16px 18px}
+  .exp-in .h{font-size:12px; font-weight:800; color:var(--accent); letter-spacing:1px; margin-bottom:8px}
+  .exp-in p{font-size:14px; line-height:1.7; color:#333}
+  .exp-in .src{margin-top:10px; padding-top:10px; border-top:1px dashed var(--line); font-size:12.5px; color:var(--sub)}
+  .exp-in .src b{color:var(--ink)}
+
+  /* ---- FINAL MODAL ---- */
+  .overlay{position:fixed; inset:0; background:rgba(26,26,26,.6); backdrop-filter:blur(4px); display:none; align-items:center; justify-content:center; z-index:100; padding:20px}
+  .overlay.show{display:flex}
+  .modal{background:#fff; border-radius:20px; padding:36px 28px; max-width:400px; width:100%; text-align:center; box-shadow:0 20px 60px rgba(0,0,0,.3); animation:pop .35s ease}
+  @keyframes pop{from{transform:scale(.9); opacity:0} to{transform:scale(1); opacity:1}}
+  .modal .grade{font-family:'Playfair Display',serif; font-weight:900; font-size:72px; line-height:1; color:var(--accent)}
+  .modal .m-score{font-size:19px; font-weight:700; margin:12px 0 6px}
+  .modal .m-msg{font-size:14px; color:var(--sub); line-height:1.6; margin-bottom:24px}
+  .modal .retry{width:100%; padding:14px; font-size:15px; font-weight:700; font-family:inherit; color:#fff; background:var(--accent); border:none; border-radius:12px; cursor:pointer}
+  .modal .retry:hover{background:var(--accent2)}
+
+  @media(max-width:400px){
+    header h1{font-size:25px}
+    .sn .v{font-size:19px}
+    .q-text{font-size:15.5px}
+    .ox-btn{font-size:22px; padding:18px}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="kicker">지식인 초대석 EP.152 · 김효진 박사 2부</div>
+  <h1>고점을 가려내는 법<br>이해도 체크 퀴즈</h1>
+  <p>총 10문항 · 클릭하면 즉시 채점됩니다</p>
+</header>
+
+<!-- STICKY SCOREBOARD -->
+<div class="score-bar">
+  <div class="score-inner">
+    <div class="score-nums">
+      <div class="sn"><div class="v" id="sc-solved">0 / 10</div><div class="k">푼 문제</div></div>
+      <div class="div"></div>
+      <div class="sn"><div class="v" id="sc-correct">0</div><div class="k">맞힌 문제</div></div>
+      <div class="div"></div>
+      <div class="sn"><div class="v acc" id="sc-rate">0%</div><div class="k">정답률</div></div>
+    </div>
+    <div class="pbar"><div class="pfill" id="sc-fill"></div></div>
+  </div>
+</div>
+
+<div class="wrap" id="quiz-root"></div>
+
+<!-- FINAL MODAL -->
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <div class="grade" id="m-grade">A</div>
+    <div class="m-score" id="m-score"></div>
+    <div class="m-msg" id="m-msg"></div>
+    <button class="retry" id="m-retry">↺ 다시 풀기</button>
+  </div>
+</div>
+
+<script>
+/* ==================== QUIZ DATA ==================== */
+const QUIZ_DATA = [
+  {
+    id:1, type:'mc', difficulty:'easy',
+    question:'스페이스X, 앤트로픽, 오픈AI 세 기업의 예상 시가총액을 합하면 약 얼마로 언급됐나요?',
+    options:['약 4천억 달러','약 2조 달러','약 4조 달러','약 10조 달러'],
+    answer:2,
+    explanation:'세 기업의 예상 시총 합은 약 4조 달러로, 한국 GDP(약 2조 달러)의 2배 규모입니다. 즉 한국 경제 체력의 2배만큼이 새 주식으로 시장에 풀리는 셈입니다.',
+    source:'&ldquo;이 세 기업이 시가총액을 합하면 한 4조 달러 정도… 한국 GDP가 한 2조 달러… 한국 경제 체력의 2배만큼이 그냥 시장에 풀리는 셈&rdquo;'
+  },
+  {
+    id:2, type:'mc', difficulty:'mid',
+    question:'IPO 연구 학자들이 말하는 IPO의 &lsquo;질&rsquo;을 판단하는 두 가지 기준은 무엇인가요?',
+    options:['상장 국가와 산업 분야','신주 발행 비중과 적자 기업 상장 비중','시가총액과 거래량','창업자 지분과 배당률'],
+    answer:1,
+    explanation:'박사는 IPO가 양(금액)보다 질이 중요하며, 질은 ① 신주 발행을 얼마나 많이 하는지 ② 적자 기업의 상장 비중이 얼마나 높은지 두 가지로 본다고 설명했습니다.',
+    source:'&ldquo;신주 발행을 얼마나 많이 하는지… 그리고 두 번째는 적자 기업의 상장 비중이 얼마나 높은지&rdquo;'
+  },
+  {
+    id:3, type:'ox', difficulty:'easy',
+    question:'김효진 박사는 &ldquo;고점에 파는 것은 실력&rdquo;이라고 말했다.',
+    answer:'X',
+    explanation:'박사는 정반대로 말했습니다. 고점에 파는 것은 실력이 아니라 &lsquo;운&rsquo;이며, 그래서 고점에 팔 수 있다는 생각을 버리고 기계적인 분할 매도를 하라고 조언했습니다.',
+    source:'&ldquo;고점에 파는 건 실력이 아니고 운이거든요… 기계적인 분할매도 밖에는 돈을 지키는 방법 없다&rdquo;'
+  },
+  {
+    id:4, type:'mc', difficulty:'mid',
+    question:'스페이스X가 적자 기업임에도 무난하게 상장될 수 있었던 이유로, 안에서 돈을 잘 버는 사업으로 언급된 것은?',
+    options:['테슬라','스타링크','솔라시티','보링컴퍼니'],
+    answer:1,
+    explanation:'스페이스X는 신주 발행이 약 4%로 적었고(보통 15~20%), 적자 기업이지만 안에서 돈을 계속 잘 버는 &lsquo;스타링크&rsquo;를 보유해 무난히 상장됐다고 설명했습니다.',
+    source:'&ldquo;스페이스X 자체는 적자 기업이에요. 그런데 그 안에서 돈을 계속해서 잘 버는 스타링크를 가지고 있죠&rdquo;'
+  },
+  {
+    id:5, type:'sa', difficulty:'mid',
+    question:'시장의 체력을 재는 &lsquo;온도계&rsquo;로 추천된, 티커가 &lsquo;IPO&rsquo;인 미국 상장 상품의 이름은? (예: OOO ETF)',
+    answer:['ipo etf','ipoetf','아이피오 etf','아이피오etf','ipo 이티에프','ipo etf(상장지수펀드)'],
+    explanation:'박사는 티커가 IPO인 &lsquo;IPO ETF&rsquo;를 추천했습니다. 매매용이 아니라, 주가지수는 그럭저럭 가는데 이 ETF가 힘이 없다면 시장이 원활하지 않다는 조기 신호로 활용하라는 뜻입니다.',
+    source:'&ldquo;IPO ETF… 티커가 IPO예요… 이게 잘 가고 있는지 아니면 매가리 없이 흘러내리고 있는지 체크&rdquo;'
+  },
+  {
+    id:6, type:'mc', difficulty:'hard',
+    question:'1929~2019년 약 100년간 미국 시장을 분석했을 때, 전체 부의 상당 부분을 가져간 종목은 평균 몇 개였나요?',
+    options:['약 50개','약 20개','약 5개','약 100개'],
+    answer:2,
+    explanation:'약 100년간 평균 단 5개 종목이 부의 상당 부분을 가져갔습니다. 미국 시장 전체 4~6천 개 종목 중 5개, 즉 약 0.1%에 불과합니다. 그래서 &lsquo;쏠림은 시장의 기본값&rsquo;이라고 설명했습니다.',
+    source:'&ldquo;무려 90년 동안 평균적으로 단 5개의 종목… 한 5천 개 종목이라고 치면 0.1%&rdquo;'
+  },
+  {
+    id:7, type:'sa', difficulty:'mid',
+    question:'한국이 AI 하드웨어에서 &lsquo;병목을 틀어쥔 수문장&rsquo;으로 표현된 핵심 메모리의 약자(영문 3글자)는?',
+    answer:['hbm','에이치비엠'],
+    explanation:'박사는 한국이 AI 하드웨어의 병목을 쥔 수문장이라며, 그 핵심으로 HBM(고대역폭 메모리)과 전력을 꼽았습니다. 지금은 모델 성능보다 병목을 넓혀 빠르게 계산해주는 것이 더 중요하다는 맥락입니다.',
+    source:'&ldquo;우리는 굳이 말하자면 AI의 하드웨어를 담당… HBM 플러스 전력까지. 한국은 AI 하드웨어의 병목을 탁 틀어 쥐고 있는 그런 수문장&rdquo;'
+  },
+  {
+    id:8, type:'mc', difficulty:'mid',
+    question:'닷컴 붐 대장주였던 시스코는 주가 고점(2000년 3월) 대비 크게 하락한 뒤에도 약 몇 분기 동안 영업이익이 오히려 더 늘었나요?',
+    options:['약 3개 분기','약 10개 분기','즉시 감소했다','약 20개 분기'],
+    answer:0,
+    explanation:'시스코는 주가가 고점 대비 80~90% 하락한 뒤에도 약 3개 분기 동안 영업이익이 더 늘었습니다. 좋은 기업과 좋은 주식은 다르다는 점, 그리고 AI 랠리도 쉬어가는 국면이 온다는 점을 보여주는 사례입니다.',
+    source:'&ldquo;주가가 막 고점 대비 한 80~90% 하락하고 나서도 한 3개 분기 동안 시스코의 영업이익은 더 늘어났어요&rdquo;'
+  },
+  {
+    id:9, type:'sa', difficulty:'hard',
+    question:'김효진 박사가 2007년 처음 접했고, &ldquo;규모가 작아 괜찮다&rdquo;는 중론을 따랐다가 큰 실패로 이어진 미국 금융 상품의 이름은?',
+    answer:['서브프라임 모기지','서브프라임모기지','서브프라임','subprime','subprime mortgage','sub prime'],
+    explanation:'2007년 박사는 서브프라임 모기지를 처음 접했고, GDP의 1%도 안 돼 괜찮다는 중론을 따라 &lsquo;괜찮다&rsquo;는 보고서를 썼습니다. 그러나 약 1년 뒤 주가지수는 50% 하락했고, 이는 &lsquo;펀더멘탈과 전체 경제를 봐야 한다&rsquo;는 교훈으로 이어졌습니다.',
+    source:'&ldquo;2007년도에 제가 서브프라임 모기지라는 단어를 처음 알았어요… 그냥 괜찮다라는 식으로 보고서를 썼었던 것 같아요&rdquo;'
+  },
+  {
+    id:10, type:'mc', difficulty:'easy',
+    question:'삼성전자와 하이닉스 두 종목이 한국 전체 시가총액에서 차지하는 비중은 약 얼마로 언급됐나요?',
+    options:['약 25%','약 40%','약 55%','약 80%'],
+    answer:2,
+    explanation:'두 종목이 전체 시총의 약 55%를 차지합니다. 다만 이는 글로벌을 상대하는 대형주 때문으로, 수출국 한국은 &lsquo;작은 연못에 고래&rsquo;가 사는 구조라 쏠림이 심해 보인다고 설명했습니다.',
+    source:'&ldquo;이 숫자로 보는 두 종목이 전체 시가총액에서 55% 정도 차지하는데&rdquo;'
+  }
+];
+
+/* ==================== STATE ==================== */
+let state = { solved:0, correct:0, done:new Set() };
+const root = document.getElementById('quiz-root');
+
+const DIFF = {easy:['easy','쉬움'], mid:['mid','보통'], hard:['hard','어려움']};
+const TYPE = {mc:'객관식', ox:'O X', sa:'단답형'};
+
+function normalize(s){
+  return (s||'').toString().trim().toLowerCase().replace(/\s+/g,' ').replace(/\s/g,'');
+}
+
+/* ==================== RENDER ==================== */
+function render(){
+  root.innerHTML='';
+  QUIZ_DATA.forEach(q=>{
+    const card=document.createElement('div');
+    card.className='q-card';
+    card.id='card-'+q.id;
+
+    const dcls=DIFF[q.difficulty][0], dlbl=DIFF[q.difficulty][1];
+    let inner=`
+      <div class="q-top">
+        <span class="q-no">${q.id<10?'0'+q.id:q.id}</span>
+        <span class="badge type">${TYPE[q.type]}</span>
+        <span class="badge ${dcls}">${dlbl}</span>
+      </div>
+      <div class="q-text">${q.question}</div>`;
+
+    if(q.type==='mc'){
+      inner+='<div class="opts">';
+      const letters=['A','B','C','D'];
+      q.options.forEach((o,i)=>{
+        inner+=`<button class="opt" data-i="${i}"><span class="mark">${letters[i]}</span>${o}<span class="tag"></span></button>`;
+      });
+      inner+='</div>';
+    } else if(q.type==='ox'){
+      inner+=`<div class="ox-row">
+        <button class="ox-btn" data-v="O">O</button>
+        <button class="ox-btn" data-v="X">X</button>
+      </div>`;
+    } else if(q.type==='sa'){
+      inner+=`<div class="sa-row">
+        <input type="text" class="sa-input" placeholder="정답을 입력하세요">
+        <button class="sa-btn">제출</button>
+      </div>
+      <div class="sa-fb"></div>`;
+    }
+
+    inner+=`<div class="exp"><div class="exp-in">
+        <div class="h">💡 해설</div>
+        <p>${q.explanation}</p>
+        <div class="src"><b>원본 근거</b> · ${q.source}</div>
+      </div></div>`;
+
+    card.innerHTML=inner;
+    root.appendChild(card);
+    bind(card,q);
+  });
+}
+
+/* ==================== BIND EVENTS ==================== */
+function bind(card,q){
+  const exp=card.querySelector('.exp');
+
+  if(q.type==='mc'){
+    const opts=card.querySelectorAll('.opt');
+    opts.forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        if(state.done.has(q.id)) return;
+        const chosen=+btn.getAttribute('data-i');
+        const isRight=chosen===q.answer;
+        opts.forEach((b,i)=>{
+          b.disabled=true;
+          if(i===q.answer){ b.classList.add('correct'); b.querySelector('.tag').textContent='✓ 정답'; }
+        });
+        if(!isRight){ btn.classList.add('wrong'); btn.querySelector('.tag').textContent='✗ 오답'; }
+        finalize(q,isRight,exp);
+      });
+    });
+  }
+
+  else if(q.type==='ox'){
+    const btns=card.querySelectorAll('.ox-btn');
+    btns.forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        if(state.done.has(q.id)) return;
+        const v=btn.getAttribute('data-v');
+        const isRight=v===q.answer;
+        btns.forEach(b=>{
+          b.disabled=true;
+          if(b.getAttribute('data-v')===q.answer) b.classList.add('correct');
+        });
+        if(!isRight) btn.classList.add('wrong');
+        finalize(q,isRight,exp);
+      });
+    });
+  }
+
+  else if(q.type==='sa'){
+    const input=card.querySelector('.sa-input');
+    const sbtn=card.querySelector('.sa-btn');
+    const fb=card.querySelector('.sa-fb');
+    const submit=()=>{
+      if(state.done.has(q.id)) return;
+      const val=normalize(input.value);
+      if(!val){ input.focus(); return; }
+      const accepted=q.answer.map(normalize);
+      const isRight=accepted.includes(val);
+      input.disabled=true; sbtn.disabled=true;
+      if(isRight){ fb.className='sa-fb correct'; fb.textContent='✓ 정답입니다!'; }
+      else{ fb.className='sa-fb wrong'; fb.textContent='✗ 오답 · 정답: '+q.answer[0]; }
+      finalize(q,isRight,exp);
+    };
+    sbtn.addEventListener('click',submit);
+    input.addEventListener('keydown',e=>{ if(e.key==='Enter') submit(); });
+  }
+}
+
+/* ==================== FINALIZE (grade + scoreboard) ==================== */
+function finalize(q,isRight,exp){
+  state.done.add(q.id);
+  state.solved++;
+  if(isRight) state.correct++;
+  exp.classList.add('open');
+  updateScore();
+  if(state.solved===QUIZ_DATA.length){
+    setTimeout(showResult, 650);
+  }
+}
+
+function updateScore(){
+  document.getElementById('sc-solved').textContent=state.solved+' / '+QUIZ_DATA.length;
+  document.getElementById('sc-correct').textContent=state.correct;
+  const rate=state.solved? Math.round(state.correct/state.solved*100):0;
+  document.getElementById('sc-rate').textContent=rate+'%';
+  const fill=document.getElementById('sc-fill');
+  fill.style.width=(state.solved/QUIZ_DATA.length*100)+'%';
+  let color='#dc2626';
+  if(rate>=70) color='#16a34a';
+  else if(rate>=40) color='#f59e0b';
+  fill.style.background=color;
+}
+
+/* ==================== RESULT MODAL ==================== */
+function showResult(){
+  const total=QUIZ_DATA.length;
+  const c=state.correct;
+  const pct=Math.round(c/total*100);
+  let grade,msg;
+  if(pct>=90){grade='A'; msg='탁월합니다! 고점을 가려내는 핵심 논리를 완벽히 이해하셨네요.';}
+  else if(pct>=70){grade='B'; msg='훌륭합니다. 대부분의 개념을 잘 파악하셨어요. 틀린 부분만 다시 짚어보세요.';}
+  else if(pct>=50){grade='C'; msg='절반은 맞히셨어요. 해설을 다시 읽으며 IPO·쏠림·분할매도 개념을 복습해 보세요.';}
+  else {grade='D'; msg='아직 어렵게 느껴지시죠? 리포트와 해설을 함께 보며 한 번 더 도전해 보세요.';}
+  document.getElementById('m-grade').textContent=grade;
+  document.getElementById('m-score').textContent=total+'문제 중 '+c+'개 정답 ('+pct+'%)';
+  document.getElementById('m-msg').textContent=msg;
+  document.getElementById('overlay').classList.add('show');
+}
+
+document.getElementById('m-retry').addEventListener('click',()=>{
+  state={solved:0, correct:0, done:new Set()};
+  document.getElementById('overlay').classList.remove('show');
+  updateScore();
+  render();
+  window.scrollTo({top:0, behavior:'smooth'});
+});
+
+/* ==================== INIT ==================== */
+render();
+updateScore();
+</script>
+</body>
+</html>

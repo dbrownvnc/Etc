@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>반도체 하락 신호 — 이해도 확인 퀴즈 | 신영증권 김효진 박사</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,500&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#ffffff; --bg2:#fafafa; --text:#1a1a1a; --text2:#777777;
+    --accent:#e11d48; --accent2:#f43f5e; --border:#e5e5e5;
+    --ok:#15803d; --okbg:#e8f5e9; --okbd:#a5d6a7;
+    --no:#e11d48; --nobg:#fdecef; --nobd:#f5b6c3;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Noto Sans KR',sans-serif;background:var(--bg2);color:var(--text);line-height:1.7;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:680px;margin:0 auto;background:var(--bg);min-height:100vh}
+
+  /* header */
+  .head{padding:40px 22px 26px;border-bottom:2px solid var(--text)}
+  .head .kick{font-family:'Playfair Display',serif;font-style:italic;color:var(--accent);font-size:14px;margin-bottom:10px}
+  .head h1{font-family:'Playfair Display','Noto Sans KR',serif;font-weight:900;font-size:26px;line-height:1.3;letter-spacing:-.3px}
+  .head p{font-size:13.5px;color:var(--text2);margin-top:10px}
+
+  /* sticky scoreboard */
+  .score{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.96);backdrop-filter:blur(6px);border-bottom:1px solid var(--border);padding:12px 22px}
+  .score-row{display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:700;margin-bottom:8px}
+  .score-row .s-item span{color:var(--accent);font-family:'Playfair Display',serif;font-size:16px}
+  .bar{height:8px;background:#eee;border-radius:5px;overflow:hidden}
+  .bar-fill{height:100%;width:0;background:var(--accent);border-radius:5px;transition:width .4s ease,background .4s ease}
+
+  /* quiz list */
+  .list{padding:20px 22px 40px}
+  .q{background:var(--bg);border:1px solid var(--border);border-radius:14px;padding:22px 20px;margin-bottom:18px;box-shadow:0 1px 3px rgba(0,0,0,.03)}
+  .q-top{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+  .q-no{font-family:'Playfair Display',serif;font-weight:900;font-size:22px;color:var(--accent)}
+  .badge{font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px}
+  .b-type{background:#f0f0f0;color:#555}
+  .b-easy{background:#e8f5e9;color:#15803d}
+  .b-mid{background:#fff4e5;color:#c47d18}
+  .b-hard{background:#fdecef;color:#e11d48}
+  .q-text{font-size:16px;font-weight:500;line-height:1.55;margin-bottom:16px;letter-spacing:-.2px}
+
+  /* options */
+  .opts{display:flex;flex-direction:column;gap:9px}
+  .opt{text-align:left;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;padding:13px 15px;font-size:14.5px;font-family:inherit;cursor:pointer;transition:.15s;display:flex;align-items:center;gap:10px;color:var(--text)}
+  .opt:hover:not(:disabled){border-color:var(--accent);background:#fff5f7}
+  .opt:disabled{cursor:default}
+  .opt .mk{width:24px;height:24px;border-radius:50%;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;color:var(--text2)}
+  .opt.correct{background:var(--okbg);border-color:var(--okbd)}
+  .opt.correct .mk{background:var(--ok);border-color:var(--ok);color:#fff}
+  .opt.wrong{background:var(--nobg);border-color:var(--nobd)}
+  .opt.wrong .mk{background:var(--no);border-color:var(--no);color:#fff}
+  .rbadge{margin-left:auto;font-size:11.5px;font-weight:700;padding:2px 8px;border-radius:12px}
+  .rbadge.ok{background:var(--ok);color:#fff}
+  .rbadge.no{background:var(--no);color:#fff}
+
+  /* short answer / OX */
+  .short{display:flex;gap:8px}
+  .short input{flex:1;border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;font-size:15px;font-family:inherit;outline:none}
+  .short input:focus{border-color:var(--accent)}
+  .short input:disabled{background:var(--bg2)}
+  .btn{background:var(--accent);color:#fff;border:none;border-radius:10px;padding:0 18px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;white-space:nowrap}
+  .btn:disabled{opacity:.5;cursor:default}
+  .ox{display:flex;gap:12px}
+  .ox .opt{justify-content:center;font-size:22px;font-weight:900;padding:16px;flex:1}
+
+  /* explanation */
+  .exp{margin-top:14px;max-height:0;overflow:hidden;transition:max-height .4s ease;background:var(--bg2);border-radius:10px}
+  .exp.show{max-height:600px}
+  .exp-in{padding:16px 16px}
+  .exp-h{font-size:13px;font-weight:700;color:var(--accent);margin-bottom:6px;display:flex;align-items:center;gap:6px}
+  .exp-tx{font-size:13.5px;color:#444;line-height:1.65}
+  .exp-tx .src{display:block;margin-top:8px;font-size:12px;color:var(--text2);border-top:1px dashed var(--border);padding-top:8px}
+
+  /* final modal */
+  .overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;z-index:100;padding:24px}
+  .overlay.show{display:flex}
+  .modal{background:#fff;border-radius:20px;max-width:400px;width:100%;padding:34px 26px;text-align:center;animation:pop .3s ease}
+  @keyframes pop{from{transform:scale(.9);opacity:0}to{transform:scale(1);opacity:1}}
+  .modal .grade{font-family:'Playfair Display',serif;font-weight:900;font-size:64px;line-height:1;color:var(--accent)}
+  .modal .sc{font-size:18px;font-weight:700;margin:12px 0 4px}
+  .modal .msg{font-size:14px;color:var(--text2);margin:12px 0 22px;line-height:1.6}
+  .modal .again{background:var(--accent);color:#fff;border:none;border-radius:30px;padding:13px 30px;font-size:15px;font-weight:700;font-family:inherit;cursor:pointer}
+  .modal .ring{position:relative;width:140px;height:140px;margin:0 auto 8px}
+
+  .foot{padding:20px 22px 40px;font-size:11.5px;color:var(--text2);line-height:1.6;text-align:center;border-top:1px solid var(--border)}
+  @media(max-width:400px){.head h1{font-size:22px}.q-text{font-size:15px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="head">
+    <div class="kick">Comprehension Quiz · 언더스탠딩 × 신영증권</div>
+    <h1>반도체 하락 신호 — 이해도 확인 10문제</h1>
+    <p>주도주의 생애주기(등장·쏠림·붕괴)와 약세장 신호를 얼마나 이해했는지 확인해 보세요. 보기를 누르면 즉시 채점되고 해설이 펼쳐집니다.</p>
+  </header>
+
+  <div class="score">
+    <div class="score-row">
+      <div class="s-item">푼 문제 <span id="sSolved">0</span> / 10</div>
+      <div class="s-item">맞힘 <span id="sCorrect">0</span></div>
+      <div class="s-item">정답률 <span id="sRate">0</span>%</div>
+    </div>
+    <div class="bar"><div class="bar-fill" id="barFill"></div></div>
+  </div>
+
+  <div class="list" id="quizList"></div>
+
+  <div class="foot">
+    본 퀴즈는 언더스탠딩 방송(신영증권 김효진 박사, 2026.07.06 녹화) 내용을 바탕으로 제작된 학습 자료입니다.<br>모든 문제는 방송에서 실제 언급된 내용에 근거합니다.
+  </div>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <svg class="ring" viewBox="0 0 120 120">
+      <circle cx="60" cy="60" r="52" fill="none" stroke="#eee" stroke-width="10"/>
+      <circle id="ringFg" cx="60" cy="60" r="52" fill="none" stroke="#e11d48" stroke-width="10"
+        stroke-linecap="round" stroke-dasharray="326.7" stroke-dashoffset="326.7"
+        transform="rotate(-90 60 60)" style="transition:stroke-dashoffset 1s ease"/>
+    </svg>
+    <div class="grade" id="mGrade">A</div>
+    <div class="sc" id="mScore">10 / 10 정답</div>
+    <div class="msg" id="mMsg"></div>
+    <button class="again" id="againBtn">↺ 다시 풀기</button>
+  </div>
+</div>
+
+<script>
+const QUIZ_DATA=[
+  {
+    id:1, type:'mc', difficulty:'쉬움',
+    question:"김효진 박사가 정리한 '주도주의 생애주기' 3단계 순서로 옳은 것은?",
+    options:["붕괴 → 등장 → 쏠림","등장 → 쏠림 → 붕괴","쏠림 → 등장 → 붕괴","등장 → 붕괴 → 쏠림"],
+    answer:1,
+    explanation:"방송에서는 주도주가 '등장 → (주도주로의) 쏠림 → 붕괴'라는 세 흐름을 밟는다고 설명했습니다. 지금 어디쯤 서 있는지 알려면 이 순서대로 봐야 한다는 것이 강연의 뼈대입니다."
+  },
+  {
+    id:2, type:'mc', difficulty:'보통',
+    question:"베셈바인더 연구(1929~2019, 약 100년)에서, 미국 시장이 창출한 부의 '10%'를 만든 종목은 평균 몇 개였나?",
+    options:["약 2개","약 5개","약 18개","약 83개"],
+    answer:1,
+    explanation:"100년 평균으로 단 5개 종목(약 0.12%)이 창출된 부의 10%를 가져갔습니다. '약 2개'는 2019년 한 해만 끊어 본 수치(0.04%)이고, 약 83개는 부의 절반(50%)을 만든 상위 2% 수준입니다."
+  },
+  {
+    id:3, type:'mc', difficulty:'쉬움',
+    question:"국가별 시총 집중도에서 '삼성전자+SK하이닉스' 두 종목이 차지하는 한국의 비중은?",
+    options:["32%","44%","56%","70%"],
+    answer:2,
+    explanation:"한국은 두 종목으로 56%를 차지해, 단일 챔피언이던 핀란드 노키아(70%) 다음으로 높았습니다. 44%는 대만 TSMC, 32%는 미국 정보기술 섹터 수준입니다."
+  },
+  {
+    id:4, type:'mc', difficulty:'보통',
+    question:"김 박사가 2000년 닷컴 붕괴의 '결정타'로 지목한 요인은?",
+    options:["이전 고점(5.5%)을 넘어선 금리 '긴축'","기준금리 대폭 인하","원자재 가격 급락","신흥국의 대규모 외환위기"],
+    answer:0,
+    explanation:"금리를 올리는 초반엔 오히려 주가가 더 올랐지만, 이전 고점(5.5%)을 넘어 6.5%까지 '긴축'으로 넘어가자 주가가 급락했습니다. '정상화'까지는 견디지만 그 선을 넘어선 '긴축'이 방아쇠가 된다는 것이 핵심입니다."
+  },
+  {
+    id:5, type:'mc', difficulty:'쉬움',
+    question:"김 박사가 약세장 전환의 '카나리아'로 요즘 가장 열심히 보는 증시는?",
+    options:["미국 나스닥","유럽 증시","일본 닛케이","인도 증시"],
+    answer:1,
+    explanation:"유럽은 이렇다 할 AI 기업이 없는데도 증시 대부분이 플러스입니다. 그 돈마저 나스닥으로 옮겨가며 유럽이 마이너스로 돌면, 글로벌 자금 압착이 끝단계라는 '카나리아' 신호로 본다고 했습니다."
+  },
+  {
+    id:6, type:'mc', difficulty:'어려움',
+    question:"주도업종 교체 빈도 분석에서 '연속 1위 비율'은 미국(GICS)과 한국(WICS)이 각각 얼마였나?",
+    options:["미국 3.8% · 한국 22.2%","미국 22.2% · 한국 3.8%","미국 15.2% · 한국 6.5%","미국 6.7% · 한국 13.3%"],
+    answer:1,
+    explanation:"미국(GICS)은 22.2%, 한국(WICS)은 3.8%였습니다. 미국은 올해 1등 업종이 내년에도 1등일 확률이 높지만, 한국은 거의 매년 갈리기 때문에 '올해 좋았으니 사놓자'가 통하지 않는다는 근거입니다."
+  },
+  {
+    id:7, type:'sa', difficulty:'보통',
+    question:"김 박사는 한국 증시를 작은 연못에 사는 '○○'에 비유했다. ○○에 들어갈 두 글자는?",
+    answer:["고래"],
+    explanation:"세계의 4~5% 규모인 작은 연못에 삼성전자·SK하이닉스 같은 '고래'가 헤엄치면 물이 이리저리 튀듯 시장이 요동친다는 비유였습니다."
+  },
+  {
+    id:8, type:'sa', difficulty:'어려움',
+    question:"IPO를 '양이 아니라 질'로 읽을 때, 신주 발행 비율과 함께 봐야 할 핵심 지표는 '○○ 기업 비중'이다. ○○는? (두 글자)",
+    answer:["적자"],
+    explanation:"적자 기업 비중은 평시 20~40%에서 과열기 80% 안팎까지 치솟습니다(Jay Ritter). 이익 없는 회사가 대거 상장한다는 것은 위험 인식이 무뎌졌다는 가장 직접적인 신호로 봅니다."
+  },
+  {
+    id:9, type:'sa', difficulty:'보통',
+    question:"베셈바인더 논문이 '개인에게 유리하다'며 사실상 예찬한 투자 방식은? (영문 3글자)",
+    answer:["ETF","etf"],
+    explanation:"소수의 대박 종목을 콕 집을 확률이 극히 낮으니, 시장 전체를 담는 ETF가 개인의 자산 증식에 낫다는 것이 이 논문의 메인 논지였습니다. 2020년 발표 후 ETF 시장이 급성장했습니다."
+  },
+  {
+    id:10, type:'ox', difficulty:'보통',
+    question:"김 박사는 '이번에도 연준 풋(연준의 시장 구제)이 쉽게 나올 것'이라고 확신했다.",
+    answer:"X",
+    explanation:"오답입니다. 연준 풋은 주가가 50% 하락할 때에나 나왔고(2008년 S&P500 -50%), 대차대조표 축소를 강조하는 케빈 워시 의장과 국채 가격을 지키려는 채권시장 때문에 이번엔 다를 수 있다고 봤습니다."
+  }
+];
+
+let state={solved:0, correct:0};
+const answered=new Set();
+
+const diffClass={'쉬움':'b-easy','보통':'b-mid','어려움':'b-hard'};
+const typeLabel={mc:'객관식', sa:'단답형', ox:'OX'};
+
+const list=document.getElementById('quizList');
+
+QUIZ_DATA.forEach((q)=>{
+  const card=document.createElement('div');
+  card.className='q'; card.id='q'+q.id;
+  let inner=`<div class="q-top">
+      <span class="q-no">${q.id}</span>
+      <span class="badge b-type">${typeLabel[q.type]}</span>
+      <span class="badge ${diffClass[q.difficulty]}">${q.difficulty}</span>
+    </div>
+    <div class="q-text">${q.question}</div>`;
+
+  if(q.type==='mc'){
+    inner+=`<div class="opts">`;
+    q.options.forEach((o,i)=>{
+      inner+=`<button class="opt" data-i="${i}"><span class="mk">${String.fromCharCode(65+i)}</span>${o}</button>`;
+    });
+    inner+=`</div>`;
+  } else if(q.type==='ox'){
+    inner+=`<div class="ox">
+      <button class="opt" data-v="O"><span class="mk">O</span>O</button>
+      <button class="opt" data-v="X"><span class="mk">X</span>X</button>
+    </div>`;
+  } else { // sa
+    inner+=`<div class="short">
+      <input type="text" placeholder="정답 입력 후 제출" data-in="${q.id}">
+      <button class="btn" data-sub="${q.id}">제출</button>
+    </div>`;
+  }
+  inner+=`<div class="exp" id="exp${q.id}"><div class="exp-in">
+      <div class="exp-h">💡 해설</div>
+      <div class="exp-tx">${q.explanation}</div>
+    </div></div>`;
+  card.innerHTML=inner;
+  list.appendChild(card);
+
+  // bind
+  if(q.type==='mc'){
+    card.querySelectorAll('.opt').forEach(btn=>{
+      btn.addEventListener('click',()=>gradeMC(q,card,+btn.dataset.i));
+    });
+  } else if(q.type==='ox'){
+    card.querySelectorAll('.opt').forEach(btn=>{
+      btn.addEventListener('click',()=>gradeOX(q,card,btn.dataset.v));
+    });
+  } else {
+    const inp=card.querySelector('input');
+    const sub=card.querySelector('button');
+    const go=()=>gradeSA(q,card,inp.value);
+    sub.addEventListener('click',go);
+    inp.addEventListener('keydown',e=>{if(e.key==='Enter')go();});
+  }
+});
+
+function lock(card){ card.querySelectorAll('button,input').forEach(el=>el.disabled=true); }
+function showExp(q){ document.getElementById('exp'+q.id).classList.add('show'); }
+
+function tallies(isCorrect){
+  state.solved++; if(isCorrect) state.correct++;
+  document.getElementById('sSolved').textContent=state.solved;
+  document.getElementById('sCorrect').textContent=state.correct;
+  const rate=state.solved?Math.round(state.correct/state.solved*100):0;
+  document.getElementById('sRate').textContent=rate;
+  const fill=document.getElementById('barFill');
+  fill.style.width=(state.solved*10)+'%';
+  let col='#e11d48';
+  if(rate>=70) col='#22c55e'; else if(rate>=40) col='#f59e0b';
+  fill.style.background=col;
+  if(state.solved===QUIZ_DATA.length) setTimeout(finish,450);
+}
+
+function gradeMC(q,card,pick){
+  if(answered.has(q.id)) return; answered.add(q.id);
+  const opts=card.querySelectorAll('.opt');
+  const isCorrect=pick===q.answer;
+  opts[q.answer].classList.add('correct');
+  opts[q.answer].insertAdjacentHTML('beforeend','<span class="rbadge ok">✓ 정답</span>');
+  if(!isCorrect){
+    opts[pick].classList.add('wrong');
+    opts[pick].insertAdjacentHTML('beforeend','<span class="rbadge no">✗ 오답</span>');
+  }
+  lock(card); showExp(q); tallies(isCorrect);
+}
+
+function gradeOX(q,card,val){
+  if(answered.has(q.id)) return; answered.add(q.id);
+  const opts=card.querySelectorAll('.opt');
+  const isCorrect=val===q.answer;
+  const correctBtn=[...opts].find(b=>b.dataset.v===q.answer);
+  const pickBtn=[...opts].find(b=>b.dataset.v===val);
+  correctBtn.classList.add('correct');
+  correctBtn.insertAdjacentHTML('beforeend','<span class="rbadge ok">✓ 정답</span>');
+  if(!isCorrect){
+    pickBtn.classList.add('wrong');
+    pickBtn.insertAdjacentHTML('beforeend','<span class="rbadge no">✗ 오답</span>');
+  }
+  lock(card); showExp(q); tallies(isCorrect);
+}
+
+function gradeSA(q,card,raw){
+  if(answered.has(q.id)) return;
+  const val=(raw||'').trim();
+  if(!val){ card.querySelector('input').focus(); return; }
+  answered.add(q.id);
+  const norm=s=>s.replace(/\s+/g,'').toLowerCase();
+  const isCorrect=q.answer.some(a=>norm(a)===norm(val));
+  const inp=card.querySelector('input');
+  inp.style.borderColor=isCorrect?'var(--ok)':'var(--no)';
+  inp.style.background=isCorrect?'var(--okbg)':'var(--nobg)';
+  const badge=document.createElement('div');
+  badge.style.cssText='margin-top:10px;font-size:13.5px;font-weight:700;color:'+(isCorrect?'var(--ok)':'var(--no)');
+  badge.innerHTML=isCorrect?'✓ 정답!':('✗ 오답 — 정답: <b>'+q.answer[0]+'</b>');
+  card.querySelector('.short').after(badge);
+  lock(card); showExp(q); tallies(isCorrect);
+}
+
+function finish(){
+  const total=QUIZ_DATA.length, c=state.correct;
+  const pct=Math.round(c/total*100);
+  let grade='D', msg='';
+  if(pct>=90){grade='A'; msg='탁월합니다! 주도주의 생애주기와 약세장 신호를 완벽히 이해하셨네요.';}
+  else if(pct>=70){grade='B'; msg='잘하셨어요! 핵심 흐름은 확실히 잡으셨습니다. 틀린 문제 해설만 다시 보세요.';}
+  else if(pct>=50){grade='C'; msg='절반은 맞히셨네요. 리포트의 쏠림·금리·신호 파트를 한 번 더 읽어보면 좋아요.';}
+  else {grade='D'; msg='아직 헷갈리는 부분이 있네요. 해설을 천천히 읽고 다시 도전해 보세요!';}
+  document.getElementById('mGrade').textContent=grade;
+  document.getElementById('mScore').textContent=c+' / '+total+' 정답 ('+pct+'%)';
+  document.getElementById('mMsg').textContent=msg;
+  const ring=document.getElementById('ringFg');
+  const circ=326.7;
+  ring.style.strokeDashoffset=circ*(1-pct/100);
+  ring.style.stroke = pct>=70?'#22c55e':(pct>=40?'#f59e0b':'#e11d48');
+  document.getElementById('overlay').classList.add('show');
+}
+
+document.getElementById('againBtn').addEventListener('click',()=>location.reload());
+</script>
+</body>
+</html>

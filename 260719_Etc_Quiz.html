@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>키미 K3 · 미중 AI 패권 — 이해도 퀴즈 (10문제)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,500&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#ffffff; --bg2:#fafafa;
+    --ink:#1a1a1a; --sub:#777777;
+    --accent:#e11d48; --accent2:#f43f5e;
+    --line:#e5e5e5;
+    --ok:#15803d; --okbg:#dcfce7;
+    --no:#b91c1c; --nobg:#fee2e2;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{
+    background:var(--bg2); color:var(--ink);
+    font-family:'Noto Sans KR',sans-serif; line-height:1.7;
+    -webkit-font-smoothing:antialiased; font-size:16px;
+  }
+  .wrap{max-width:680px; margin:0 auto; background:var(--bg); min-height:100vh}
+
+  /* header */
+  .head{padding:44px 22px 26px; border-bottom:2px solid var(--ink)}
+  .eyebrow{font-size:12px; letter-spacing:.22em; text-transform:uppercase; color:var(--accent); font-weight:700; margin-bottom:14px}
+  h1{font-family:'Playfair Display',serif; font-weight:900; font-size:30px; line-height:1.15; margin-bottom:10px}
+  .head p{font-size:14px; color:var(--sub)}
+
+  /* sticky scoreboard */
+  .score{
+    position:sticky; top:0; z-index:20;
+    background:rgba(255,255,255,.96); backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line); padding:12px 22px;
+  }
+  .scorerow{display:flex; justify-content:space-between; align-items:center; font-size:13px; margin-bottom:8px}
+  .scorerow .item b{font-family:'Playfair Display',serif; font-size:18px; color:var(--ink)}
+  .scorerow .item.acc b{color:var(--accent)}
+  .scorerow .item span{color:var(--sub); margin-left:3px}
+  .bar{height:7px; background:var(--line); border-radius:4px; overflow:hidden}
+  .bar > i{display:block; height:100%; width:0; background:var(--no); border-radius:4px; transition:width .4s ease, background .4s ease}
+
+  /* questions */
+  .qlist{padding:20px 22px 40px}
+  .card{border:1px solid var(--line); border-radius:10px; padding:20px 18px; margin-bottom:20px; background:#fff}
+  .qtop{display:flex; align-items:center; gap:8px; margin-bottom:12px}
+  .qno{font-family:'Playfair Display',serif; font-weight:700; color:var(--accent); font-size:16px}
+  .badge{font-size:11px; padding:3px 9px; border-radius:20px; font-weight:500; letter-spacing:.02em}
+  .b-type{background:#f3f4f6; color:#555}
+  .b-e{background:#dcfce7; color:#15803d}
+  .b-m{background:#fef9c3; color:#a16207}
+  .b-h{background:#fee2e2; color:#b91c1c}
+  .qtext{font-size:16.5px; font-weight:500; line-height:1.6; margin-bottom:16px}
+
+  /* options */
+  .opts{display:flex; flex-direction:column; gap:9px}
+  .opt{
+    display:flex; align-items:center; gap:11px; text-align:left;
+    padding:13px 14px; border:1.5px solid var(--line); border-radius:8px;
+    background:#fff; font-family:inherit; font-size:14.5px; color:var(--ink);
+    cursor:pointer; transition:all .18s ease; width:100%; line-height:1.45;
+  }
+  .opt:hover:not(:disabled){border-color:var(--accent2); background:#fff5f7}
+  .opt:disabled{cursor:default}
+  .opt .mk{
+    flex:0 0 24px; height:24px; border-radius:50%; border:1.5px solid var(--line);
+    display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:var(--sub);
+  }
+  .opt.correct{border-color:var(--ok); background:var(--okbg)}
+  .opt.correct .mk{background:var(--ok); color:#fff; border-color:var(--ok)}
+  .opt.wrong{border-color:var(--no); background:var(--nobg)}
+  .opt.wrong .mk{background:var(--no); color:#fff; border-color:var(--no)}
+  .opt .rb{margin-left:auto; font-size:12px; font-weight:700; padding:2px 8px; border-radius:5px; display:none}
+  .opt.correct .rb{display:inline; background:var(--ok); color:#fff}
+  .opt.wrong .rb{display:inline; background:var(--no); color:#fff}
+
+  /* OX */
+  .ox{display:flex; gap:12px}
+  .ox .opt{justify-content:center; font-size:20px; font-weight:700; padding:18px}
+
+  /* short answer */
+  .sa{display:flex; gap:8px}
+  .sa input{flex:1; padding:13px 14px; border:1.5px solid var(--line); border-radius:8px; font-family:inherit; font-size:15px; outline:none}
+  .sa input:focus{border-color:var(--accent)}
+  .sa button{padding:0 20px; border:none; border-radius:8px; background:var(--ink); color:#fff; font-family:inherit; font-weight:500; font-size:14px; cursor:pointer; transition:background .2s}
+  .sa button:hover{background:var(--accent)}
+  .sa input:disabled, .sa button:disabled{opacity:.6; cursor:default}
+  .sa-result{font-size:13px; margin-top:9px; font-weight:500; display:none}
+
+  /* explanation */
+  .exp{
+    max-height:0; overflow:hidden; opacity:0;
+    transition:max-height .4s ease, opacity .3s ease, margin .3s ease, padding .3s;
+    background:var(--bg2); border-radius:8px; border-left:3px solid var(--accent);
+    font-size:14px; color:#444;
+  }
+  .exp.show{max-height:400px; opacity:1; margin-top:15px; padding:14px 16px}
+  .exp b{color:var(--accent)}
+  .exp .src{display:block; margin-top:8px; font-size:12.5px; color:var(--sub); font-style:italic}
+
+  /* final modal */
+  .overlay{position:fixed; inset:0; background:rgba(26,26,26,.55); display:none; align-items:center; justify-content:center; padding:24px; z-index:50}
+  .overlay.show{display:flex}
+  .modal{background:#fff; border-radius:16px; max-width:380px; width:100%; padding:34px 26px; text-align:center; box-shadow:0 20px 60px rgba(0,0,0,.3)}
+  .modal .grade{font-family:'Playfair Display',serif; font-weight:900; font-size:64px; line-height:1; color:var(--accent)}
+  .modal .gsub{font-size:13px; color:var(--sub); letter-spacing:.1em; text-transform:uppercase; margin:6px 0 18px}
+  .modal .fscore{font-size:20px; font-weight:700; margin-bottom:6px}
+  .modal .fscore span{color:var(--accent)}
+  .modal .msg{font-size:14px; color:#444; margin-bottom:24px}
+  .modal button{width:100%; padding:14px; border:none; border-radius:8px; background:var(--ink); color:#fff; font-family:inherit; font-weight:500; font-size:15px; cursor:pointer; transition:background .2s}
+  .modal button:hover{background:var(--accent)}
+
+  @media(max-width:520px){h1{font-size:25px} .qtext{font-size:15.5px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="head">
+    <div class="eyebrow">이해도 퀴즈 · 10문제</div>
+    <h1>키미 K3 &amp;<br>미중 AI 패권전쟁</h1>
+    <p>보기를 클릭하면 즉시 채점되고 해설이 열립니다. 원본 자막 내용만으로 출제했습니다.</p>
+  </div>
+
+  <div class="score">
+    <div class="scorerow">
+      <div class="item">푼 문제 <b id="sSolved">0</b><span>/ 10</span></div>
+      <div class="item">맞힌 문제 <b id="sCorrect">0</b></div>
+      <div class="item acc">정답률 <b id="sAcc">0</b><span>%</span></div>
+    </div>
+    <div class="bar"><i id="sBar"></i></div>
+  </div>
+
+  <div class="qlist" id="qlist"></div>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <div class="grade" id="mGrade">A</div>
+    <div class="gsub">Your Grade</div>
+    <div class="fscore">정답 <span id="mCorrect">0</span> / 10</div>
+    <div class="msg" id="mMsg"></div>
+    <button id="mRetry">다시 풀기</button>
+  </div>
+</div>
+
+<script>
+const QUIZ_DATA=[
+  {
+    id:1, type:'mc', difficulty:'쉬움',
+    question:"키미 K3를 오픈 웨이트(핵심 파일 공개)로 발표해 화제가 된 중국 기업은?",
+    options:["문샷 AI (Moonshot AI)","딥시크","알리바바","텐센트"],
+    answer:0,
+    explanation:"키미 K3는 <b>문샷 AI</b>가 만든 프론티어 모델입니다. 문샷 AI는 중국 대형 모델 '4대 천왕' 중 하나로, 2023년 3월 베이징에서 설립됐습니다.",
+    src:"자막: \"중국 문샷 AI의 기미 K3가 1조 파라미터급의 프론티어 성능을 오픈 웨이트로 선언…\""
+  },
+  {
+    id:2, type:'mc', difficulty:'쉬움',
+    question:"'문샷(Moonshot)'이라는 회사 이름의 유래가 된 핑크플로이드 앨범은?",
+    options:["The Wall","Dark Side of the Moon","Wish You Were Here","Animals"],
+    answer:1,
+    explanation:"회사명은 핑크플로이드 앨범 <b>Dark Side of the Moon</b>에서 따왔습니다. 서구 문화에 영향받은 뒤 중국으로 돌아온 천재의 전형적 모습을 보여주는 대목입니다.",
+    src:"자막: \"문샷이라는 이 명칭은 핑크플로이드 앨범 Dark Side of the Moon에서 따온 겁니다.\""
+  },
+  {
+    id:3, type:'ox', difficulty:'쉬움',
+    question:"원본에 따르면, 키미 K3는 앤스로픽의 핵심 경쟁력 '전체'를 완전히 추월했다.",
+    answer:"X",
+    explanation:"틀립니다. 원본은 키미 K3가 <b>특정 과목(예: 프론트엔드 코드)의 성적을 앞지른 것</b>이지, 앤스로픽의 핵심 경쟁력 전체를 추월한 것은 아니라고 분명히 말합니다.",
+    src:"자막: \"특정 과목 성적을 앞지른 것이지 앤스로픽의 핵심 경쟁력 전체를 추월한 것은 아니다.\""
+  },
+  {
+    id:4, type:'mc', difficulty:'보통',
+    question:"중국 모델이 특정 영역에서 강한 힘을 내는 데 쓰는, 큰 모델의 지식을 작은 모델로 '복사'하는 기술은?",
+    options:["양자 보안","파운드리","증류(distillation)","오픈 웨이트"],
+    answer:2,
+    explanation:"정답은 <b>증류(distillation)</b>입니다. 큰 원본 모델을 만들어 놓고 거기서 지식을 복사해 최적화하는 기술로, 테슬라도 FSD 라이트 모델에서 사용했다고 언급됩니다. 중국이 이 기술의 1인자로 꼽힙니다.",
+    src:"자막: \"이걸 일종의 증류라는 기술을 쓰는 건데… 이 증류 기술의 1인자들이 중국입니다.\""
+  },
+  {
+    id:5, type:'sa', difficulty:'보통',
+    question:"문샷 AI의 창업자 CEO 이름은? (인명)",
+    accept:["양즈린","양지린","양즈린ceo","양절이","양재린"],
+    answerText:"양즈린",
+    explanation:"정답은 <b>양즈린</b>(34세)입니다. 칭화대 학사 후 카네기멜론에서 박사를 받았고, 구글 브레인·메타 AI 연구원을 거친 알고리즘 최적화 전문가입니다.",
+    src:"자막: \"창업자 CEO 양즈린이라는 사람은 나이가 34세 정도 되고…\""
+  },
+  {
+    id:6, type:'mc', difficulty:'보통',
+    question:"양즈린의 카네기멜론 박사 지도교수 루슬란 살라쿠드니노프는 딥러닝의 대부 누구의 핵심 제자인가?",
+    options:["얀 르쿤","제프 딘","앤드류 응","제프리 힌튼"],
+    answer:3,
+    explanation:"정답은 <b>제프리 힌튼</b>입니다. 즉 양즈린의 학문적 뿌리가 힌튼과 같습니다. 지도교수는 애플 시리 등의 기술 기반 고도화에도 참여한 인물입니다.",
+    src:"자막: \"지도 교수가 루슬란 살라쿠드니노프… 딥러닝의 대부가 누구입니까? 제프리 힌트죠. 핵심 제자라고 합니다.\""
+  },
+  {
+    id:7, type:'mc', difficulty:'보통',
+    question:"미국(빅테크·정부)이 중국의 오픈 모델 배포를 용인하는 '플라이휠' 논리로 가장 알맞은 것은?",
+    options:[
+      "중국 모델이 미국 소프트웨어를 완전히 대체하기 때문에",
+      "추론·에이전트 수요가 폭발해 결국 미국 GPU·인프라·메모리를 더 사게 되기 때문에",
+      "미국이 중국의 HBM 공급망에 의존하기 때문에",
+      "오픈소스라서 미국이 아무 이득도 얻지 못하기 때문에"
+    ],
+    answer:1,
+    explanation:"정답은 2번입니다. 키미 K3 같은 모델이 AI <b>추론·에이전트 수요를 폭발</b>시키면, 그 수요는 결국 미국의 GPU·인프라를 더 많이 사게 만들고 <b>메모리(HBM)</b>까지 팔리게 하는 선순환(플라이휠)을 만듭니다.",
+    src:"자막: \"AI 추론을 돌리는 수요가 폭발한다… 미국의 GPU와 인프라를 더 많이 사서 써야… 메모리도 팔리게 되겠죠. 이런 구조 플라이휠이 있다.\""
+  },
+  {
+    id:8, type:'sa', difficulty:'보통',
+    question:"시진핑 주석이 사상 처음 직접 기조연설을 한 '2026 세계 AI 대회'가 열린 도시는? (미국은 불참)",
+    accept:["상하이","상해","shanghai"],
+    answerText:"상하이",
+    explanation:"정답은 <b>상하이</b>입니다. 시진핑은 상하이에서 열린 2026 세계 AI 대회 개막식에서 사상 처음으로 직접 기조연설을 했고, 미국은 참여하지 않았습니다.",
+    src:"자막: \"시진핑 주석이 상하에서 열린 2026년 세계 AI 대회… 개막식의 사상 처음으로 직접 등판에 기조연설을 진행했습니다.\""
+  },
+  {
+    id:9, type:'sa', difficulty:'어려움',
+    question:"소프트웨어는 카피되지만, 카피가 안 되기 때문에 미국이 공급망 목줄을 계속 쥘 수 있는 영역은?",
+    accept:["하드웨어","hardware"],
+    answerText:"하드웨어",
+    explanation:"정답은 <b>하드웨어</b>입니다. 소프트웨어는 복제가 가능하지만 하드웨어는 그렇지 않기에, 미국은 반도체 장비·제조·파운드리·HBM 메모리 공급망의 목줄을 계속 쥘 수 있습니다.",
+    src:"자막: \"결국 카피가 안 되는 건 뭐겠습니까? 하드웨어죠… 반도체 장비, 제조, 파운드리, 메모리가 HBM 공급망의 목줄을 계속 쥐게 된다.\""
+  },
+  {
+    id:10, type:'mc', difficulty:'어려움',
+    question:"AI 패권전쟁이 '21세기판 핵무기 경쟁'과 결정적으로 다른 점은?",
+    options:[
+      "AI는 핵무기처럼 서로 절대 쓰지 않는다",
+      "AI는 상호 억제로 균형을 이룬다",
+      "핵무기는 공멸로 향하지만, AI는 실제 생산성으로 승자독식이 가능하다",
+      "AI는 군사력과 전혀 무관하다"
+    ],
+    answer:2,
+    explanation:"정답은 3번입니다. 핵무기는 실제로 쓰이지 않고 공멸로 향하지만, AI는 <b>실제 생산성을 만들고 휴머노이드로 연결</b>되어 완전한 파워·패권, 즉 <b>승자독식</b> 구조를 만든다는 점이 결정적 차이입니다.",
+    src:"자막: \"핵무기는 파멸로 가지만 AI는 완전한 파워 패권을 가지고… 승자독식 구조가 되는 겁니다.\""
+  }
+];
+
+let state={solved:0, correct:0};
+const answered=new Array(QUIZ_DATA.length).fill(false);
+const list=document.getElementById('qlist');
+
+function badgeClass(d){return d==='쉬움'?'b-e':d==='보통'?'b-m':'b-h';}
+function typeLabel(t){return t==='mc'?'객관식':t==='ox'?'O / X':'단답형';}
+
+QUIZ_DATA.forEach((q,qi)=>{
+  const card=document.createElement('div');
+  card.className='card';
+  let inner=`<div class="qtop">
+      <span class="qno">Q${q.id}</span>
+      <span class="badge b-type">${typeLabel(q.type)}</span>
+      <span class="badge ${badgeClass(q.difficulty)}">${q.difficulty}</span>
+    </div>
+    <div class="qtext">${q.question}</div>`;
+
+  if(q.type==='mc'){
+    inner+=`<div class="opts" id="opts-${qi}"></div>`;
+  } else if(q.type==='ox'){
+    inner+=`<div class="ox" id="opts-${qi}"></div>`;
+  } else {
+    inner+=`<div class="sa">
+      <input type="text" id="in-${qi}" placeholder="정답 입력 후 제출" autocomplete="off">
+      <button id="btn-${qi}">제출</button>
+    </div><div class="sa-result" id="sar-${qi}"></div>`;
+  }
+  inner+=`<div class="exp" id="exp-${qi}"></div>`;
+  card.innerHTML=inner;
+  list.appendChild(card);
+
+  if(q.type==='mc'){
+    const box=card.querySelector(`#opts-${qi}`);
+    const letters=['A','B','C','D'];
+    q.options.forEach((opt,oi)=>{
+      const b=document.createElement('button');
+      b.className='opt';
+      b.innerHTML=`<span class="mk">${letters[oi]}</span><span>${opt}</span><span class="rb"></span>`;
+      b.onclick=()=>gradeMC(qi,oi,box);
+      box.appendChild(b);
+    });
+  } else if(q.type==='ox'){
+    const box=card.querySelector(`#opts-${qi}`);
+    ['O','X'].forEach(v=>{
+      const b=document.createElement('button');
+      b.className='opt';
+      b.innerHTML=`<span>${v}</span>`;
+      b.onclick=()=>gradeOX(qi,v,box);
+      box.appendChild(b);
+    });
+  } else {
+    const btn=card.querySelector(`#btn-${qi}`);
+    const inp=card.querySelector(`#in-${qi}`);
+    btn.onclick=()=>gradeSA(qi,inp);
+    inp.addEventListener('keydown',e=>{if(e.key==='Enter')gradeSA(qi,inp);});
+  }
+});
+
+function normalize(s){return (s||'').toLowerCase().replace(/\s+/g,'').trim();}
+
+function gradeMC(qi,oi,box){
+  if(answered[qi])return;
+  answered[qi]=true;
+  const q=QUIZ_DATA[qi];
+  const btns=box.querySelectorAll('.opt');
+  btns.forEach(b=>b.disabled=true);
+  const isCorrect=oi===q.answer;
+  if(isCorrect){
+    btns[oi].classList.add('correct');
+    btns[oi].querySelector('.rb').textContent='✓ 정답!';
+  } else {
+    btns[oi].classList.add('wrong');
+    btns[oi].querySelector('.rb').textContent='✗ 오답';
+    btns[q.answer].classList.add('correct');
+    btns[q.answer].querySelector('.rb').textContent='정답';
+  }
+  finishQuestion(qi,isCorrect);
+}
+
+function gradeOX(qi,val,box){
+  if(answered[qi])return;
+  answered[qi]=true;
+  const q=QUIZ_DATA[qi];
+  const btns=box.querySelectorAll('.opt');
+  btns.forEach(b=>b.disabled=true);
+  const isCorrect=val===q.answer;
+  const chosen=[...btns].find(b=>b.textContent.trim()===val);
+  const correctBtn=[...btns].find(b=>b.textContent.trim()===q.answer);
+  if(isCorrect){
+    chosen.classList.add('correct');
+  } else {
+    chosen.classList.add('wrong');
+    correctBtn.classList.add('correct');
+  }
+  finishQuestion(qi,isCorrect);
+}
+
+function gradeSA(qi,inp){
+  if(answered[qi])return;
+  const val=normalize(inp.value);
+  if(!val){inp.focus();return;}
+  answered[qi]=true;
+  const q=QUIZ_DATA[qi];
+  inp.disabled=true;
+  document.getElementById(`btn-${qi}`).disabled=true;
+  const isCorrect=q.accept.map(normalize).includes(val);
+  const res=document.getElementById(`sar-${qi}`);
+  res.style.display='block';
+  if(isCorrect){
+    res.style.color='var(--ok)';
+    res.textContent=`✓ 정답! (${q.answerText})`;
+    inp.style.borderColor='var(--ok)';
+    inp.style.background='var(--okbg)';
+  } else {
+    res.style.color='var(--no)';
+    res.textContent=`✗ 오답 — 정답: ${q.answerText}`;
+    inp.style.borderColor='var(--no)';
+    inp.style.background='var(--nobg)';
+  }
+  finishQuestion(qi,isCorrect);
+}
+
+function finishQuestion(qi,isCorrect){
+  const q=QUIZ_DATA[qi];
+  state.solved++;
+  if(isCorrect)state.correct++;
+  const exp=document.getElementById(`exp-${qi}`);
+  exp.innerHTML=`${q.explanation}<span class="src">${q.src}</span>`;
+  exp.classList.add('show');
+  updateScore();
+  if(state.solved===QUIZ_DATA.length){
+    setTimeout(showFinal,500);
+  }
+}
+
+function updateScore(){
+  document.getElementById('sSolved').textContent=state.solved;
+  document.getElementById('sCorrect').textContent=state.correct;
+  const acc=state.solved?Math.round(state.correct/state.solved*100):0;
+  document.getElementById('sAcc').textContent=acc;
+  const bar=document.getElementById('sBar');
+  bar.style.width=acc+'%';
+  bar.style.background = acc>=70 ? 'var(--ok)' : acc>=40 ? '#f59e0b' : 'var(--no)';
+}
+
+function showFinal(){
+  const c=state.correct;
+  let grade,msg;
+  if(c>=9){grade='A';msg='완벽합니다. 미중 AI 패권의 큰 그림을 정확히 이해하셨어요.';}
+  else if(c>=7){grade='B';msg='훌륭합니다. 핵심 논리를 잘 짚으셨어요.';}
+  else if(c>=5){grade='C';msg='기본은 잡으셨어요. 해설을 다시 보면 더 탄탄해집니다.';}
+  else {grade='D';msg='해설과 함께 리포트를 한 번 더 보시면 크게 도움이 됩니다.';}
+  document.getElementById('mGrade').textContent=grade;
+  document.getElementById('mCorrect').textContent=c;
+  document.getElementById('mMsg').textContent=msg;
+  document.getElementById('overlay').classList.add('show');
+}
+
+document.getElementById('mRetry').onclick=()=>location.reload();
+updateScore();
+</script>
+</body>
+</html>

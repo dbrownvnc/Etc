@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>스페이스X발 회사채 폭락사태 정리</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;0,900;1,500&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+  :root{
+    --rose:#e11d48;
+    --rose-soft:#fff1f4;
+    --rose-line:#fecdd6;
+    --ink:#1c1917;
+    --ink-soft:#57534e;
+    --paper:#fdfcfb;
+    --paper-2:#f7f4f1;
+    --gold:#b45309;
+    --navy:#0f172a;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{
+    font-family:'Noto Sans KR',sans-serif;
+    background:var(--paper);
+    color:var(--ink);
+    line-height:1.75;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:680px;margin:0 auto;padding:0 20px 80px;}
+
+  /* ── 헤더 ── */
+  .masthead{
+    padding:54px 0 30px;
+    border-bottom:2.5px solid var(--ink);
+    margin-bottom:8px;
+  }
+  .eyebrow{
+    font-size:11px;letter-spacing:.32em;text-transform:uppercase;
+    color:var(--rose);font-weight:700;margin-bottom:20px;
+    display:flex;align-items:center;gap:10px;
+  }
+  .eyebrow::after{content:"";flex:1;height:1px;background:var(--rose-line);}
+  h1.title{
+    font-family:'Playfair Display',serif;
+    font-weight:900;font-size:41px;line-height:1.12;
+    letter-spacing:-.01em;margin-bottom:16px;
+  }
+  h1.title em{font-style:italic;color:var(--rose);}
+  .dek{
+    font-size:16px;color:var(--ink-soft);font-weight:400;
+    border-left:3px solid var(--rose);padding-left:16px;
+  }
+  .byline{
+    display:flex;flex-wrap:wrap;gap:8px 18px;
+    margin-top:24px;font-size:12.5px;color:var(--ink-soft);
+    letter-spacing:.02em;
+  }
+  .byline b{color:var(--ink);font-weight:700;}
+
+  /* ── 섹션 ── */
+  section{margin-top:52px;}
+  .kicker{
+    font-family:'Playfair Display',serif;
+    font-style:italic;font-size:15px;color:var(--rose);
+    margin-bottom:6px;
+  }
+  h2{
+    font-family:'Playfair Display',serif;
+    font-weight:700;font-size:26px;line-height:1.25;
+    margin-bottom:18px;letter-spacing:-.01em;
+    display:flex;gap:12px;align-items:baseline;
+  }
+  h2 .num{
+    font-size:14px;color:var(--rose);font-weight:900;
+    font-family:'Noto Sans KR';letter-spacing:.05em;
+    flex-shrink:0;padding-top:4px;
+  }
+  p{margin-bottom:16px;font-size:15.5px;}
+  p .hl{background:linear-gradient(transparent 58%,var(--rose-soft) 58%);font-weight:700;padding:0 2px;}
+  strong{color:var(--rose);font-weight:700;}
+  .lead{font-size:17px;color:var(--ink);font-weight:400;}
+
+  /* ── 카드 / 박스 ── */
+  .card{
+    background:#fff;border:1px solid var(--rose-line);
+    border-radius:14px;padding:22px 22px 18px;margin:24px 0;
+    box-shadow:0 2px 20px rgba(225,29,72,.05);
+  }
+  .card .card-t{
+    font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--rose);font-weight:700;margin-bottom:12px;
+  }
+  .quote{
+    background:var(--navy);color:#f8fafc;border-radius:14px;
+    padding:26px 24px;margin:30px 0;position:relative;
+  }
+  .quote::before{
+    content:"\201C";font-family:'Playfair Display',serif;
+    font-size:70px;color:var(--rose);line-height:0;
+    position:absolute;top:34px;left:18px;opacity:.55;
+  }
+  .quote p{margin:0 0 0 40px;font-size:16px;line-height:1.7;color:#e7e5e4;}
+  .quote .q-src{margin:14px 0 0 40px;font-size:12px;color:#a8a29e;letter-spacing:.05em;}
+
+  /* ── 수치 스탯 ── */
+  .stats{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin:24px 0;}
+  .stat{
+    background:var(--paper-2);border-radius:12px;padding:18px 16px;
+    border-bottom:3px solid var(--rose);
+  }
+  .stat .v{font-family:'Playfair Display',serif;font-weight:900;font-size:30px;color:var(--ink);line-height:1;}
+  .stat .v small{font-size:16px;font-weight:700;}
+  .stat .l{font-size:12px;color:var(--ink-soft);margin-top:8px;line-height:1.4;}
+  .stat.warn{border-bottom-color:var(--gold);}
+  .stat.warn .v{color:var(--gold);}
+
+  /* ── 차트 ── */
+  .chart-block{margin:30px 0;}
+  .chart-cap{font-size:12.5px;color:var(--ink-soft);text-align:center;margin-top:10px;font-style:italic;}
+  .chart-title{font-size:14px;font-weight:700;text-align:center;margin-bottom:14px;letter-spacing:.02em;}
+  .chart-container{position:relative;max-height:340px;}
+  .chart-container canvas{opacity:0;transition:opacity .4s ease;max-height:300px;}
+  .chart-container.chart-ready canvas{opacity:1;}
+
+  /* ── 테이블 ── */
+  .tbl{width:100%;border-collapse:collapse;margin:22px 0;font-size:14px;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 14px rgba(0,0,0,.04);}
+  .tbl th{background:var(--navy);color:#fff;padding:12px 10px;font-weight:500;font-size:13px;text-align:center;}
+  .tbl td{padding:11px 10px;border-bottom:1px solid #f0ebe6;text-align:center;}
+  .tbl tr:last-child td{border-bottom:none;}
+  .tbl .em td{background:var(--rose-soft);font-weight:700;color:var(--rose);}
+
+  /* ── 시뮬레이터 ── */
+  .sim{
+    background:linear-gradient(160deg,#0f172a,#1e293b);
+    border-radius:18px;padding:26px 22px;margin:34px 0;color:#f1f5f9;
+    box-shadow:0 12px 40px rgba(15,23,42,.25);
+  }
+  .sim h3{font-family:'Playfair Display',serif;font-size:21px;font-weight:700;margin-bottom:6px;color:#fff;}
+  .sim .sim-sub{font-size:13px;color:#94a3b8;margin-bottom:22px;}
+  .sim-row{margin-bottom:20px;}
+  .sim-row label{display:flex;justify-content:space-between;font-size:13.5px;font-weight:500;margin-bottom:9px;color:#cbd5e1;}
+  .sim-row label b{color:#fda4af;font-family:'Playfair Display',serif;font-size:16px;}
+  input[type=range]{
+    -webkit-appearance:none;width:100%;height:6px;border-radius:6px;
+    background:#334155;outline:none;
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;width:22px;height:22px;border-radius:50%;
+    background:var(--rose);cursor:pointer;border:3px solid #fff;
+    box-shadow:0 2px 8px rgba(225,29,72,.5);
+  }
+  input[type=range]::-moz-range-thumb{
+    width:22px;height:22px;border-radius:50%;background:var(--rose);
+    cursor:pointer;border:3px solid #fff;
+  }
+  .sim-result{
+    background:rgba(255,255,255,.06);border-radius:14px;
+    padding:20px;margin-top:6px;text-align:center;
+    border:1px solid rgba(253,164,175,.25);
+  }
+  .sim-result .rl{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:#94a3b8;margin-bottom:8px;}
+  .sim-result .price{font-family:'Playfair Display',serif;font-size:44px;font-weight:900;line-height:1;}
+  .sim-result .price.down{color:#fda4af;}
+  .sim-result .price.up{color:#6ee7b7;}
+  .sim-result .delta{font-size:14px;margin-top:10px;font-weight:500;}
+  .sim-note{font-size:11.5px;color:#64748b;margin-top:16px;line-height:1.6;}
+  .preset-btns{display:flex;gap:8px;margin:14px 0 4px;flex-wrap:wrap;}
+  .preset-btns button{
+    flex:1;min-width:120px;background:rgba(225,29,72,.15);color:#fda4af;
+    border:1px solid rgba(253,164,175,.4);border-radius:10px;
+    padding:9px 8px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR';
+    transition:background .2s;
+  }
+  .preset-btns button:hover{background:rgba(225,29,72,.3);}
+
+  /* ── 인포박스 ── */
+  .info{
+    background:var(--rose-soft);border-radius:12px;padding:18px 20px;
+    margin:22px 0;font-size:14.5px;border:1px solid var(--rose-line);
+  }
+  .info .it{font-weight:700;color:var(--rose);margin-bottom:6px;font-size:13.5px;}
+
+  /* ── 흐름도 ── */
+  .flow{margin:26px 0;}
+  .flow-step{
+    display:flex;gap:14px;align-items:flex-start;padding:14px 0;
+    border-bottom:1px dashed var(--rose-line);
+  }
+  .flow-step:last-child{border-bottom:none;}
+  .flow-step .fn{
+    flex-shrink:0;width:30px;height:30px;border-radius:50%;
+    background:var(--rose);color:#fff;font-weight:900;font-size:13px;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .flow-step .ft b{color:var(--ink);}
+  .flow-step .ft{font-size:14.5px;}
+
+  /* ── 마무리 ── */
+  .outro{
+    border-top:2.5px solid var(--ink);margin-top:60px;padding-top:26px;
+  }
+  .outro .kicker{margin-bottom:10px;}
+  footer{margin-top:50px;padding-top:22px;border-top:1px solid var(--rose-line);font-size:11.5px;color:#a8a29e;text-align:center;line-height:1.8;}
+
+  .fade-in{opacity:0;transform:translateY(18px);transition:opacity .7s ease,transform .7s ease;}
+  .fade-in.visible{opacity:1;transform:translateY(0);}
+
+  @media(max-width:520px){
+    h1.title{font-size:33px;}
+    h2{font-size:22px;}
+    .stats{grid-template-columns:1fr;}
+    .sim-result .price{font-size:38px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- 헤더 -->
+  <header class="masthead fade-in">
+    <div class="eyebrow">미국 채권시장 · 크레딧 리포트</div>
+    <h1 class="title">3주 만에 <em>9%</em> 증발한<br>스페이스X 회사채</h1>
+    <p class="dek">일론 머스크는 좋은 조건으로 자금을 챙겼지만, 그 채권을 산 투자자들은 하한가보다 아픈 손실을 맞았다. 성공한 발행과 실패한 투자, 그 사이에서 채권 가격과 금리의 원리를 다시 짚는다.</p>
+    <div class="byline">
+      <span><b>분석</b> 미국 크레딧 시장 관점</span>
+      <span><b>발행</b> 2026년 7월 20일</span>
+      <span><b>원문</b> 채권 폭락사태 정리 (feat. 일론 머스크)</span>
+    </div>
+  </header>
+
+  <!-- 리드 -->
+  <section class="fade-in">
+    <p class="lead">2026년 6월 11일, 스페이스X가 나스닥에 상장했다. IPO만으로 <strong>857억 달러</strong>를 끌어모으는 대성공이었다. 문제는 그 직후 추가로 발행한 <strong>250억 달러</strong>의 회사채였다. 발행은 초대박이었는데, 정작 그 채권을 산 사람들은 며칠 만에 큰 손실을 봤다. 어떻게 이런 일이 가능했을까.</p>
+  </section>
+
+  <!-- 스탯 요약 -->
+  <section class="fade-in">
+    <div class="stats">
+      <div class="stat"><div class="v">$857<small>억</small></div><div class="l">IPO로 조달한 금액</div></div>
+      <div class="stat"><div class="v">$250<small>억</small></div><div class="l">추가 발행한 회사채</div></div>
+      <div class="stat"><div class="v">$890<small>억</small></div><div class="l">회사채에 몰린 주문 (3.6배)</div></div>
+      <div class="stat warn"><div class="v">-9.3<small>%</small></div><div class="l">며칠 만의 채권 가격 하락</div></div>
+    </div>
+  </section>
+
+  <!-- 1. 성공적 발행 -->
+  <section class="fade-in">
+    <div class="kicker">The Issuance</div>
+    <h2><span class="num">01</span>발행은 완벽한 흥행이었다</h2>
+    <p>스페이스X는 2031년부터 2056년까지 만기가 제각각인 <span class="hl">5종류의 회사채</span>를 한꺼번에 내놨다. 만기가 길수록 돈을 오래 빌려주는 위험이 커지므로, 금리도 계단식으로 높아진다.</p>
+
+    <div class="chart-block">
+      <div class="chart-title">만기별 회사채 발행 금리 (쿠폰)</div>
+      <div class="chart-container fade-in">
+        <canvas id="chartCoupon" height="240"></canvas>
+      </div>
+      <div class="chart-cap">만기가 길수록 금리가 높아지는 전형적인 우상향 구조</div>
+    </div>
+
+    <p>발행 당시 250억 달러 물량에 무려 <strong>890억 달러의 주문</strong>이 몰렸다. 3.6배가 넘는 초과 청약이었다. 수요가 넘치자 스페이스X는 처음 제시했던 금리보다 <span class="hl">스프레드를 25bp(0.25%p) 낮춰서</span> 발행할 수 있었다.</p>
+
+    <div class="chart-block">
+      <div class="chart-title">발행 물량 vs 몰린 주문</div>
+      <div class="chart-container fade-in">
+        <canvas id="chartOrder" height="230"></canvas>
+      </div>
+      <div class="chart-cap">3.6배 초과 청약 — 발행사 입장에선 이자를 깎을 수 있는 유리한 협상 카드</div>
+    </div>
+
+    <div class="info">
+      <div class="it">💡 bp(베이시스포인트)란?</div>
+      금리를 잴 때 쓰는 아주 작은 단위입니다. <b>1bp = 0.01%p</b>. 25bp는 0.25%p를 뜻합니다. 예를 들어 2056년물은 원래 6.90%로 낼 계획이었지만 <b>6.65%로 25bp 낮춰</b> 발행했습니다. 스페이스X 입장에선 그만큼 이자를 덜 줘도 되니 성공적인 발행이었죠.</div>
+  </section>
+
+  <!-- 2. 유통시장 폭락 -->
+  <section class="fade-in">
+    <div class="kicker">The Collapse</div>
+    <h2><span class="num">02</span>그런데 며칠 만에 무너졌다</h2>
+    <p>채권은 만기까지 이자만 받다가 원금을 회수하는 게 기본이지만, 중간에 사고팔 수도 있다. 이렇게 거래되는 곳이 <span class="hl">유통시장</span>이다. 스페이스X 채권이 유통시장에 나오자마자 금리가 급등하기 시작했다.</p>
+    <p>6.65%로 발행한 <strong>2056년물의 유통 금리가 며칠 만에 7.3%대까지</strong> 치솟았다. 상승폭은 총 0.72%p. 이 상승은 두 가지가 겹친 결과였다.</p>
+
+    <div class="chart-block">
+      <div class="chart-title">2056년물 유통 금리 상승 분해 (%p)</div>
+      <div class="chart-container fade-in">
+        <canvas id="chartYield" height="230"></canvas>
+      </div>
+      <div class="chart-cap">스페이스X 자체 위험 0.56%p + 미 국채 금리 0.16%p = 총 0.72%p 상승</div>
+    </div>
+
+    <table class="tbl">
+      <thead><tr><th>구분</th><th>금리</th><th>비고</th></tr></thead>
+      <tbody>
+        <tr><td>발행 금리 (쿠폰)</td><td>6.65%</td><td>이미 고정됨</td></tr>
+        <tr><td>+ 스페이스X 위험 상승</td><td>+0.56%p</td><td>회사 자체 리스크</td></tr>
+        <tr><td>+ 미 국채 금리 상승</td><td>+0.16%p</td><td>시장 전체 요인</td></tr>
+        <tr class="em"><td>유통시장 요구 금리</td><td>≈ 7.37%</td><td>7.3%대</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- 3. 왜 9.3% -->
+  <section class="fade-in">
+    <div class="kicker">The Math</div>
+    <h2><span class="num">03</span>왜 하필 9.3% 손실인가</h2>
+    <p>쿠폰(표면이자)은 6.65%로 <span class="hl">이미 고정</span>돼 있다. 그런데 시장은 이제 0.72%p 더 얹어줘야 이 채권을 사겠다고 한다. 부족한 이자를 채우는 방법은 하나뿐 — <strong>매매 가격을 깎는 것</strong>이다.</p>
+    <p>얼마나 깎아야 할까. 여기서 <span class="hl">듀레이션</span>이 등장한다. 이 30년물의 듀레이션은 약 13년. 금리 상승폭 0.72%p에 듀레이션 13을 곱하면:</p>
+
+    <div class="card" style="text-align:center;">
+      <div class="card-t">가격 하락폭 계산</div>
+      <p style="font-size:19px;margin:0;font-family:'Playfair Display',serif;">
+        0.72%p × 13년 ≈ <strong style="font-size:26px;">9.3%</strong> 하락
+      </p>
+    </div>
+
+    <p>100달러를 주고 산 채권이 <strong>며칠 만에 91달러 수준</strong>으로 떨어졌다는 뜻이다.</p>
+
+    <div class="chart-block">
+      <div class="chart-title">채권 가격: $100 → $91</div>
+      <div class="chart-container fade-in">
+        <canvas id="chartPrice" height="220"></canvas>
+      </div>
+      <div class="chart-cap">듀레이션이 길수록(만기가 멀수록) 같은 금리 변화에도 손실이 커진다</div>
+    </div>
+
+    <div class="info">
+      <div class="it">💡 듀레이션(Duration)이란?</div>
+      채권 가격이 금리 변화에 얼마나 민감한지를 나타내는 숫자입니다. 대략 <b>"금리가 1%p 오르면 가격이 몇 % 떨어지는지"</b>로 이해하면 됩니다. 만기가 멀수록 듀레이션이 커지고, 그만큼 금리 변동에 크게 흔들립니다. 그래서 30년물처럼 장기 채권일수록 손실도 커집니다.</div>
+
+    <div class="quote">
+      <p>채권시장에서 3주 만에 9.3% 손실이 난다는 것은, 채권쟁이들의 체감으로는 주식에서 하한가를 맞는 것보다 충격이 더 큰 사건이다.</p>
+      <div class="q-src">— 원문 코멘트</div>
+    </div>
+  </section>
+
+  <!-- 인터랙티브 시뮬레이터 -->
+  <section class="fade-in">
+    <div class="kicker">Simulator</div>
+    <h2><span class="num">04</span>직접 계산해 보기</h2>
+    <p>금리가 얼마나 오르고, 만기(듀레이션)가 얼마나 길면 손실이 어떻게 커지는지 직접 움직여 보세요. 이번 스페이스X 사태가 왜 그렇게 아팠는지 감이 올 겁니다.</p>
+
+    <div class="sim">
+      <h3>채권 가격 시뮬레이터</h3>
+      <div class="sim-sub">발행가 $100 기준 · 근사식: 가격변화 ≈ −듀레이션 × 금리변화</div>
+
+      <div class="sim-row">
+        <label>유통시장 금리 변화 <b id="valYield">+0.72 %p</b></label>
+        <input type="range" id="slYield" min="-2" max="3" step="0.01" value="0.72">
+      </div>
+      <div class="sim-row">
+        <label>듀레이션 (만기 민감도) <b id="valDur">13 년</b></label>
+        <input type="range" id="slDur" min="1" max="20" step="1" value="13">
+      </div>
+
+      <div class="preset-btns">
+        <button data-y="0.72" data-d="13">📉 이번 스페이스X 2056년물</button>
+        <button data-y="0.72" data-d="5">단기채였다면 (듀레이션 5)</button>
+      </div>
+
+      <div class="sim-result">
+        <div class="rl">채권 가격</div>
+        <div class="price down" id="simPrice">$90.7</div>
+        <div class="delta" id="simDelta">발행가 대비 −9.3%</div>
+      </div>
+      <div class="sim-note">※ 실제 채권 가격은 볼록성(convexity) 등으로 정밀하게는 달라지지만, 시장에서 손익을 빠르게 가늠할 때 쓰는 <b>듀레이션 근사법</b>입니다. 만기가 길수록(듀레이션이 클수록) 같은 금리 변화에도 손실·수익이 확대되는 걸 확인해 보세요.</div>
+    </div>
+  </section>
+
+  <!-- 5. 폭락의 원인 -->
+  <section class="fade-in">
+    <div class="kicker">Why It Happened</div>
+    <h2><span class="num">05</span>누가 이 채권을 던졌나</h2>
+    <p>가격 폭락의 방아쇠는 <span class="hl">"평소와 다른 매수 세력"</span>이었다. 스페이스X의 흥행을 보고, 상장 직후 스프레드가 더 좁혀질 거라 판단한 <strong>헤지펀드들이 단기 트레이딩 자금</strong>을 대량으로 밀어 넣은 것이다.</p>
+
+    <div class="flow">
+      <div class="flow-step"><div class="fn">1</div><div class="ft"><b>단타 자금 유입</b> — 연기금·보험사 같은 장기 자금이 아니라, 며칠짜리 차익을 노린 단기 자금이 들어옴</div></div>
+      <div class="flow-step"><div class="fn">2</div><div class="ft"><b>며칠 만에 매도</b> — 기대만큼 스프레드가 안 좁혀지자 곧바로 팔기 시작</div></div>
+      <div class="flow-step"><div class="fn">3</div><div class="ft"><b>매도 물량 과다</b> — 팔자 물량이 한꺼번에 쏟아지며 가격이 밀림</div></div>
+      <div class="flow-step"><div class="fn">4</div><div class="ft"><b>가격↓ = 금리↑</b> — 가격이 떨어지니 유통 금리가 치솟고, 손실이 확정됨</div></div>
+    </div>
+
+    <p>장기 투자자가 채권을 오래 들고 갈 생각으로 샀다면 이런 급락은 없었을 것이다. <span class="hl">돈의 성격이 달랐던 것</span>이 사태의 핵심이다.</p>
+  </section>
+
+  <!-- 6. 주식 vs 채권 -->
+  <section class="fade-in">
+    <div class="kicker">Two Mindsets</div>
+    <h2><span class="num">06</span>주식쟁이와 채권쟁이는 다르다</h2>
+    <p>같은 스페이스X를 두고도 주식 투자자와 채권 투자자는 정반대로 반응했다.</p>
+
+    <table class="tbl">
+      <thead><tr><th></th><th>주식 투자자</th><th>채권 투자자</th></tr></thead>
+      <tbody>
+        <tr><td><b>본질</b></td><td>꿈을 먹고 산다</td><td>현실과 숫자에 기반한다</td></tr>
+        <tr><td><b>보는 것</b></td><td>머스크의 비전·미래</td><td>현금흐름·상환 능력</td></tr>
+        <tr><td><b>지금 판단</b></td><td>힘들어도 미래에 베팅</td><td>2029년까지 마이너스 현금흐름</td></tr>
+      </tbody>
+    </table>
+
+    <p>채권시장은 스페이스X의 <span class="hl">막대한 지출 계획</span>과 <span class="hl">xAI의 누적 손실</span>로 <strong>2029년까지 마이너스 현금흐름</strong>이 예상되는 점을 냉정하게 부정적으로 봤다. 주식은 꿈에 값을 매기지만, 채권은 "제때 갚을 수 있는가"만 본다.</p>
+  </section>
+
+  <!-- 7. 기초이론 -->
+  <section class="fade-in">
+    <div class="kicker">Back to Basics</div>
+    <h2><span class="num">07</span>금리↑ = 채권가격↓, 왜?</h2>
+    <p>이 사태의 뿌리에는 채권의 가장 기본 원리가 있다. 쉬운 예로 풀어보자.</p>
+
+    <div class="card">
+      <div class="card-t">예시: 1천만 원짜리 채권</div>
+      <p style="margin-bottom:10px;">1천만 원, 이자 <b>2%</b>, 1년 뒤 원금+이자를 받는 채권을 샀다. 그런데 6개월 시점에 돈이 필요해 팔아야 한다면?</p>
+      <p style="margin-bottom:10px;">6개월치 이자 10만 원을 반영해 약 <b>1,010만 원</b>에 파는 게 합리적이다.</p>
+      <p style="margin:0;"><b style="color:var(--rose);">그런데 시장금리가 2% → 5%로 올랐다면?</b> 새 채권은 6개월에 25만 원 이자를 주는데, 내 2%짜리는 10만 원뿐. 15만 원 차이를 메우려면 가격을 깎아야 한다. 1,010만 원이 아니라 <b>995만 원</b>에 팔린다.</p>
+    </div>
+
+    <div class="info">
+      <div class="it">📌 한 줄 정리</div>
+      <b>시장금리가 오르면 → 기존 채권은 상대적으로 매력이 떨어져 → 가격을 깎아야 팔린다.</b> 반대로 금리가 내리면 기존 채권 값은 오른다. 스페이스X 2056년물이 겪은 게 바로 이 원리의 극단적 버전이었습니다.</div>
+  </section>
+
+  <!-- 마무리 -->
+  <section class="outro fade-in">
+    <div class="kicker">한 줄 코멘트</div>
+    <h2 style="font-size:22px;">머스크는 이겼고, 채권 투자자는 아팠다</h2>
+    <p>일론 머스크는 좋은 조건으로 충분한 자금 조달에 성공했다. 다만 스페이스X 회사채를 매수한 채권 투자자들의 손실이 커지고 있어 <span class="hl">뒤끝이 남을 사건</span>이다.</p>
+    <p>진짜 문제는 앞으로다. 스페이스X가 충분한 돈을 벌지 못하는 상황에서 <strong>회사채 조달이 힘들어지면, 결국 주주에게 손을 벌려야 한다</strong>. 이번 손실의 기억은 다음 자금 조달의 비용으로 되돌아올 수 있다.</p>
+  </section>
+
+  <footer>
+    본 문서는 원문 자막 내용을 정리·시각화한 자료입니다.<br>
+    수치는 원문 기준이며 투자 판단의 근거로 사용될 수 없습니다.<br>
+    분석·시각화 by 앤스로픽 Claude · 2026.07.20
+  </footer>
+
+</div>
+
+<script>
+// ── Observer 1: 일반 fade-in ──
+const fadeObs = new IntersectionObserver((entries) => {
+  entries.forEach((e, i) => {
+    if (e.isIntersecting) {
+      setTimeout(() => e.target.classList.add('visible'), i * 80);
+      fadeObs.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.12 });
+document.querySelectorAll('.fade-in').forEach(el => fadeObs.observe(el));
+
+// ── 공통 차트 옵션 ──
+Chart.defaults.font.family = "'Noto Sans KR', sans-serif";
+Chart.defaults.color = '#57534e';
+const ROSE='#e11d48', NAVY='#0f172a', GOLD='#b45309', SOFT='#fecdd6';
+
+// ── chartConfigs 딕셔너리 ──
+const chartConfigs = {};
+
+chartConfigs['chartCoupon'] = () => {
+  new Chart(document.getElementById('chartCoupon'), {
+    type: 'bar',
+    data: {
+      labels: ['2031년물','2033년물','2036년물','2046년물','2056년물'],
+      datasets: [{
+        label: '발행 금리(%)',
+        data: [5.35, 5.65, 5.875, 6.6, 6.65],
+        backgroundColor: ['#fecdd6','#fda4b8','#fb7185','#f43f5e','#e11d48'],
+        borderRadius: 8, maxBarThickness: 54
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display:false },
+        tooltip:{ callbacks:{ label:(c)=>' '+c.parsed.y+'%' } } },
+      scales: { y: { beginAtZero:false, min:5, max:7, ticks:{ callback:v=>v+'%' }, grid:{color:'#f0ebe6'} },
+                x: { grid:{ display:false } } },
+      animation: { duration:1500, easing:'easeInOutQuart', delay:(ctx)=>ctx.dataIndex*150 },
+      animations: { y: { from: 0 } }
+    }
+  });
+};
+
+chartConfigs['chartOrder'] = () => {
+  new Chart(document.getElementById('chartOrder'), {
+    type: 'bar',
+    data: {
+      labels: ['발행 물량','몰린 주문'],
+      datasets: [{
+        label: '금액(억 달러)',
+        data: [250, 890],
+        backgroundColor: [NAVY, ROSE],
+        borderRadius: 8, maxBarThickness: 90
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend:{ display:false },
+        tooltip:{ callbacks:{ label:(c)=>' $'+c.parsed.y+'억' } } },
+      scales: { y:{ beginAtZero:true, ticks:{ callback:v=>'$'+v+'억' }, grid:{color:'#f0ebe6'} },
+                x:{ grid:{ display:false } } },
+      animation: { duration:1500, easing:'easeInOutQuart', delay:(ctx)=>ctx.dataIndex*150 },
+      animations: { y: { from: 0 } }
+    }
+  });
+};
+
+chartConfigs['chartYield'] = () => {
+  new Chart(document.getElementById('chartYield'), {
+    type: 'bar',
+    data: {
+      labels: ['발행 쿠폰','+스페이스X 위험','+미 국채 금리','유통 요구금리'],
+      datasets: [{
+        label: '금리(%)',
+        data: [6.65, 0.56, 0.16, 7.37],
+        backgroundColor: [NAVY, ROSE, GOLD, '#7f1d1d'],
+        borderRadius: 8, maxBarThickness: 60
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend:{ display:false },
+        tooltip:{ callbacks:{ label:(c)=>' '+c.parsed.y+'%p' } } },
+      scales: { y:{ beginAtZero:true, ticks:{ callback:v=>v+'%' }, grid:{color:'#f0ebe6'} },
+                x:{ grid:{ display:false }, ticks:{ font:{size:10.5} } } },
+      animation: { duration:1500, easing:'easeInOutQuart', delay:(ctx)=>ctx.dataIndex*150 },
+      animations: { y: { from: 0 } }
+    }
+  });
+};
+
+chartConfigs['chartPrice'] = () => {
+  new Chart(document.getElementById('chartPrice'), {
+    type: 'bar', 
+    data: {
+      labels: ['발행 직후','며칠 뒤'],
+      datasets: [{
+        label: '가격($)',
+        data: [100, 90.7],
+        backgroundColor: [NAVY, ROSE],
+        borderRadius: 8, maxBarThickness: 90
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend:{ display:false },
+        tooltip:{ callbacks:{ label:(c)=>' $'+c.parsed.y } } },
+      scales: { y:{ beginAtZero:false, min:85, max:102, ticks:{ callback:v=>'$'+v }, grid:{color:'#f0ebe6'} },
+                x:{ grid:{ display:false } } },
+      animation: { duration:1500, easing:'easeInOutQuart', delay:(ctx)=>ctx.dataIndex*150 },
+      animations: { y: { from: 0 } }
+    }
+  });
+};
+
+// ── Observer 2: 차트 전용 ──
+const chartObs = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const canvas = entry.target.querySelector('canvas');
+      if (canvas && chartConfigs[canvas.id]) {
+        setTimeout(() => {
+          chartConfigs[canvas.id]();
+          entry.target.classList.add('chart-ready');
+          delete chartConfigs[canvas.id];
+        }, 200);
+      }
+      chartObs.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.25 });
+document.querySelectorAll('.chart-container').forEach(el => chartObs.observe(el));
+
+// ── 시뮬레이터 ──
+(function(){
+  const slYield = document.getElementById('slYield');
+  const slDur   = document.getElementById('slDur');
+  const valYield= document.getElementById('valYield');
+  const valDur  = document.getElementById('valDur');
+  const simPrice= document.getElementById('simPrice');
+  const simDelta= document.getElementById('simDelta');
+
+  function fmtY(v){ return (v>=0?'+':'')+v.toFixed(2)+' %p'; }
+
+  function update(){
+    const y = parseFloat(slYield.value);   // 금리 변화 %p
+    const d = parseFloat(slDur.value);      // 듀레이션
+    const change = -d * y;                   // 가격변화 %
+    const price = 100 * (1 + change/100);
+
+    valYield.textContent = fmtY(y);
+    valDur.textContent = d + ' 년';
+    simPrice.textContent = '$' + price.toFixed(1);
+    simDelta.textContent = '발행가 대비 ' + (change>=0?'+':'') + change.toFixed(1) + '%';
+
+    simPrice.classList.remove('up','down');
+    if (change < 0){ simPrice.classList.add('down'); }
+    else if (change > 0){ simPrice.classList.add('up'); }
+  }
+
+  slYield.addEventListener('input', update);
+  slDur.addEventListener('input', update);
+
+  document.querySelectorAll('.preset-btns button').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      slYield.value = btn.dataset.y;
+      slDur.value = btn.dataset.d;
+      update();
+    });
+  });
+
+  update();
+})();
+</script>
+</body>
+</html>

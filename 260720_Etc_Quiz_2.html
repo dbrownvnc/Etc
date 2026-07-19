@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>스페이스X 회사채 폭락사태 — 시험문제</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,500&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --rose:#e11d48;--rose-soft:#fff1f4;--rose-line:#fecdd6;
+    --ink:#1c1917;--ink-soft:#57534e;--paper:#fdfcfb;--paper-2:#f7f4f1;
+    --navy:#0f172a;--green:#059669;--green-soft:#ecfdf5;--gold:#b45309;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Noto Sans KR',sans-serif;background:var(--paper);color:var(--ink);line-height:1.7;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:680px;margin:0 auto;padding:0 20px 80px;}
+
+  /* 헤더 */
+  .masthead{padding:50px 0 28px;border-bottom:2.5px solid var(--ink);}
+  .eyebrow{font-size:11px;letter-spacing:.32em;text-transform:uppercase;color:var(--rose);font-weight:700;margin-bottom:18px;display:flex;align-items:center;gap:10px;}
+  .eyebrow::after{content:"";flex:1;height:1px;background:var(--rose-line);}
+  h1.title{font-family:'Playfair Display',serif;font-weight:900;font-size:36px;line-height:1.15;letter-spacing:-.01em;margin-bottom:14px;}
+  h1.title em{font-style:italic;color:var(--rose);}
+  .dek{font-size:15px;color:var(--ink-soft);border-left:3px solid var(--rose);padding-left:15px;}
+  .meta{margin-top:20px;font-size:12.5px;color:var(--ink-soft);}
+  .meta b{color:var(--ink);}
+
+  /* 스티키 스코어보드 */
+  .scoreboard{
+    position:sticky;top:0;z-index:50;background:rgba(253,252,251,.94);
+    backdrop-filter:blur(8px);border-bottom:1px solid var(--rose-line);
+    margin:0 -20px 0;padding:12px 20px;display:flex;align-items:center;
+    justify-content:space-between;gap:12px;
+  }
+  .sb-left{font-size:13px;font-weight:700;color:var(--ink-soft);}
+  .sb-left b{color:var(--rose);font-family:'Playfair Display',serif;font-size:18px;}
+  .sb-bar{flex:1;height:8px;background:var(--paper-2);border-radius:8px;overflow:hidden;max-width:180px;}
+  .sb-fill{height:100%;width:0;background:linear-gradient(90deg,var(--rose),#fb7185);transition:width .5s ease;}
+  .sb-btn{background:var(--rose);color:#fff;border:none;border-radius:9px;padding:8px 14px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR';}
+  .sb-btn:disabled{background:#d6d3d1;cursor:not-allowed;}
+
+  /* 섹션 라벨 */
+  .sheet-label{
+    font-family:'Playfair Display',serif;font-weight:900;font-size:15px;
+    letter-spacing:.15em;text-transform:uppercase;color:var(--rose);
+    text-align:center;margin:44px 0 8px;
+  }
+  .sheet-sub{text-align:center;font-size:13px;color:var(--ink-soft);margin-bottom:8px;}
+  .divider{height:2px;background:var(--ink);margin:0 0 10px;}
+
+  /* 문제 카드 */
+  .q{background:#fff;border:1px solid var(--rose-line);border-radius:14px;padding:22px 20px;margin:20px 0;box-shadow:0 2px 16px rgba(225,29,72,.04);}
+  .q-head{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap;}
+  .q-no{font-family:'Playfair Display',serif;font-weight:900;font-size:20px;color:var(--rose);}
+  .q-badge{font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;background:var(--paper-2);color:var(--ink-soft);}
+  .q-badge.type{background:var(--navy);color:#fff;}
+  .stars{font-size:11px;color:var(--gold);letter-spacing:1px;}
+  .q-text{font-size:15.5px;font-weight:500;margin-bottom:16px;line-height:1.65;}
+  .q-text .blank{display:inline-block;min-width:70px;border-bottom:2px solid var(--rose);}
+
+  /* 선택지 */
+  .opts{display:flex;flex-direction:column;gap:9px;}
+  .opt{
+    display:flex;align-items:flex-start;gap:10px;padding:12px 14px;
+    border:1.5px solid #eee;border-radius:11px;cursor:pointer;font-size:14.5px;
+    transition:all .18s;background:#fff;
+  }
+  .opt:hover{border-color:var(--rose-line);background:var(--rose-soft);}
+  .opt .mark{flex-shrink:0;width:22px;height:22px;border-radius:50%;background:var(--paper-2);color:var(--ink-soft);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+  .opt.correct{border-color:var(--green);background:var(--green-soft);}
+  .opt.correct .mark{background:var(--green);color:#fff;}
+  .opt.wrong{border-color:var(--rose);background:var(--rose-soft);}
+  .opt.wrong .mark{background:var(--rose);color:#fff;}
+  .opt.disabled{cursor:default;pointer-events:none;opacity:.85;}
+
+  /* OX */
+  .ox{display:flex;gap:12px;}
+  .ox button{flex:1;padding:16px;border:1.5px solid #eee;border-radius:12px;background:#fff;font-size:22px;font-weight:900;cursor:pointer;font-family:'Playfair Display',serif;transition:all .18s;}
+  .ox button:hover{border-color:var(--rose-line);background:var(--rose-soft);}
+  .ox button.correct{border-color:var(--green);background:var(--green-soft);color:var(--green);}
+  .ox button.wrong{border-color:var(--rose);background:var(--rose-soft);color:var(--rose);}
+  .ox button.disabled{pointer-events:none;opacity:.7;}
+
+  /* 주관식 reveal */
+  .reveal-btn{width:100%;background:var(--navy);color:#fff;border:none;border-radius:11px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR';margin-top:4px;}
+  .answer-box{display:none;margin-top:14px;background:var(--paper-2);border-radius:12px;padding:16px 18px;border-left:4px solid var(--green);}
+  .answer-box.show{display:block;animation:fadeUp .4s ease;}
+  .answer-box .a-label{font-size:12px;font-weight:700;color:var(--green);letter-spacing:.08em;margin-bottom:6px;}
+  .answer-box .a-val{font-size:15px;font-weight:700;color:var(--ink);margin-bottom:8px;}
+  .answer-box .a-exp{font-size:13.5px;color:var(--ink-soft);line-height:1.6;}
+  .selfmark{display:flex;gap:10px;margin-top:14px;}
+  .selfmark button{flex:1;padding:10px;border-radius:10px;border:1.5px solid;font-size:13px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR';background:#fff;}
+  .selfmark .yes{border-color:var(--green);color:var(--green);}
+  .selfmark .yes:hover{background:var(--green-soft);}
+  .selfmark .no{border-color:var(--rose);color:var(--rose);}
+  .selfmark .no:hover{background:var(--rose-soft);}
+  .selfmark button.picked{color:#fff;}
+  .selfmark .yes.picked{background:var(--green);}
+  .selfmark .no.picked{background:var(--rose);}
+  .selfmark.locked{pointer-events:none;opacity:.9;}
+
+  .feedback{margin-top:12px;font-size:13.5px;font-weight:600;display:none;padding:10px 14px;border-radius:10px;}
+  .feedback.show{display:block;}
+  .feedback.ok{background:var(--green-soft);color:var(--green);}
+  .feedback.no{background:var(--rose-soft);color:var(--rose);}
+
+  @keyframes fadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+
+  /* 결과 모달 */
+  .modal-bg{position:fixed;inset:0;background:rgba(15,23,42,.6);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:100;padding:24px;}
+  .modal-bg.show{display:flex;animation:fadeUp .3s ease;}
+  .modal{background:#fff;border-radius:20px;max-width:400px;width:100%;padding:34px 28px;text-align:center;box-shadow:0 24px 60px rgba(0,0,0,.3);}
+  .modal .grade{font-family:'Playfair Display',serif;font-weight:900;font-size:72px;line-height:1;color:var(--rose);}
+  .modal .m-score{font-size:17px;font-weight:700;margin:12px 0 4px;}
+  .modal .m-score b{color:var(--rose);font-size:22px;}
+  .modal .m-msg{font-size:14px;color:var(--ink-soft);margin:14px 0 24px;line-height:1.6;}
+  .modal .m-close{background:var(--rose);color:#fff;border:none;border-radius:12px;padding:13px 30px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR';width:100%;}
+  .modal .m-retry{background:none;border:none;color:var(--ink-soft);font-size:13px;margin-top:14px;cursor:pointer;text-decoration:underline;font-family:'Noto Sans KR';}
+
+  footer{margin-top:50px;padding-top:22px;border-top:1px solid var(--rose-line);font-size:11.5px;color:#a8a29e;text-align:center;line-height:1.8;}
+
+  @media(max-width:520px){h1.title{font-size:30px;}.modal .grade{font-size:60px;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="masthead">
+    <div class="eyebrow">미국 채권시장 · 이해도 점검</div>
+    <h1 class="title">스페이스X 회사채<br><em>폭락사태</em> 시험문제</h1>
+    <p class="dek">총 10문제 · 객관식 · OX · 단답형 · 빈칸 · 서술형. 분석 문서를 읽고 도전해 보세요.</p>
+    <div class="meta"><b>난이도</b> ⭐쉬움 3 · ⭐⭐보통 5 · ⭐⭐⭐어려움 2 &nbsp;|&nbsp; <b>배점</b> 문항당 10점</div>
+  </header>
+
+  <!-- 스코어보드 -->
+  <div class="scoreboard">
+    <div class="sb-left">맞힌 문제 <b id="sbCount">0</b> / 10</div>
+    <div class="sb-bar"><div class="sb-fill" id="sbFill"></div></div>
+    <button class="sb-btn" id="sbResult" disabled>결과 보기</button>
+  </div>
+
+  <div class="sheet-label">📋 문제지</div>
+  <div class="sheet-sub">객관식·OX는 보기를 누르면 바로 채점됩니다 · 주관식은 정답 확인 후 스스로 채점</div>
+  <div class="divider"></div>
+
+  <!-- 문제 1 -->
+  <div class="q" data-q="1" data-type="mc" data-answer="2">
+    <div class="q-head"><span class="q-no">Q1</span><span class="q-badge type">객관식</span><span class="q-badge"><span class="stars">⭐</span> 쉬움</span></div>
+    <div class="q-text">스페이스X가 2026년 6월 11일 상장(IPO)에 성공한 시장은?</div>
+    <div class="opts">
+      <div class="opt" data-i="1"><span class="mark">①</span><span>뉴욕증권거래소(NYSE)</span></div>
+      <div class="opt" data-i="2"><span class="mark">②</span><span>나스닥(NASDAQ)</span></div>
+      <div class="opt" data-i="3"><span class="mark">③</span><span>런던증권거래소(LSE)</span></div>
+      <div class="opt" data-i="4"><span class="mark">④</span><span>도쿄증권거래소(TSE)</span></div>
+    </div>
+    <div class="feedback"></div>
+  </div>
+
+  <!-- 문제 2 -->
+  <div class="q" data-q="2" data-type="ox" data-answer="O">
+    <div class="q-head"><span class="q-no">Q2</span><span class="q-badge type">OX</span><span class="q-badge"><span class="stars">⭐</span> 쉬움</span></div>
+    <div class="q-text">스페이스X의 회사채 발행 자체는 성공적이었지만, 그 채권을 매수한 투자자들은 손실을 봤다.</div>
+    <div class="ox">
+      <button data-v="O">O</button>
+      <button data-v="X">X</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+
+  <!-- 문제 3 -->
+  <div class="q" data-q="3" data-type="mc" data-answer="3">
+    <div class="q-head"><span class="q-no">Q3</span><span class="q-badge type">객관식</span><span class="q-badge"><span class="stars">⭐</span> 쉬움</span></div>
+    <div class="q-text">이번에 문제가 된, 스페이스X가 IPO와 별도로 <b>추가 발행</b>한 회사채 규모는?</div>
+    <div class="opts">
+      <div class="opt" data-i="1"><span class="mark">①</span><span>85억 달러</span></div>
+      <div class="opt" data-i="2"><span class="mark">②</span><span>150억 달러</span></div>
+      <div class="opt" data-i="3"><span class="mark">③</span><span>250억 달러</span></div>
+      <div class="opt" data-i="4"><span class="mark">④</span><span>857억 달러</span></div>
+    </div>
+    <div class="feedback"></div>
+  </div>
+
+  <!-- 문제 4 -->
+  <div class="q" data-q="4" data-type="sub" data-answer="25bp (0.25%p)">
+    <div class="q-head"><span class="q-no">Q4</span><span class="q-badge type">단답형</span><span class="q-badge"><span class="stars">⭐⭐</span> 보통</span></div>
+    <div class="q-text">발행 물량 250억 달러에 890억 달러 주문이 몰리자, 스페이스X는 스프레드를 처음보다 몇 bp 낮춰 발행했을까요?</div>
+    <button class="reveal-btn">정답 확인</button>
+    <div class="answer-box">
+      <div class="a-label">정답</div>
+      <div class="a-val">25bp (0.25%p)</div>
+      <div class="a-exp">3.6배 초과 청약으로 수요가 넘치자, 발행사는 이자를 25bp 깎아 발행할 수 있었습니다. 예로 2056년물은 6.90% 계획 → 6.65%로 낮췄습니다.</div>
+      <div class="selfmark">
+        <button class="yes">✓ 맞았어요</button>
+        <button class="no">✗ 틀렸어요</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 문제 5 -->
+  <div class="q" data-q="5" data-type="mc" data-answer="3">
+    <div class="q-head"><span class="q-no">Q5</span><span class="q-badge type">객관식</span><span class="q-badge"><span class="stars">⭐⭐</span> 보통</span></div>
+    <div class="q-text">6.65%로 발행된 <b>2056년물</b>의 유통 금리는 며칠 만에 몇 %대까지 치솟았나요?</div>
+    <div class="opts">
+      <div class="opt" data-i="1"><span class="mark">①</span><span>5.9%대</span></div>
+      <div class="opt" data-i="2"><span class="mark">②</span><span>6.9%대</span></div>
+      <div class="opt" data-i="3"><span class="mark">③</span><span>7.3%대</span></div>
+      <div class="opt" data-i="4"><span class="mark">④</span><span>8.5%대</span></div>
+    </div>
+    <div class="feedback"></div>
+  </div>
+
+  <!-- 문제 6 -->
+  <div class="q" data-q="6" data-type="sub" data-answer="0.72%p (0.56 + 0.16)">
+    <div class="q-head"><span class="q-no">Q6</span><span class="q-badge type">빈칸채우기</span><span class="q-badge"><span class="stars">⭐⭐</span> 보통</span></div>
+    <div class="q-text">2056년물의 금리 상승은 <b>스페이스X 자체 위험 상승 0.56%p</b> + <b>미 국채 금리 상승 0.16%p</b> = 총 <span class="blank"></span> %p 상승이었다.</div>
+    <button class="reveal-btn">정답 확인</button>
+    <div class="answer-box">
+      <div class="a-label">정답</div>
+      <div class="a-val">0.72 %p</div>
+      <div class="a-exp">0.56%p(회사 자체 리스크) + 0.16%p(시장 전체 국채 금리) = 0.72%p. 발행 쿠폰 6.65%에 이 0.72%p가 얹혀 유통 요구금리가 약 7.37%(7.3%대)가 되었습니다.</div>
+      <div class="selfmark">
+        <button class="yes">✓ 맞았어요</button>
+        <button class="no">✗ 틀렸어요</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 문제 7 -->
+  <div class="q" data-q="7" data-type="mc" data-answer="2">
+    <div class="q-head"><span class="q-no">Q7</span><span class="q-badge type">객관식</span><span class="q-badge"><span class="stars">⭐⭐</span> 보통</span></div>
+    <div class="q-text">금리 상승폭 0.72%p에 듀레이션 약 13년을 적용했을 때, 이 채권의 가격 하락률은?</div>
+    <div class="opts">
+      <div class="opt" data-i="1"><span class="mark">①</span><span>약 0.7% 하락</span></div>
+      <div class="opt" data-i="2"><span class="mark">②</span><span>약 9.3% 하락</span></div>
+      <div class="opt" data-i="3"><span class="mark">③</span><span>약 25% 하락</span></div>
+      <div class="opt" data-i="4"><span class="mark">④</span><span>가격은 오히려 상승</span></div>
+    </div>
+    <div class="feedback"></div>
+  </div>
+
+  <!-- 문제 8 -->
+  <div class="q" data-q="8" data-type="ox" data-answer="X">
+    <div class="q-head"><span class="q-no">Q8</span><span class="q-badge type">OX</span><span class="q-badge"><span class="stars">⭐⭐</span> 보통</span></div>
+    <div class="q-text">이번 채권 폭락의 주된 원인은, 연기금·보험사 같은 장기 투자자들이 채권을 대량 매도했기 때문이다.</div>
+    <div class="ox">
+      <button data-v="O">O</button>
+      <button data-v="X">X</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+
+  <!-- 문제 9 -->
+  <div class="q" data-q="9" data-type="sub" data-answer="금리↑ → 채권가격↓">
+    <div class="q-head"><span class="q-no">Q9</span><span class="q-badge type">서술형</span><span class="q-badge"><span class="stars">⭐⭐⭐</span> 어려움</span></div>
+    <div class="q-text">"시장금리가 오르면 기존 채권의 가격이 내려간다"는 원리를, 왜 그런지 이유를 포함해 설명해 보세요.</div>
+    <button class="reveal-btn">모범답안 확인</button>
+    <div class="answer-box">
+      <div class="a-label">모범답안</div>
+      <div class="a-val">금리 상승 → 기존 채권 매력 하락 → 가격 인하로 보정</div>
+      <div class="a-exp">시장금리가 오르면 새로 발행되는 채권은 더 높은 이자를 준다. 그에 비해 낮은 고정 이자를 주는 기존 채권은 상대적으로 매력이 떨어진다. 따라서 기존 채권을 팔려면 그 이자 차이만큼 <b>매매 가격을 깎아야</b> 살 사람이 나타난다. 예를 들어 시장금리가 2%→5%로 오르면, 1,010만 원에 팔릴 2%짜리 채권이 995만 원으로 떨어진다. 즉 부족한 수익률을 가격 할인으로 메우는 것이 핵심이다.</div>
+      <div class="selfmark">
+        <button class="yes">✓ 맞았어요</button>
+        <button class="no">✗ 틀렸어요</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 문제 10 -->
+  <div class="q" data-q="10" data-type="sub" data-answer="약 5% 하락">
+    <div class="q-head"><span class="q-no">Q10</span><span class="q-badge type">계산·단답</span><span class="q-badge"><span class="stars">⭐⭐⭐</span> 어려움</span></div>
+    <div class="q-text">만약 동일한 금리 상승(0.72%p)이 <b>듀레이션 7년</b>짜리 단기 채권에 발생했다면, 가격은 대략 몇 % 변할까요? (근사식: 가격변화 ≈ −듀레이션 × 금리변화)</div>
+    <button class="reveal-btn">정답 확인</button>
+    <div class="answer-box">
+      <div class="a-label">정답</div>
+      <div class="a-val">약 −5% (5% 하락)</div>
+      <div class="a-exp">−7 × 0.72%p ≈ −5.0%. 같은 금리 충격이라도 듀레이션이 13년일 땐 −9.3%, 7년일 땐 −5%로 손실이 줄어듭니다. <b>만기가 길수록(듀레이션이 클수록) 금리 변화에 더 크게 손실이 확대된다</b>는 것이 이번 사태의 핵심 원리입니다.</div>
+      <div class="selfmark">
+        <button class="yes">✓ 맞았어요</button>
+        <button class="no">✗ 틀렸어요</button>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    스페이스X 회사채 폭락사태 이해도 점검 · 총 10문제 100점<br>
+    문제·해설 by 앤스로픽 Claude · 2026.07.20
+  </footer>
+</div>
+
+<!-- 결과 모달 -->
+<div class="modal-bg" id="modalBg">
+  <div class="modal">
+    <div class="grade" id="mGrade">A</div>
+    <div class="m-score">10문제 중 <b id="mScore">0</b>문제 정답</div>
+    <div class="m-msg" id="mMsg"></div>
+    <button class="m-close" id="mClose">닫기</button>
+    <button class="m-retry" id="mRetry">다시 풀기</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  const total = 10;
+  const answered = {};   // qNo -> true/false (correct)
+  const done = {};       // qNo -> answered?
+
+  const sbCount = document.getElementById('sbCount');
+  const sbFill  = document.getElementById('sbFill');
+  const sbResult= document.getElementById('sbResult');
+
+  function refresh(){
+    const correct = Object.values(answered).filter(Boolean).length;
+    const attempted = Object.keys(done).length;
+    sbCount.textContent = correct;
+    sbFill.style.width = (attempted/total*100) + '%';
+    sbResult.disabled = attempted < total;
+  }
+
+  function mark(qNo, isCorrect){
+    if(done[qNo]) return;
+    done[qNo] = true;
+    answered[qNo] = isCorrect;
+    refresh();
+  }
+
+  // 객관식
+  document.querySelectorAll('.q[data-type="mc"]').forEach(q=>{
+    const qNo = q.dataset.q;
+    const ans = q.dataset.answer;
+    const fb = q.querySelector('.feedback');
+    q.querySelectorAll('.opt').forEach(opt=>{
+      opt.addEventListener('click', ()=>{
+        if(done[qNo]) return;
+        const picked = opt.dataset.i;
+        const isCorrect = picked === ans;
+        q.querySelectorAll('.opt').forEach(o=>{
+          o.classList.add('disabled');
+          if(o.dataset.i === ans) o.classList.add('correct');
+        });
+        if(!isCorrect) opt.classList.add('wrong');
+        fb.classList.add('show', isCorrect?'ok':'no');
+        fb.textContent = isCorrect ? '정답입니다! 👏' : '아쉬워요. 정답은 ' + ans + '번입니다.';
+        mark(qNo, isCorrect);
+      });
+    });
+  });
+
+  // OX
+  document.querySelectorAll('.q[data-type="ox"]').forEach(q=>{
+    const qNo = q.dataset.q;
+    const ans = q.dataset.answer;
+    const fb = q.querySelector('.feedback');
+    q.querySelectorAll('.ox button').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        if(done[qNo]) return;
+        const v = btn.dataset.v;
+        const isCorrect = v === ans;
+        q.querySelectorAll('.ox button').forEach(b=>{
+          b.classList.add('disabled');
+          if(b.dataset.v === ans) b.classList.add('correct');
+        });
+        if(!isCorrect) btn.classList.add('wrong');
+        fb.classList.add('show', isCorrect?'ok':'no');
+        fb.textContent = isCorrect ? '정답입니다! 👏' : '아쉬워요. 정답은 ' + ans + ' 입니다.';
+        mark(qNo, isCorrect);
+      });
+    });
+  });
+
+  // 주관식
+  document.querySelectorAll('.q[data-type="sub"]').forEach(q=>{
+    const qNo = q.dataset.q;
+    const revealBtn = q.querySelector('.reveal-btn');
+    const box = q.querySelector('.answer-box');
+    const sm = q.querySelector('.selfmark');
+    revealBtn.addEventListener('click', ()=>{
+      box.classList.add('show');
+      revealBtn.style.display='none';
+    });
+    sm.querySelector('.yes').addEventListener('click', ()=>{
+      if(done[qNo]) return;
+      sm.querySelector('.yes').classList.add('picked');
+      sm.classList.add('locked');
+      mark(qNo, true);
+    });
+    sm.querySelector('.no').addEventListener('click', ()=>{
+      if(done[qNo]) return;
+      sm.querySelector('.no').classList.add('picked');
+      sm.classList.add('locked');
+      mark(qNo, false);
+    });
+  });
+
+  // 결과 모달
+  const modalBg = document.getElementById('modalBg');
+  function gradeOf(score){
+    const p = score/total*100;
+    if(p>=90) return ['A+','채권 전문가 수준입니다! 금리와 듀레이션의 원리를 완벽히 이해했네요.'];
+    if(p>=80) return ['A','훌륭합니다! 핵심 개념을 확실히 잡았습니다.'];
+    if(p>=70) return ['B','좋아요. 몇 가지 수치만 더 챙기면 완벽합니다.'];
+    if(p>=60) return ['C','기본은 이해했어요. 분석 문서를 다시 한 번 훑어보세요.'];
+    if(p>=40) return ['D','아쉬워요. 금리↑=가격↓ 원리부터 복습해 봅시다.'];
+    return ['F','괜찮아요. 천천히 분석 문서를 읽고 다시 도전해 보세요!'];
+  }
+  sbResult.addEventListener('click', ()=>{
+    const score = Object.values(answered).filter(Boolean).length;
+    const [g,msg] = gradeOf(score);
+    document.getElementById('mGrade').textContent = g;
+    document.getElementById('mScore').textContent = score;
+    document.getElementById('mMsg').textContent = msg;
+    modalBg.classList.add('show');
+  });
+  document.getElementById('mClose').addEventListener('click', ()=> modalBg.classList.remove('show'));
+  document.getElementById('mRetry').addEventListener('click', ()=> location.reload());
+  modalBg.addEventListener('click', (e)=>{ if(e.target===modalBg) modalBg.classList.remove('show'); });
+
+  refresh();
+})();
+</script>
+</body>
+</html>

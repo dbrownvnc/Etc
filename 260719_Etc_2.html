@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>변동성의 여름, 위험을 관리하는 법 — 윤지호 평론가</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;0,900;1,500&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+  :root{
+    --bg:#ffffff; --bg2:#fafafa; --ink:#1a1a1a; --sub:#777777;
+    --rose:#e11d48; --rose2:#f43f5e; --line:#e5e5e5;
+    --blue:#2563eb; --gray:#6b7280;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{
+    background:var(--bg); color:var(--ink);
+    font-family:'Noto Sans KR',sans-serif; font-weight:400;
+    line-height:1.75; -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:680px;margin:0 auto;padding:0 22px;}
+
+  /* ---------- HERO ---------- */
+  .hero{padding:64px 0 40px;border-bottom:2px solid var(--ink);}
+  .kicker{
+    font-family:'Noto Sans KR';font-weight:700;font-size:12px;
+    letter-spacing:.22em;text-transform:uppercase;color:var(--rose);
+    display:flex;align-items:center;gap:10px;margin-bottom:24px;
+  }
+  .kicker::after{content:"";flex:1;height:1px;background:var(--line);}
+  .hero h1{
+    font-family:'Playfair Display',serif;font-weight:900;
+    font-size:clamp(34px,9vw,52px);line-height:1.08;letter-spacing:-.01em;
+    margin-bottom:18px;
+  }
+  .hero h1 em{font-style:italic;color:var(--rose);}
+  .dek{font-size:17px;color:var(--sub);font-weight:300;max-width:90%;}
+  .meta{
+    margin-top:26px;padding-top:18px;border-top:1px solid var(--line);
+    display:flex;flex-wrap:wrap;gap:6px 20px;font-size:12.5px;color:var(--sub);
+  }
+  .meta b{color:var(--ink);font-weight:500;}
+
+  /* ---------- SECTION ---------- */
+  section{padding:44px 0;border-bottom:1px solid var(--line);}
+  .snum{
+    font-family:'Playfair Display',serif;font-style:italic;font-weight:500;
+    font-size:15px;color:var(--rose);margin-bottom:8px;display:block;
+  }
+  h2{
+    font-family:'Playfair Display',serif;font-weight:700;
+    font-size:clamp(24px,6vw,32px);line-height:1.2;letter-spacing:-.01em;
+    margin-bottom:20px;
+  }
+  h3{font-size:17px;font-weight:700;margin:28px 0 10px;color:var(--ink);}
+  p{margin-bottom:16px;font-size:15.5px;}
+  p .term{color:var(--gray);font-size:13px;}
+  strong{font-weight:700;color:var(--rose);}
+
+  .lead{font-size:18px;font-weight:400;line-height:1.7;}
+  .lead::first-letter{
+    font-family:'Playfair Display',serif;font-weight:900;
+    font-size:58px;float:left;line-height:.82;margin:6px 12px 0 0;color:var(--rose);
+  }
+
+  /* pull quote */
+  .pull{
+    margin:30px 0;padding:22px 24px;background:var(--bg2);
+    border-left:3px solid var(--rose);
+  }
+  .pull q{
+    font-family:'Playfair Display',serif;font-style:italic;font-weight:500;
+    font-size:20px;line-height:1.4;quotes:none;color:var(--ink);display:block;
+  }
+  .pull cite{display:block;margin-top:12px;font-size:12.5px;color:var(--sub);font-style:normal;}
+
+  /* callout box */
+  .box{
+    background:var(--bg2);border:1px solid var(--line);
+    border-radius:2px;padding:20px 22px;margin:24px 0;
+  }
+  .box .lbl{
+    font-family:'Noto Sans KR';font-weight:700;font-size:11px;
+    letter-spacing:.14em;text-transform:uppercase;color:var(--rose);
+    margin-bottom:10px;
+  }
+  .box p:last-child{margin-bottom:0;}
+
+  /* term chip */
+  .chip{
+    display:inline-block;background:#fff;border:1px solid var(--line);
+    border-radius:20px;padding:3px 11px;font-size:12px;color:var(--gray);
+    margin:2px 3px;font-weight:500;
+  }
+
+  /* chart */
+  .fade-in{opacity:0;transform:translateY(18px);transition:opacity .7s ease,transform .7s ease;}
+  .fade-in.visible{opacity:1;transform:translateY(0);}
+  .chart-container{position:relative;max-height:340px;margin:26px 0;}
+  .chart-container canvas{opacity:0;transition:opacity .4s ease;max-height:300px;}
+  .chart-container.chart-ready canvas{opacity:1;}
+  .cap{font-size:12px;color:var(--sub);text-align:center;margin-top:8px;}
+
+  /* table */
+  table{width:100%;border-collapse:collapse;margin:22px 0;font-size:13.5px;}
+  th,td{padding:11px 12px;text-align:left;border:1px solid var(--line);}
+  th{background:var(--rose);color:#fff;font-weight:500;font-size:12.5px;}
+  td{background:var(--bg2);}
+  td:first-child{font-weight:700;color:var(--ink);}
+
+  /* interactive: risk simulator */
+  .sim{background:var(--bg2);border:1px solid var(--line);border-radius:4px;padding:24px 22px;margin:26px 0;}
+  .sim h4{font-size:16px;font-weight:700;margin-bottom:6px;}
+  .sim .hint{font-size:13px;color:var(--sub);margin-bottom:18px;}
+  .sim label{display:flex;justify-content:space-between;font-size:13.5px;font-weight:500;margin:16px 0 6px;}
+  .sim label span{color:var(--rose);font-weight:700;}
+  .sim input[type=range]{width:100%;-webkit-appearance:none;height:5px;border-radius:5px;background:var(--line);outline:none;cursor:pointer;}
+  .sim input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:var(--rose);cursor:pointer;box-shadow:0 1px 4px rgba(225,29,72,.4);}
+  .sim input[type=range]::-moz-range-thumb{width:20px;height:20px;border:none;border-radius:50%;background:var(--rose);cursor:pointer;}
+  .sim .result{margin-top:22px;padding-top:20px;border-top:1px solid var(--line);}
+  .sim .big{font-family:'Playfair Display',serif;font-weight:900;font-size:38px;line-height:1;}
+  .sim .big.calm{color:var(--blue);}
+  .sim .big.warn{color:var(--rose);}
+  .sim .rlbl{font-size:12px;color:var(--sub);margin-bottom:4px;text-transform:uppercase;letter-spacing:.1em;}
+  .sim .verdict{margin-top:14px;font-size:14px;line-height:1.6;padding:12px 14px;border-radius:3px;background:#fff;border:1px solid var(--line);}
+  .sim .reset{margin-top:16px;background:var(--ink);color:#fff;border:none;padding:9px 16px;border-radius:3px;font-size:12.5px;font-weight:500;cursor:pointer;font-family:'Noto Sans KR';}
+  .sim .reset:hover{background:var(--rose);}
+
+  /* cycle line diagram */
+  .cycle{margin:26px 0;}
+  .cycle .track{display:flex;gap:0;border-radius:4px;overflow:hidden;border:1px solid var(--line);cursor:pointer;}
+  .cycle .zone{flex:1;padding:16px 8px;text-align:center;font-size:12px;font-weight:700;color:#fff;transition:opacity .25s;position:relative;}
+  .cycle .zone small{display:block;font-weight:400;font-size:10.5px;opacity:.85;margin-top:3px;}
+  .cycle .z1{background:var(--rose);}
+  .cycle .z2{background:var(--gray);}
+  .cycle .z3{background:var(--blue);}
+  .cycle .zone.dim{opacity:.32;}
+  .cycle .expl{margin-top:14px;font-size:14px;line-height:1.6;padding:14px 16px;background:var(--bg2);border-left:3px solid var(--rose);min-height:20px;}
+
+  .foot{padding:40px 0 70px;text-align:center;}
+  .foot .mk{font-family:'Playfair Display',serif;font-style:italic;font-size:15px;color:var(--rose);margin-bottom:8px;}
+  .foot p{font-size:12px;color:var(--sub);}
+
+  @media(max-width:400px){
+    .wrap{padding:0 16px;}
+    .lead::first-letter{font-size:46px;}
+    .sim,.box,.pull{padding-left:16px;padding-right:16px;}
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="kicker">지식인 초대석 · 투자 심리</div>
+    <h1>변동성의 여름,<br><em>위험을 관리하는</em> 법</h1>
+    <p class="dek">폭락과 사이드카가 2·3일에 한 번씩 반복되는 장에서, 아마추어 투자자가 살아남는 방법은 화려한 매매가 아니라 '공을 잘 넘기는 것'이다. 윤지호 평론가가 말하는 위험·현금·가치의 삼각형.</p>
+    <div class="meta">
+      <span><b>출연</b> 윤지호 평론가</span>
+      <span><b>진행</b> 한석준</span>
+      <span><b>녹화</b> 2026.06.30</span>
+      <span><b>정리</b> 2026.07.19</span>
+    </div>
+  </div>
+</header>
+
+<!-- 1 -->
+<section>
+  <div class="wrap">
+    <span class="snum">Chapter 01</span>
+    <h2>테니스로 배우는 투자</h2>
+    <p class="lead">프로 테니스 선수의 경기를 보면 구석구석을 정확히 찔러 넣는다. 그걸 흉내 내려다 아마추어는 엉뚱한 곳으로 공을 날린다. 그렇다면 아마추어가 이기는 법은? 답은 단순하다. <strong>공을 잘 넘기기만 하면 된다.</strong></p>
+    <p>윤지호 평론가는 하워드 막스가 인용한 '아마추어 테니스에서 이기는 법'을 투자에 그대로 옮긴다. 8% 폭락한 날 사서 8% 폭등한 날 파는 화려한 매매는 소수의 뛰어난 트레이더가 도파민을 분출하며 하는 영역이다. 나머지 대부분은 그 흉내를 낼 것이 아니라, <strong>변동성을 어떻게 제어할지</strong>부터 물어야 한다.</p>
+
+    <div class="pull">
+      <q>우리는 위험을 피할 수는 없잖아요. 관리할 수는 있지 않습니까.</q>
+      <cite>— 윤지호 평론가</cite>
+    </div>
+
+    <p>변동성을 제어하는 방법은 간단하다. 일정 부분의 현금을 들고 있는 것. 급락했을 때 당황하지 않고 살 수 있고, 오르면 현금을 마련하며 포지션을 조절할 수 있다. 그는 <strong>현금 비중 30~50%</strong>를 완충지대로 제안한다.</p>
+  </div>
+</section>
+
+<!-- 2 -->
+<section>
+  <div class="wrap">
+    <span class="snum">Chapter 02</span>
+    <h2>위험이란 무엇인가</h2>
+    <p>재무이론<span class="term">(파이낸스)</span>은 위험을 '변동성', 즉 주가가 오르내리는 폭으로 정의한다. 이 이론은 CAPM<span class="term">(자본자산 가격결정 모형)</span>으로 노벨상까지 받았고, "하이리스크 하이리턴 / 로우리스크 로우리턴"이라는 핵심 토대를 만들었다.</p>
+    <p>하지만 워런 버핏은 이를 비웃었다. 그가 말하는 위험은 <strong>내 돈이 영구적으로 깨지는 것</strong><span class="term">(영구 자본손실)</span>이다.</p>
+
+    <div class="box">
+      <div class="lbl">복권의 비유</div>
+      <p>공짜로 받은 복권을 긁어 꽝이 나도 손해는 없다 — 위험이 아니다. 하지만 <strong>당첨을 목적으로 5천 원에 산</strong> 복권이 꽝이면, 그 5천 원은 사라진다. 그것이 진짜 위험이다.</p>
+    </div>
+
+    <p>흥미로운 반전이 있다. 장기적으로 보면 변동성은 위험이 아니다. 좋은 기업을 <strong>싸게</strong> 사두었다면, 주가가 위에서 아무리 흔들려도 위험을 느끼지 않기 때문이다. 반대로 클리퍼드 애스니스는 변동성이 <strong>단기적으로는 위험</strong>이라 했다 — 투자자의 심리를 흔들어 싸게 팔고 비싸게 사는 감정적 반복에 빠지게 만들기 때문이다.</p>
+
+    <h3>매입 가격이 만드는 심리의 차이</h3>
+    <p>같은 20% 변동이라도 매입 가격에 따라 체감은 정반대다. 아래 슬라이더로 직접 확인해보자.</p>
+
+    <div class="sim">
+      <h4>변동성 체감 시뮬레이터</h4>
+      <p class="hint">현재가는 만 원. 매입 단가를 바꾸면 ±10% 변동이 내 수익률에서 어떻게 느껴지는지 보여줍니다.</p>
+      <label>내 매입 단가 <span id="buyOut">3,000원</span></label>
+      <input type="range" id="buyPrice" min="1000" max="10000" step="500" value="3000">
+      <div class="result">
+        <div class="rlbl">현재 평가 수익률</div>
+        <div class="big" id="baseRet">+233%</div>
+        <div class="verdict" id="verdict"></div>
+        <button class="reset" id="simReset">초기값으로</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 3 -->
+<section>
+  <div class="wrap">
+    <span class="snum">Chapter 03</span>
+    <h2>지금, 시장의 '회색지대'</h2>
+    <p>윤 평론가에게 시장은 세 상태로 움직인다. 흐릿한 <strong>회색지대</strong>일 때 주식을 열심히 사두고, 모든 것이 선명해졌을 때는 사면 안 된다. 인간은 하워드 막스의 '시계추 이론'처럼 극단에서 극단으로 오간다.</p>
+
+    <div class="cycle">
+      <div class="track" id="cycTrack">
+        <div class="zone z1" data-k="buy">공격 구간<small>회색·공포일 때</small></div>
+        <div class="zone z2" data-k="hold">유지 구간<small>불확실·중간</small></div>
+        <div class="zone z3" data-k="def">방어 구간<small>선명·환호할 때</small></div>
+      </div>
+      <div class="expl" id="cycExpl">▲ 위 구간을 눌러보세요. 각 국면에서 어떻게 행동해야 하는지 설명이 나타납니다.</div>
+    </div>
+
+    <p>지금 한국 시장의 무게중심은 명확하다. <strong>전체 시가총액의 58%가 반도체</strong>, 수출 비중의 약 53%가 반도체다. 반면 연초 시총의 약 13%를 차지하던 코스닥은 지금 6~7% 수준으로 반토막이 났다. 시장은 중심이 어디인지 스스로 말해주고 있다.</p>
+
+    <div class="chart-container fade-in">
+      <canvas id="cKosdaq" height="230"></canvas>
+    </div>
+    <p class="cap">코스피+코스닥 합산 시총 중 코스닥 비중 변화 (연초 대비)</p>
+
+    <div class="chart-container fade-in">
+      <canvas id="cWeight" height="230"></canvas>
+    </div>
+    <p class="cap">한국 경제·시장에서 반도체가 차지하는 비중</p>
+  </div>
+</section>
+
+<!-- 4 -->
+<section>
+  <div class="wrap">
+    <span class="snum">Chapter 04</span>
+    <h2>메모리 이익, 세금인가 축복인가</h2>
+    <p>반도체를 좋게 보는 이유는 단순하다. 돈을 많이 벌기 때문이다. 마이크론의 매출총이익률<span class="term">(마진)</span>은 84%, 다음 분기 전망은 86%. 만 원에 팔면 8,600원이 이익이라는 뜻이다.</p>
+
+    <div class="pull">
+      <q>메모리 가격 상승이 이익인 것도 있지만, 어떻게 보면 일종의 세금일 수도 있는 거예요.</q>
+      <cite>— 메모리를 사주는 기업 입장에서</cite>
+    </div>
+
+    <p>이 마진이 유지될 수 있을까? 아무도 모른다. 문제는 이 비싼 메모리를 사주는 하이퍼스케일러<span class="term">(대형 클라우드 기업)</span>들이 힘들어진다는 점이다. 원래 미국 기업의 매력은 <strong>FCF</strong><span class="term">(잉여현금흐름 — 영업으로 번 돈에서 설비투자를 뺀, 자유롭게 쓸 수 있는 돈)</span>였는데, 그 돈이 전부 메모리 구매에 빨려 들어가 마이너스로 가고 있다.</p>
+
+    <div class="chart-container fade-in">
+      <canvas id="cMargin" height="230"></canvas>
+    </div>
+    <p class="cap">마이크론 매출총이익률 시나리오 — 86%는 과하고, 50%대 안착이 오히려 구조적 강세</p>
+
+    <h3>자금 조달의 경고등</h3>
+    <p>하이퍼스케일러들은 자기 돈 → 장기채 → 단기채 순으로 조달 방식이 내려앉고 있다. <strong>장기채가 발행되지 않는다</strong>는 건 시장이 "너 망할 수도 있어"라고 본다는 신호다. 1년 미만 단기채 비중이 12%를 넘었다는 데이터도 있다. 매년 갚고 다시 빌리는 번거로움이 쌓인다.</p>
+
+    <div class="box">
+      <div class="lbl">핵심 관전 포인트</div>
+      <p>미국채 10년물 금리가 <strong>4.5%</strong>를 넘으면 트럼프도 멈췄다. 장기채 금리는 모기지·대출의 베이스다. 금리가 4.6·4.7·4.8로 오르면 차입에 의존하던 기업들이 손을 든다. 올여름 이후 진짜 주제는 <strong>"하이퍼스케일러가 자본을 조달할 수 있느냐"</strong>다.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 5 -->
+<section>
+  <div class="wrap">
+    <span class="snum">Chapter 05</span>
+    <h2>WACC, ROIC, 그리고 오픈AI의 시한</h2>
+    <p>기업이 돈을 빌리는 비용이 <strong>WACC</strong><span class="term">(가중평균자본비용 — 채권 비용과 주식 비용을 합쳐 평균낸 전체 자금 조달 비용)</span>다. 투자로 벌어들이는 능력이 <strong>ROIC</strong><span class="term">(투하자본이익률)</span>다. 원칙은 하나 — ROIC가 WACC보다 높아야 한다. 설비투자<span class="term">(캐펙스)</span>한 것 이상을 벌지 못하면, 그 돈은 매몰비용<span class="term">(썽크코스트)</span>이 되고 감가상각은 손상차손으로 바뀐다.</p>
+
+    <p>이 사이클의 급소는 <strong>오픈AI</strong>다. 소프트뱅크가 천억 달러를 넣었지만, 손정의 회장은 오픈AI 지분을 담보로 100억 달러 조달에 실패했다. IPO 얘기가 나온 이유는 <strong>천억 달러 리파이낸싱</strong> 시기가 다가오기 때문이다.</p>
+
+    <div class="pull">
+      <q>오픈AI부터 돈이 들어가서 이 순환출자에 돈이 흐르게 해줘야, 그다음 단계로 갈 수 있어요.</q>
+    </div>
+
+    <div class="box">
+      <div class="lbl">순환의 사슬</div>
+      <p>오픈AI 리파이낸싱 실패 → 업데이트 지연 → AI 경쟁에서 밀림 → 이용자 감소 → 데이터센터 ROI 실종 → 자금 경색. 반대로 순환이 잘 돌면 시장은 <strong>위로 폭발</strong>할 수 있다. 그때는 반도체를 넘어 현대차·네이버·금융까지 온기가 번질 수 있다.</p>
+    </div>
+
+    <p>엔비디아의 젠슨 황이 한국을 사랑해서 오는 게 아니다. 자기 돈을 대주고 자기 칩을 사게 해, 그 생태계에서 돈이 돌아 들어와야 판이 굴러가기 때문이다. 그게 순환출자의 큰 그림이다.</p>
+  </div>
+</section>
+
+<!-- 6 -->
+<section>
+  <div class="wrap">
+    <span class="snum">Chapter 06</span>
+    <h2>레버리지 ETF, 꼬리가 몸통을 흔드나</h2>
+    <p>5월 이후 단일 종목 레버리지 ETF<span class="term">(하루 등락을 2배로 추종하는 상품)</span>가 출시되며 쏠림이 극심해졌다. 금감원장은 "드러누워서라도 말렸어야 했다"고 했다.</p>
+    <p>윤 평론가의 진단은 균형적이다. 변동성의 <strong>출발점</strong>은 삼성전자·하이닉스 두 기업의 이익이 압도적으로 좋다는 데 있다. 레버리지 ETF는 매일 복리로 포지션을 조절하기에 <strong>증폭 효과는 분명히 있지만</strong>, 본주 가격을 흔드는 정도는 제한적이다. 본주가 수십 % 움직인다면 ETF발 영향은 10% 수준.</p>
+
+    <div class="pull">
+      <q>페라리를 몰고 나와 빗길에서 엑셀을 밟으면, 미끄러지거나 나무에 부딪혀 죽을 수도 있는 거예요.</q>
+      <cite>— 험한 날씨(변동성 장)에서의 레버리지</cite>
+    </div>
+
+    <p>그의 결론: 급등하는 날엔 <strong>레버리지를 줄여라</strong>. 단일 종목이든 지수든. 이 장은 레버리지를 쓸 장이 아니다.</p>
+  </div>
+</section>
+
+<!-- 7 -->
+<section>
+  <div class="wrap">
+    <span class="snum">Chapter 07</span>
+    <h2>훌륭한 기업 · 적정 가격 · 현금</h2>
+    <p>그레이엄은 1949년, 재무제표가 엉성하던 시절 '싼 기업'을 찾으라 했다. 버핏은 이를 넘어섰다 — <strong>싼 기업이 아니라, 아주 훌륭한 기업을 적정 가격에 사라.</strong> 훌륭한 기업의 조건은 단 하나, <strong>통장에 현금을 만들어내는 능력</strong>이다.</p>
+
+    <div class="box">
+      <div class="lbl">진주집 vs 옆 칼국수집</div>
+      <p>백화점의 진주집은 회전이 빨라 현금이 계속 쌓인다 — 지분을 투자하고 싶어진다. 옆의 비슷한 칼국수집은? 안 한다. <strong>"이익은 의견일 뿐이고, 현금이 가치다."</strong></p>
+    </div>
+
+    <p>PER·PBR은 밸류에이션 지표가 아니라 <strong>상대가치</strong>일 뿐이다. 한강변 30평 아파트가 30억이라고 옆 40평이 40억은 아니듯. 진짜 가치는 현금흐름이 결정한다. 2012~2014년 대우조선은 영업이익 1.4조를 냈지만 영업현금흐름은 3년간 마이너스 2.8조 — 투자자는 망했다.</p>
+
+    <table>
+      <thead><tr><th>구분</th><th>그레이엄</th><th>버핏 이후</th></tr></thead>
+      <tbody>
+        <tr><td>목표</td><td>싼 기업</td><td>훌륭한 기업</td></tr>
+        <tr><td>가격</td><td>가치보다 쌀 때</td><td>적정 가격</td></tr>
+        <tr><td>핵심</td><td>순수한 가치</td><td>성장하는 현금</td></tr>
+        <tr><td>예시</td><td>부정 많던 저평가주</td><td>애플·코카콜라·코스트코</td></tr>
+      </tbody>
+    </table>
+
+    <p>한국에도 '헤자<span class="term">(해자·독점적 지위)</span>'를 가진 기업이 있다. 음식료의 삼양식품(불닭볶음면), 화장품의 APR. 반면 대우조선식 함정도, 아무도 관심 없는 LG생활건강 같은 사례도 있다. 그리고 지금 이 자본비용을 감당하며 현금을 만드는 대표 주자가 <strong>삼성전자·하이닉스</strong>라, 자금이 그리로 쏠린다.</p>
+  </div>
+</section>
+
+<!-- 8 -->
+<section>
+  <div class="wrap">
+    <span class="snum">Chapter 08</span>
+    <h2>자기 속도로 완주하기</h2>
+    <p>투자는 100m 달리기가 아니라 완주 게임이다. 20·30대는 빠르게 시간의 복리를 벌 수 있고 실패해도 재기할 수 있다. 하지만 50대에 전세금을 빼 주식하는 건 위험하다 — 남은 시간이 그만큼 길지 않다. 버핏이 60부터 만개했다지만, 그는 그 전까지 프로였다.</p>
+
+    <div class="box">
+      <div class="lbl">피해야 할 감정 — 하인드사이트</div>
+      <p>"그때 샀더라면"이라는 사후확신은 하나의 경로만 떠올리는 착각이다. 다른 경로도 있었다. 성공 사례를 부러워하며 <strong>쫓아가는 매매</strong>(피터 린치의 '칵테일 파티 이론')는 확률을 낮춘다.</p>
+    </div>
+
+    <p>대신 <strong>캐시플로</strong>를 만들어 두라. 변동성이 커지면 ELS 쿠폰이 오르니 활용하고, 이익 실현분 일부를 현금 자산으로 분별해 모아두면, 우발적 붕괴가 왔을 때 그 돈을 투입할 수 있다.</p>
+
+    <div class="pull">
+      <q>삶이 바뀌는 순간은 지수 9,000에서 12,000 갈 때가 아니라, 3,000에서 6,000·7,000 갈 때 옵니다.</q>
+    </div>
+
+    <p>모든 결정적 사건은 <strong>우발적으로</strong> 온다. 과거의 것이 반복되지 않는다. 그래서 겸손하게, 최소 50% 이상은 주식으로 시장을 대체하되 30~40% 현금을 오가며 조절한다. <strong>손익비</strong><span class="term">(아래로 감수할 손해 대비 위로 기대되는 이익)</span>를 반드시 따진다.</p>
+  </div>
+</section>
+
+<!-- 9 -->
+<section>
+  <div class="wrap">
+    <span class="snum">Chapter 09</span>
+    <h2>코스피 만(萬), 새로운 미래인가</h2>
+    <p>심정적으로 그는 한국 증시가 <strong>큰 변화를 시작했다</strong>고 본다. 핵심은 반도체 이익이 아니라, 한국이 <strong>금융자본주의</strong>로 나아가느냐다.</p>
+
+    <div class="box">
+      <div class="lbl">금융자본주의란</div>
+      <p>60년대 말 실물경제가 무너진 미국은 금융만 커졌다(버핏지수 200% 이상). 반대편 일본·한국은 실물은 강했지만 금융이 낙후됐다. 일본은 아베노믹스 실패 뒤 <strong>주주환원·거버넌스 개혁</strong>으로 10년간 시총을 1.5~1.6배 키웠다. 한국도 작년 이후 <strong>부동산에서 주식으로</strong> 자금을 이동시키기 시작했다.</p>
+    </div>
+
+    <p>지금까지 한국은 <strong>오너가치가 주주가치를 압도</strong>하는 시대였다. 상법 개정(주주 충실 의무)은 잘한 일이지만 아직 실현은 약하다. 이 흐름이 비가역적이라 그는 장기적으로 낙관한다.</p>
+
+    <h3>ROE를 올리는 두 가지 길</h3>
+    <p><strong>ROE</strong><span class="term">(자기자본이익률 — 분자는 이익, 분모는 자본)</span>를 높이려면 이익을 늘리거나 <strong>자본을 줄여야</strong> 한다. 일본은 자사주 소각·부실자산 정리로 자본을 줄였다. 한국, 특히 코스닥은 이 부분이 미약하다.</p>
+
+    <div class="chart-container fade-in">
+      <canvas id="cRoe" height="230"></canvas>
+    </div>
+    <p class="cap">ROE 개선의 두 경로 — 이익 증대 vs 자본 축소(자사주 소각)</p>
+
+    <p>버핏지수로 한국은 일본을 따라잡았지만, 그 힘은 거버넌스 개혁이 아니라 <strong>반도체</strong>였다. 미완의 혁명이다. 개혁이 다시 탄력을 받아야 반도체 하나만 바라보지 않는, 더 편안한 '만·2만 시대'가 열린다.</p>
+
+    <p>금융자본주의 시대의 포트폴리오 한 축은 <strong>금융주</strong>다. 지속 가능한 주주환원과 잉여현금을 만드는 4대 금융지주(KB·하나·우리·신한)와 대형 증권사, 그리고 지분가치가 희석되지 않는 지주사들을 늘 살펴야 한다.</p>
+  </div>
+</section>
+
+<footer class="foot">
+  <div class="wrap">
+    <div class="mk">— 위험을 피할 수는 없다, 관리할 수 있을 뿐 —</div>
+    <p>본 리포트는 방송 자막을 기반으로 정리한 요약·분석이며, 특정 종목의 매수·매도를 권유하지 않습니다.<br>투자 판단과 책임은 투자자 본인에게 있습니다.</p>
+  </div>
+</footer>
+
+<script>
+/* ---------- fade-in ---------- */
+const fadeObs=new IntersectionObserver((entries)=>{
+  entries.forEach((e,i)=>{
+    if(e.isIntersecting){
+      setTimeout(()=>e.target.classList.add('visible'),i*80);
+      fadeObs.unobserve(e.target);
+    }
+  });
+},{threshold:0.12});
+document.querySelectorAll('.fade-in').forEach(el=>fadeObs.observe(el));
+
+/* ---------- chart palette ---------- */
+const C={rose:'#e11d48',ink:'#1a1a1a',gray:'#6b7280',blue:'#2563eb'};
+Chart.defaults.font.family="'Noto Sans KR',sans-serif";
+Chart.defaults.font.size=12;
+Chart.defaults.color=C.gray;
+
+const chartConfigs={};
+
+chartConfigs['cKosdaq']=()=>{
+  new Chart(document.getElementById('cKosdaq'),{
+    type:'bar',
+    data:{labels:['연초 (1월)','현재'],
+      datasets:[{label:'코스닥 시총 비중(%)',data:[13,6.7],
+        backgroundColor:[C.gray,C.rose],borderRadius:4,barThickness:70}]},
+    options:{plugins:{legend:{display:false},
+      tooltip:{callbacks:{label:c=>c.parsed.y+'%'}}},
+      scales:{y:{beginAtZero:true,max:15,ticks:{callback:v=>v+'%'},grid:{color:'#eee'}},x:{grid:{display:false}}}}
+  });
+};
+
+chartConfigs['cWeight']=()=>{
+  new Chart(document.getElementById('cWeight'),{
+    type:'bar',
+    data:{labels:['전체 시가총액 중','수출 비중 중'],
+      datasets:[
+        {label:'반도체',data:[58,53],backgroundColor:C.rose,borderRadius:3},
+        {label:'그 외',data:[42,47],backgroundColor:'#e5e5e5',borderRadius:3}
+      ]},
+    options:{indexAxis:'y',plugins:{legend:{position:'bottom'},
+      tooltip:{callbacks:{label:c=>c.dataset.label+': '+c.parsed.x+'%'}}},
+      scales:{x:{stacked:true,max:100,ticks:{callback:v=>v+'%'},grid:{color:'#eee'}},
+        y:{stacked:true,grid:{display:false}}}}
+  });
+};
+
+chartConfigs['cMargin']=()=>{
+  new Chart(document.getElementById('cMargin'),{
+    type:'line',
+    data:{labels:['현재','다음분기(전망)','조정 시나리오','구조적 안착'],
+      datasets:[{label:'매출총이익률(%)',data:[84,86,60,50],
+        borderColor:C.rose,backgroundColor:'rgba(225,29,72,.08)',
+        fill:true,tension:.3,pointRadius:5,pointBackgroundColor:C.rose}]},
+    options:{plugins:{legend:{display:false},
+      tooltip:{callbacks:{label:c=>c.parsed.y+'%'}}},
+      scales:{y:{min:40,max:95,ticks:{callback:v=>v+'%'},grid:{color:'#eee'}},x:{grid:{display:false}}}}
+  });
+};
+
+chartConfigs['cRoe']=()=>{
+  new Chart(document.getElementById('cRoe'),{
+    type:'bar',
+    data:{labels:['이익 증대 경로','자본 축소 경로'],
+      datasets:[
+        {label:'이익(분자)',data:[120,100],backgroundColor:C.rose,borderRadius:3},
+        {label:'자본(분모)',data:[100,70],backgroundColor:C.ink,borderRadius:3}
+      ]},
+    options:{plugins:{legend:{position:'bottom'},
+      tooltip:{callbacks:{label:c=>c.dataset.label+': '+c.parsed.y}}},
+      scales:{y:{beginAtZero:true,grid:{color:'#eee'}},x:{grid:{display:false}}}}
+  });
+};
+
+const chartObs=new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      const canvas=e.target.querySelector('canvas');
+      if(canvas&&chartConfigs[canvas.id]){
+        chartConfigs[canvas.id]();
+        e.target.classList.add('chart-ready');
+        chartObs.unobserve(e.target);
+      }
+    }
+  });
+},{threshold:0.15});
+document.querySelectorAll('.chart-container').forEach(el=>chartObs.observe(el));
+
+/* ---------- risk simulator ---------- */
+const buy=document.getElementById('buyPrice');
+const buyOut=document.getElementById('buyOut');
+const baseRet=document.getElementById('baseRet');
+const verdict=document.getElementById('verdict');
+const CUR=10000;
+function fmt(n){return n.toLocaleString('ko-KR');}
+function updSim(){
+  const b=+buy.value;
+  buyOut.textContent=fmt(b)+'원';
+  const ret=Math.round((CUR-b)/b*100);
+  const up=Math.round((CUR*1.1-b)/b*100);
+  const dn=Math.round((CUR*0.9-b)/b*100);
+  baseRet.textContent=(ret>=0?'+':'')+ret+'%';
+  const swing=up-dn; // 항상 22%p 근방
+  if(b>=8000){
+    baseRet.className='big warn';
+    verdict.innerHTML='매입가가 현재가에 가까워요. ±10% 변동이 <b style="color:#e11d48">'+dn+'% ~ +'+up+'%</b> 사이를 오가며 <b>손실 구간을 넘나들어</b> 심리적으로 매우 쫄립니다.';
+  }else if(b>=5000){
+    baseRet.className='big warn';
+    verdict.innerHTML='아직 변동이 부담스러운 구간. ±10%가 <b>'+dn+'% ~ +'+up+'%</b>로, 흔들릴 때마다 마음이 요동칩니다.';
+  }else{
+    baseRet.className='big calm';
+    verdict.innerHTML='싸게 사둔 덕에 ±10% 변동은 <b style="color:#2563eb">+'+dn+'% ~ +'+up+'%</b> — 이미 큰 수익 위의 진동이라 <b>변동성이 위험으로 느껴지지 않습니다.</b>';
+  }
+}
+buy.addEventListener('input',updSim);
+document.getElementById('simReset').addEventListener('click',()=>{buy.value=3000;updSim();});
+updSim();
+
+/* ---------- cycle diagram ---------- */
+const cycExpl=document.getElementById('cycExpl');
+const cycText={
+  buy:'<b style="color:#e11d48">공격 구간 —</b> 개와 늑대가 구분 안 되는 회색·공포의 시간. 무섭지만 이때 용기를 내 매수한다. 캐시플로를 미리 만들어 둔 이유가 여기 있다. (코로나 지수 1,800 "사과나무" 사례)',
+  hold:'<b style="color:#6b7280">유지 구간 —</b> 불확실이 이어지는 중간지대. 최소 50~70% 주식으로 시장을 대체하며 현금 비중만 조절한다. 결론을 정해놓고 보지 않는다.',
+  def:'<b style="color:#2563eb">방어 구간 —</b> 모두가 환호하고 선명해졌을 때. 공격적으로 사지 않고 레버리지를 줄인다. 능력 없는 사람이 이때 뛰어들면 상투를 잡는다.'
+};
+document.querySelectorAll('#cycTrack .zone').forEach(z=>{
+  z.addEventListener('click',()=>{
+    document.querySelectorAll('#cycTrack .zone').forEach(x=>x.classList.add('dim'));
+    z.classList.remove('dim');
+    cycExpl.innerHTML=cycText[z.dataset.k];
+  });
+});
+</script>
+</body>
+</html>

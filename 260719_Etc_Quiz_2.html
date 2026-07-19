@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>올여름 투자 전략 — 이해도 퀴즈</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,500&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#ffffff;--bg2:#fafafa;--ink:#1a1a1a;--sub:#777777;
+    --rose:#e11d48;--rose2:#f43f5e;--line:#e5e5e5;
+    --green:#16a34a;--greenbg:#f0fdf4;--redbg:#fef2f2;--blue:#2563eb;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--ink);font-family:'Noto Sans KR',sans-serif;line-height:1.7;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:680px;margin:0 auto;padding:0 20px;}
+
+  /* header */
+  header{padding:52px 0 30px;text-align:center;border-bottom:2px solid var(--ink);}
+  .eyebrow{font-weight:700;font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--rose);margin-bottom:14px;}
+  header h1{font-family:'Playfair Display',serif;font-weight:900;font-size:clamp(28px,7vw,40px);line-height:1.1;letter-spacing:-.01em;}
+  header p{margin-top:12px;color:var(--sub);font-size:14px;font-weight:300;}
+
+  /* sticky scoreboard */
+  .board{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.96);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);padding:12px 0;}
+  .board .row{display:flex;justify-content:space-between;align-items:center;gap:10px;max-width:680px;margin:0 auto;padding:0 20px;}
+  .board .stat{font-size:12.5px;color:var(--sub);}
+  .board .stat b{font-family:'Playfair Display',serif;font-size:19px;color:var(--ink);font-weight:700;margin-right:2px;}
+  .board .stat .acc{color:var(--rose);}
+  .bar{height:6px;background:var(--line);border-radius:6px;overflow:hidden;margin-top:9px;max-width:680px;margin-left:auto;margin-right:auto;}
+  .bar>i{display:block;height:100%;width:0;background:var(--rose);transition:width .4s ease,background .4s ease;}
+
+  /* quiz cards */
+  main{padding:30px 0 20px;}
+  .card{background:var(--bg2);border:1px solid var(--line);border-radius:6px;padding:24px 22px;margin-bottom:22px;}
+  .qtop{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap;}
+  .qno{font-family:'Playfair Display',serif;font-weight:900;font-size:22px;color:var(--rose);line-height:1;}
+  .badge{font-size:10.5px;font-weight:700;letter-spacing:.06em;padding:3px 9px;border-radius:20px;text-transform:uppercase;}
+  .b-easy{background:#e0f2fe;color:#0369a1;}
+  .b-mid{background:#fef3c7;color:#b45309;}
+  .b-hard{background:#fee2e2;color:#b91c1c;}
+  .b-type{background:#fff;border:1px solid var(--line);color:var(--sub);}
+  .qtext{font-size:16px;font-weight:500;line-height:1.6;margin-bottom:18px;}
+
+  .opts{display:flex;flex-direction:column;gap:9px;}
+  .opt{text-align:left;background:#fff;border:1.5px solid var(--line);border-radius:5px;padding:13px 15px;font-size:14.5px;font-family:'Noto Sans KR';color:var(--ink);cursor:pointer;transition:.15s;display:flex;align-items:center;gap:10px;line-height:1.5;}
+  .opt:hover:not(:disabled){border-color:var(--rose);background:#fff5f7;}
+  .opt:disabled{cursor:default;}
+  .opt .mk{flex-shrink:0;width:22px;height:22px;border-radius:50%;border:1.5px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--sub);}
+  .opt.correct{background:var(--greenbg);border-color:var(--green);}
+  .opt.correct .mk{background:var(--green);border-color:var(--green);color:#fff;}
+  .opt.wrong{background:var(--redbg);border-color:var(--rose);}
+  .opt.wrong .mk{background:var(--rose);border-color:var(--rose);color:#fff;}
+  .tag{margin-left:auto;font-size:11px;font-weight:700;padding:2px 8px;border-radius:12px;flex-shrink:0;}
+  .tag.ok{background:var(--green);color:#fff;}
+  .tag.no{background:var(--rose);color:#fff;}
+
+  /* short answer */
+  .sa{display:flex;gap:8px;flex-wrap:wrap;}
+  .sa input{flex:1;min-width:180px;padding:12px 14px;border:1.5px solid var(--line);border-radius:5px;font-size:14.5px;font-family:'Noto Sans KR';outline:none;}
+  .sa input:focus{border-color:var(--rose);}
+  .sa button{background:var(--ink);color:#fff;border:none;padding:0 20px;border-radius:5px;font-size:14px;font-weight:500;cursor:pointer;font-family:'Noto Sans KR';}
+  .sa button:hover{background:var(--rose);}
+  .sa input:disabled,.sa button:disabled{opacity:.6;cursor:default;}
+
+  /* ox */
+  .ox{display:flex;gap:12px;}
+  .ox button{flex:1;padding:16px;border:1.5px solid var(--line);border-radius:5px;background:#fff;font-family:'Playfair Display',serif;font-size:26px;font-weight:700;cursor:pointer;transition:.15s;}
+  .ox button:hover:not(:disabled){border-color:var(--rose);background:#fff5f7;}
+  .ox button:disabled{cursor:default;}
+  .ox button.correct{background:var(--greenbg);border-color:var(--green);color:var(--green);}
+  .ox button.wrong{background:var(--redbg);border-color:var(--rose);color:var(--rose);}
+
+  /* explanation */
+  .expl{max-height:0;overflow:hidden;transition:max-height .4s ease;margin-top:0;}
+  .expl.open{max-height:600px;margin-top:16px;}
+  .expl-in{background:#fff;border-left:3px solid var(--rose);border-radius:0 4px 4px 0;padding:14px 16px;font-size:13.5px;line-height:1.65;color:#333;}
+  .expl-in .h{font-weight:700;color:var(--rose);font-size:12px;letter-spacing:.05em;text-transform:uppercase;margin-bottom:6px;display:flex;align-items:center;gap:6px;}
+  .expl-in .src{margin-top:10px;padding-top:10px;border-top:1px dashed var(--line);font-size:12.5px;color:var(--sub);}
+  .expl-in .src b{color:var(--ink);}
+
+  /* result modal */
+  .modal{position:fixed;inset:0;background:rgba(26,26,26,.55);display:none;align-items:center;justify-content:center;z-index:100;padding:20px;}
+  .modal.show{display:flex;}
+  .modal-in{background:#fff;border-radius:10px;max-width:400px;width:100%;padding:36px 28px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.3);}
+  .grade{font-family:'Playfair Display',serif;font-weight:900;font-size:72px;line-height:1;margin-bottom:6px;}
+  .modal-in .score{font-size:15px;color:var(--sub);margin-bottom:16px;}
+  .modal-in .score b{color:var(--ink);font-size:18px;}
+  .modal-in .msg{font-size:15px;line-height:1.6;margin-bottom:24px;padding:14px;background:var(--bg2);border-radius:6px;}
+  .modal-in button{background:var(--rose);color:#fff;border:none;padding:13px 28px;border-radius:6px;font-size:15px;font-weight:500;cursor:pointer;font-family:'Noto Sans KR';width:100%;}
+  .modal-in button:hover{background:var(--rose2);}
+
+  footer{text-align:center;padding:30px 0 60px;font-size:12px;color:var(--sub);}
+  @media(max-width:400px){.wrap,.board .row{padding-left:14px;padding-right:14px;}.card{padding:20px 16px;}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="eyebrow">지식인 초대석 · 윤지호 평론가</div>
+    <h1>올여름 투자 전략<br>이해도 퀴즈</h1>
+    <p>총 10문제 · 클릭하면 즉시 채점되고 해설이 열립니다</p>
+  </div>
+</header>
+
+<div class="board">
+  <div class="row">
+    <span class="stat"><b id="sSolved">0</b>/ 10 푼 문제</span>
+    <span class="stat"><b id="sCorrect">0</b>맞힘</span>
+    <span class="stat">정답률 <b class="acc" id="sAcc">0</b><span class="acc" style="font-size:13px">%</span></span>
+  </div>
+  <div class="bar"><i id="sBar"></i></div>
+</div>
+
+<main class="wrap" id="quiz"></main>
+
+<div class="modal" id="modal">
+  <div class="modal-in">
+    <div class="grade" id="mGrade">A</div>
+    <div class="score">10문제 중 <b id="mScore">0</b>문제 정답</div>
+    <div class="msg" id="mMsg"></div>
+    <button id="mRetry">다시 풀기</button>
+  </div>
+</div>
+
+<footer class="wrap">방송 자막에 실제로 등장한 내용만으로 출제되었습니다.</footer>
+
+<script>
+const QUIZ_DATA=[
+  {
+    id:1,type:'mc',difficulty:'쉬움',
+    question:'윤지호 평론가가 인용한 "아마추어 테니스에서 이기는 법"에서, 아마추어 투자자가 해야 할 일은?',
+    options:['프로처럼 구석구석을 화려하게 찔러 넣는다','공을 잘 넘기기만 하면 된다','상대의 실수를 유도하는 전술을 쓴다','매 순간 강한 스매싱으로 승부한다'],
+    answer:1,
+    explanation:'하워드 막스가 인용한 책의 핵심은 아마추어는 화려한 매매를 흉내 내지 말고 "공을 잘 넘기기만 하면 된다"는 것입니다.',
+    src:'"아마추어 플레이어들이 이기는 방법은 공을 잘 넘기기만 하면 됩니다."'
+  },
+  {
+    id:2,type:'mc',difficulty:'보통',
+    question:'변동성을 제어(관리)하기 위해 윤 평론가가 제안한 현금 비중 범위는?',
+    options:['0~10%','10~20%','30~50%','80~90%'],
+    answer:2,
+    explanation:'일정 부분의 현금을 들고 있어야 급락 시 당황하지 않고 살 수 있습니다. 그는 30~50% 사이의 현금을 완충지대로 제안했습니다.',
+    src:'"30% 50% 사이에 현금을 갖고 있어야 이러한 완충지대를 갖고서 변동성을 제어할 수 있지 않나."'
+  },
+  {
+    id:3,type:'ox',difficulty:'보통',
+    question:'재무이론(파이낸스)에서는 위험을 "변동성"으로 정의하지만, 워런 버핏은 위험을 "내 돈이 영구적으로 깨지는 것(영구 자본손실)"이라고 보았다.',
+    answer:'O',
+    explanation:'맞습니다. 재무이론은 위험=변동성(CAPM으로 노벨상)이지만, 버핏은 "무슨 그게 위험이야, 위험은 내 돈이 깨지는 것"이라며 영구 자본손실을 위험으로 봤습니다.',
+    src:'복권을 공짜로 받아 긁으면 위험이 아니고, 당첨 목적으로 5천 원에 사서 꽝이 되면 그것이 위험이라는 비유.'
+  },
+  {
+    id:4,type:'mc',difficulty:'쉬움',
+    question:'현재 한국에서 전체 시가총액 중 반도체가 차지하는 비중으로 언급된 수치는?',
+    options:['약 33%','약 42%','약 58%','약 75%'],
+    answer:2,
+    explanation:'전체 시가총액의 58%가 반도체이고, 수출 비중의 약 53%가 반도체라고 언급했습니다.',
+    src:'"전체 시가총액의 58%가 반도체고요. 우리나라 수출 비중의 한 53%가 반도체입니다."'
+  },
+  {
+    id:5,type:'sa',difficulty:'어려움',
+    question:'기업이 돈을 빌리는 전체 자금 조달 비용(채권+주식 비용의 가중평균)을 뜻하는 영문 약어를 쓰세요.',
+    answer:['WACC','와크','와크(WACC)','wacc'],
+    explanation:'WACC(가중평균자본비용)는 채권 비용과 주식 비용을 합쳐 가중평균한 전체 조달 비용입니다. 투자 성과(ROIC)가 WACC보다 높아야 합니다.',
+    src:'"채권 아까 비용... 그거의 비용과 주식을 한 비용을 합쳐가지고 다중평균한 비용을 WACC라고 해요."'
+  },
+  {
+    id:6,type:'mc',difficulty:'보통',
+    question:'이 AI 사이클에서 윤 평론가가 "가장 중요한 맥점"이라 지목한, 천억 달러 리파이낸싱 시기가 다가오는 기업은?',
+    options:['엔비디아','오픈AI','구글','애플'],
+    answer:1,
+    explanation:'그는 오픈AI를 가장 중요한 맥점으로 봤습니다. 소프트뱅크가 천억 달러를 넣었고, 그 리파이낸싱 시기가 다가오는 것이 IPO 얘기가 나온 이유입니다.',
+    src:'"이 사이클에서 가장 중요한 맥점을 갖고 있는 게... 오픈AI예요. 천억 달러를 갚아야 될 시기가 다가오고 있거든요."'
+  },
+  {
+    id:7,type:'ox',difficulty:'어려움',
+    question:'윤 평론가는 단일 종목 레버리지 ETF가 본주 가격을 흔드는 것은 사실이지만, 그 영향은 제한적이며 변동성이 전적으로 ETF 때문이라고는 보지 않는다.',
+    answer:'O',
+    explanation:'맞습니다. 그는 증폭 효과는 분명히 있지만, 본주가 수십 % 움직인다면 ETF발 영향은 10% 수준으로 제한적이며, 변동성의 진짜 출발점은 두 기업의 압도적 이익이라고 봤습니다.',
+    src:'"흔들리고 있지만 이거는 그 흔들림에 비해서는 제한적... 전적으로 그것 때문이라는 저는 생각은 안 해요."'
+  },
+  {
+    id:8,type:'mc',difficulty:'보통',
+    question:'"이익은 의견일 뿐이고 ○○이 가치다"라는 말에서 ○○에 들어갈 말은?',
+    options:['성장','PER','현금','배당'],
+    answer:2,
+    explanation:'훌륭한 기업의 조건은 통장에 현금을 만들어내는 능력입니다. 대우조선은 영업이익은 났지만 영업현금흐름이 마이너스여서 투자자가 망한 사례입니다.',
+    src:'"이익은 의견일 뿐이고 현금이 가치다."'
+  },
+  {
+    id:9,type:'sa',difficulty:'어려움',
+    question:'"그때 샀더라면"처럼 과거의 한 경로만 떠올리며 후회하는, 투자에서 가장 피해야 할 감정(사후확신)을 부르는 용어는?',
+    answer:['하인드사이트','하인드 사이트','hindsight','후견지명','사후확신'],
+    explanation:'하인드사이트(hindsight, 사후확신)는 여러 경로가 있었음을 무시하고 하나의 경로만 떠올리는 착각입니다. 윤 평론가는 이 감정을 가장 피해야 한다고 강조했습니다.',
+    src:'"하인드 사이트라고 그래요. 일단 그러한 생각을 안 하는 게 낫습니다."'
+  },
+  {
+    id:10,type:'mc',difficulty:'쉬움',
+    question:'윤 평론가가 한국 증시의 장기 낙관 근거로 든, 부동산에서 주식으로의 자금 이동과 주주환원 개혁을 아우르는 흐름은?',
+    options:['금융자본주의로의 전환','반도체 슈퍼사이클','부동산 규제 완화','환율 안정화'],
+    answer:0,
+    explanation:'그는 한국이 작년 이후 금융자본주의(주주자본주의)로 이동했으며, 이 흐름이 비가역적이라 장기적으로 낙관한다고 했습니다. 일본의 거버넌스 개혁 사례를 참고로 들었습니다.',
+    src:'"우리는 작년 이후에 금융자본주의로 간 겁니다... 비가역적이라고 저는 보고 있기 때문에 장기적으로 낙관합니다."'
+  }
+];
+
+let state={solved:0,correct:0};
+const answered=new Set();
+
+const typeLabel={mc:'객관식',sa:'단답형',ox:'O / X'};
+const diffClass={'쉬움':'b-easy','보통':'b-mid','어려움':'b-hard'};
+
+const quizEl=document.getElementById('quiz');
+
+QUIZ_DATA.forEach(q=>{
+  const card=document.createElement('div');
+  card.className='card';
+  card.id='card-'+q.id;
+
+  let body='';
+  if(q.type==='mc'){
+    body='<div class="opts">'+q.options.map((o,i)=>
+      `<button class="opt" data-i="${i}"><span class="mk">${String.fromCharCode(65+i)}</span><span>${o}</span></button>`).join('')+'</div>';
+  }else if(q.type==='sa'){
+    body=`<div class="sa"><input type="text" placeholder="답을 입력하세요" id="in-${q.id}"><button data-sa="${q.id}">제출</button></div>`;
+  }else{
+    body=`<div class="ox"><button data-ox="O">O</button><button data-ox="X">X</button></div>`;
+  }
+
+  card.innerHTML=`
+    <div class="qtop">
+      <span class="qno">${String(q.id).padStart(2,'0')}</span>
+      <span class="badge ${diffClass[q.difficulty]}">${q.difficulty}</span>
+      <span class="badge b-type">${typeLabel[q.type]}</span>
+    </div>
+    <div class="qtext">${q.question}</div>
+    ${body}
+    <div class="expl" id="expl-${q.id}">
+      <div class="expl-in">
+        <div class="h"><span id="hres-${q.id}"></span></div>
+        <div>${q.explanation}</div>
+        <div class="src">📌 <b>자막 근거</b> — ${q.src}</div>
+      </div>
+    </div>`;
+  quizEl.appendChild(card);
+
+  if(q.type==='mc'){
+    card.querySelectorAll('.opt').forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        if(answered.has(q.id))return;
+        const chosen=+btn.dataset.i;
+        const ok=chosen===q.answer;
+        const opts=card.querySelectorAll('.opt');
+        opts.forEach((o,i)=>{
+          o.disabled=true;
+          if(i===q.answer){o.classList.add('correct');o.insertAdjacentHTML('beforeend','<span class="tag ok">✓ 정답</span>');}
+        });
+        if(!ok){btn.classList.add('wrong');btn.insertAdjacentHTML('beforeend','<span class="tag no">✗ 오답</span>');}
+        finalize(q,ok);
+      });
+    });
+  }else if(q.type==='sa'){
+    const submit=()=>{
+      if(answered.has(q.id))return;
+      const inp=document.getElementById('in-'+q.id);
+      const val=inp.value.trim().toLowerCase();
+      if(!val)return;
+      const ok=q.answer.some(a=>a.toLowerCase()===val);
+      inp.disabled=true;
+      card.querySelector('[data-sa]').disabled=true;
+      inp.style.borderColor=ok?'var(--green)':'var(--rose)';
+      inp.style.background=ok?'var(--greenbg)':'var(--redbg)';
+      finalize(q,ok,ok?null:'정답: '+q.answer[0]);
+    };
+    card.querySelector('[data-sa]').addEventListener('click',submit);
+    document.getElementById('in-'+q.id).addEventListener('keydown',e=>{if(e.key==='Enter')submit();});
+  }else{
+    card.querySelectorAll('[data-ox]').forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        if(answered.has(q.id))return;
+        const chosen=btn.dataset.ox;
+        const ok=chosen===q.answer;
+        card.querySelectorAll('[data-ox]').forEach(b=>{
+          b.disabled=true;
+          if(b.dataset.ox===q.answer)b.classList.add('correct');
+        });
+        if(!ok)btn.classList.add('wrong');
+        finalize(q,ok);
+      });
+    });
+  }
+});
+
+function finalize(q,ok,extra){
+  answered.add(q.id);
+  state.solved++;
+  if(ok)state.correct++;
+  const hres=document.getElementById('hres-'+q.id);
+  hres.textContent=ok?'✓ 정답입니다':'✗ 오답입니다'+(extra?' ('+extra+')':'');
+  hres.parentElement.style.color=ok?'var(--green)':'var(--rose)';
+  document.getElementById('expl-'+q.id).classList.add('open');
+  updateBoard();
+  if(state.solved===QUIZ_DATA.length)setTimeout(showResult,500);
+}
+
+function updateBoard(){
+  document.getElementById('sSolved').textContent=state.solved;
+  document.getElementById('sCorrect').textContent=state.correct;
+  const acc=state.solved?Math.round(state.correct/state.solved*100):0;
+  document.getElementById('sAcc').textContent=acc;
+  const bar=document.getElementById('sBar');
+  bar.style.width=(state.solved/QUIZ_DATA.length*100)+'%';
+  bar.style.background=acc>=70?'#16a34a':acc>=40?'#f59e0b':'#e11d48';
+}
+
+function showResult(){
+  const n=state.correct;
+  let grade,msg;
+  if(n>=9){grade='A';msg='탁월합니다! 위험 관리와 가치 투자의 핵심을 완벽히 이해하셨네요.';}
+  else if(n>=7){grade='B';msg='훌륭합니다. 큰 그림을 잘 잡으셨어요. 헷갈린 개념만 다시 보면 완벽!';}
+  else if(n>=5){grade='C';msg='기본기는 갖추셨습니다. 해설을 복습하며 "현금·가치·변동성"을 정리해보세요.';}
+  else{grade='D';msg='해설을 천천히 다시 읽어보세요. 공을 잘 넘기는 것부터 시작입니다.';}
+  document.getElementById('mGrade').textContent=grade;
+  const gc={'A':'#16a34a','B':'#2563eb','C':'#f59e0b','D':'#e11d48'};
+  document.getElementById('mGrade').style.color=gc[grade];
+  document.getElementById('mScore').textContent=n;
+  document.getElementById('mMsg').textContent=msg;
+  document.getElementById('modal').classList.add('show');
+}
+
+document.getElementById('mRetry').addEventListener('click',()=>location.reload());
+</script>
+</body>
+</html>

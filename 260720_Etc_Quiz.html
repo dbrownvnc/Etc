@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>딥시크 쇼크 2.0? — 이해도 점검 퀴즈 (10문제)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,500&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#ffffff; --bg2:#fafafa;
+    --tx:#1a1a1a; --tx2:#777777;
+    --ac:#e11d48; --ac2:#f43f5e;
+    --line:#e5e5e5;
+    --ok:#16a34a; --okbg:#e9f7ee; --no:#dc2626; --nobg:#fdecec;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--tx);font-family:'Noto Sans KR',sans-serif;line-height:1.7;-webkit-font-smoothing:antialiased;letter-spacing:-.01em}
+  .wrap{max-width:680px;margin:0 auto;padding:0 20px 80px}
+
+  /* header */
+  header{padding:52px 0 24px;text-align:center}
+  header .kick{font-family:'Playfair Display',serif;font-style:italic;color:var(--ac);font-size:14px}
+  header h1{font-family:'Playfair Display',serif;font-weight:900;font-size:34px;margin:10px 0 8px;line-height:1.12}
+  header p{color:var(--tx2);font-size:14px}
+
+  /* sticky scoreboard */
+  .score{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.94);backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line);padding:12px 20px;margin:0 -20px 30px}
+  .score .inner{max-width:640px;margin:0 auto;display:flex;align-items:center;gap:14px}
+  .score .st{font-size:12.5px;color:var(--tx2);white-space:nowrap}
+  .score .st b{font-family:'Playfair Display',serif;color:var(--tx);font-size:16px;font-weight:700}
+  .score .st.rate b{color:var(--ac)}
+  .score .bar{flex:1;height:8px;background:#eee;border-radius:6px;overflow:hidden;min-width:60px}
+  .score .bar span{display:block;height:100%;width:0;background:var(--no);border-radius:6px;transition:width .5s ease,background .4s ease}
+
+  /* question card */
+  .q{background:var(--bg2);border:1px solid var(--line);border-radius:16px;padding:24px 22px;margin:0 0 22px}
+  .q .top{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+  .q .num{font-family:'Playfair Display',serif;font-weight:800;color:var(--ac);font-size:15px}
+  .q .type{font-size:11px;background:#efe4e7;color:var(--ac);padding:2px 9px;border-radius:20px;font-weight:500}
+  .q .diff{font-size:11px;padding:2px 9px;border-radius:20px;font-weight:500;margin-left:auto}
+  .diff.e{background:#e6f4ea;color:#15803d}
+  .diff.m{background:#fef3e2;color:#c2680c}
+  .diff.h{background:#fdeaea;color:#c0322f}
+  .q .ask{font-size:16.5px;font-weight:500;line-height:1.55;margin-bottom:18px}
+
+  /* options */
+  .opts{display:flex;flex-direction:column;gap:10px}
+  .opt{display:flex;align-items:flex-start;gap:11px;background:#fff;border:1.5px solid var(--line);border-radius:11px;
+    padding:13px 15px;cursor:pointer;font-size:14.5px;transition:.18s;text-align:left;font-family:inherit;color:var(--tx);line-height:1.5}
+  .opt:hover:not(:disabled){border-color:var(--ac2);background:#fff5f7}
+  .opt .k{font-weight:700;color:var(--tx2);flex-shrink:0}
+  .opt:disabled{cursor:default}
+  .opt.correct{background:var(--okbg);border-color:var(--ok)}
+  .opt.correct .k{color:var(--ok)}
+  .opt.wrong{background:var(--nobg);border-color:var(--no)}
+  .opt.wrong .k{color:var(--no)}
+  .badge{margin-left:auto;font-size:11.5px;font-weight:700;padding:2px 8px;border-radius:20px;white-space:nowrap;align-self:center}
+  .badge.ok{background:var(--ok);color:#fff}
+  .badge.no{background:var(--no);color:#fff}
+
+  /* OX */
+  .ox{display:flex;gap:12px}
+  .ox .opt{flex:1;justify-content:center;font-size:20px;font-weight:700;padding:18px}
+
+  /* short answer */
+  .sa{display:flex;gap:9px}
+  .sa input{flex:1;border:1.5px solid var(--line);border-radius:11px;padding:13px 15px;font-size:15px;font-family:inherit;outline:none}
+  .sa input:focus{border-color:var(--ac2)}
+  .sa input:disabled{background:#f2f2f2}
+  .sa button{background:var(--ac);color:#fff;border:none;border-radius:11px;padding:0 20px;font-size:14px;font-weight:500;cursor:pointer;font-family:inherit}
+  .sa button:hover{background:var(--ac2)}
+  .sa button:disabled{background:#ccc;cursor:default}
+  .hint{font-size:12px;color:var(--tx2);margin-top:8px}
+
+  /* explanation */
+  .exp{max-height:0;overflow:hidden;transition:max-height .45s ease;margin-top:0}
+  .exp.show{max-height:600px;margin-top:16px}
+  .exp .inner{background:#fff;border-left:4px solid var(--ac);border-radius:8px;padding:15px 17px;font-size:13.8px;line-height:1.65}
+  .exp .r{font-weight:700;color:var(--ac);font-size:12.5px;margin-bottom:6px;display:block}
+  .exp .src{margin-top:10px;font-size:12px;color:var(--tx2);border-top:1px dashed var(--line);padding-top:9px}
+
+  /* final modal */
+  .modal{position:fixed;inset:0;background:rgba(20,20,20,.6);display:none;align-items:center;justify-content:center;z-index:100;padding:22px}
+  .modal.show{display:flex}
+  .card{background:#fff;border-radius:20px;max-width:400px;width:100%;padding:36px 30px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+  .card .gr{font-family:'Playfair Display',serif;font-weight:900;font-size:72px;line-height:1;color:var(--ac)}
+  .card .sc{font-size:19px;font-weight:700;margin:14px 0 4px}
+  .card .msg{color:var(--tx2);font-size:14px;margin-bottom:24px}
+  .card .again{background:var(--ac);color:#fff;border:none;border-radius:11px;padding:13px 30px;font-size:15px;font-weight:500;cursor:pointer;font-family:inherit;width:100%}
+  .card .again:hover{background:var(--ac2)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <span class="kick">Comprehension Check</span>
+    <h1>딥시크 쇼크 2.0? 퀴즈</h1>
+    <p>Kimi K3 · 반도체 · AI 투자 — 총 10문제</p>
+  </header>
+
+  <div class="score">
+    <div class="inner">
+      <span class="st">푼 문제 <b><span id="sSolved">0</span>/10</b></span>
+      <span class="st">맞힘 <b id="sCorrect">0</b></span>
+      <div class="bar"><span id="sBar"></span></div>
+      <span class="st rate">정답률 <b><span id="sRate">0</span>%</b></span>
+    </div>
+  </div>
+
+  <div id="quiz"></div>
+</div>
+
+<div class="modal" id="modal">
+  <div class="card">
+    <div class="gr" id="mGrade">A</div>
+    <div class="sc" id="mScore">10 / 10 정답</div>
+    <div class="msg" id="mMsg"></div>
+    <button class="again" id="mAgain">다시 풀기</button>
+  </div>
+</div>
+
+<script>
+const QUIZ_DATA=[
+  {
+    id:1, type:'객관식', difficulty:'e',
+    question:'가장 공신력 있는 "종합 지능 지수(Artificial Analysis Intelligence Index)"에서 Kimi K3의 순위는?',
+    options:['1위 (전체 모델 중 최고)','2위','3위','5위 밖'],
+    answer:2,
+    explanation:'Kimi K3는 종합 지능 지수 57점으로 3위다. 1위는 클로드 페이블 5(60점), 2위는 GPT 5.6 Sol(59점)이다. "1등이 중국 모델"이라는 뉴스는 과장이라는 게 발표자의 지적.',
+    src:'자막: "여기서는 키미 K3가 3등으로 평가되고 있습니다. 지금 1등인 페이블이 60점 GPT 5.6 솔버전이 59점입니다."'
+  },
+  {
+    id:2, type:'객관식', difficulty:'e',
+    question:'Kimi K3를 만든 회사와 그 특징으로 옳은 것은?',
+    options:['문샷 AI — 2023년 3월 베이징 설립, 중국 AI 6대 천왕 중 하나','딥시크 — 화웨이 자회사','알리바바 — QN 개발사','바이촨 — 미국 실리콘밸리 기업'],
+    answer:0,
+    explanation:'Kimi K3는 문샷 AI(Moonshot AI)가 만들었다. 2023년 3월 중국 베이징에서 설립된 스타트업으로, 중국 AI 6대 천왕(China\u0027s AI Tigers)에 속한다. 함께 거론되는 곳으로 미니맥스, 바이촨, 즈푸, 딥시크 등이 있다.',
+    src:'자막: "문샷 AI 같은 경우는 23년 3월 중국 베이징에서 설립된 AI 스타트업입니다. 중국 AI 6대 천왕이라고 해서..."'
+  },
+  {
+    id:3, type:'OX', difficulty:'e',
+    question:'Kimi K3는 종합 성능 벤치마크에서도 미국 모델을 모두 제치고 1위를 차지했다.',
+    answer:'X',
+    explanation:'거짓이다. Kimi K3가 1위를 한 것은 "프론트엔드 코드 아레나"라는 단 하나의 지표(UX/UI 웹 디자인)뿐이다. 종합 성능(종합 지능 지수)에서는 3위다.',
+    src:'자막: "지금 미국을 이겼다라고 주장하는 건 딱 하나의 지표입니다. 프론트엔드 코드... 전체 성능에서 이겼다는 것은 아니라고 보시는 게 맞거든요."'
+  },
+  {
+    id:4, type:'객관식', difficulty:'m',
+    question:'Kimi K3와 GPT 5.6의 "작업당 총비용"을 비교하면?',
+    options:['Kimi가 GPT의 1/10 수준으로 압도적으로 싸다','Kimi $0.95 vs GPT $1.04로 거의 같다','GPT가 Kimi보다 5배 싸다','둘 다 무료다'],
+    answer:1,
+    explanation:'한 작업(과업)을 끝내는 데 드는 총비용은 Kimi K3 $0.95, GPT 5.6 $1.04로 거의 같다. 토큰 단가는 Kimi가 절반이지만, 같은 일에 토큰을 약 1.8배 더 쓰기 때문에 결국 청구서가 비슷해진다. "낮은 단가 ≠ 낮은 총비용".',
+    src:'자막: "키미 K3가 대략 한 테스크를 끝내는데... 0.95달러... GPT 5.6 버전 기준으로는 1.04달러... 30달러 곱하기 1.0... 15달러 곱하기 1.8..."'
+  },
+  {
+    id:5, type:'단답형', difficulty:'m',
+    question:'가중치가 너무 커서 HBM에 다 담기지 않는 데이터를 D램·낸드로 내려보내는 기술의 이름은? (핵심 단어 포함)',
+    answer:['KV 캐시 오프로딩','KV캐시 오프로딩','캐시 오프로딩','오프로딩','KV cache offloading','KV 캐시'],
+    keyword:'오프로딩',
+    explanation:'정답은 "KV 캐시 오프로딩"이다. Kimi K3의 가중치는 약 2.8TB로 GPU 옆 HBM(최대 약 1.5TB)에 다 못 담긴다. 그래서 DDR5(D램)와 낸드 플래시로 내려보내는데, 이 때문에 오히려 D램·낸드 수요가 늘어난다.',
+    src:'자막: "이걸 우리가 이제 KV 캐시 오프로딩이라는 기술로 설명을 많이 하는데 너무 커서 HBM에 안 담기니까 DDR5나 낸드 플래시로 내려보내야겠다."'
+  },
+  {
+    id:6, type:'객관식', difficulty:'m',
+    question:'"토큰 단가가 내려가면 사용량이 폭발해 오히려 총 인프라 수요가 늘어난다"는 현상을 뭐라 부르는가?',
+    options:['무어의 법칙','제번스 효과','베타 효과','슈퍼사이클'],
+    answer:1,
+    explanation:'제번스 효과다. 효율(가성비)이 좋아질수록 총소비가 오히려 늘어나는 현상으로, 1년 전 딥시크 쇼크 때도 정확히 이 시나리오대로 총수요가 증가했다.',
+    src:'자막: "효율이 총수요를 키우는 제번스 효과. 토큰 단가가 내려가면요 사용량이... 총 인프라 수요가 오히려 올라간다."'
+  },
+  {
+    id:7, type:'객관식', difficulty:'m',
+    question:'발표자가 제시한 앤스로픽과 오픈AI의 매출총이익률은 각각 얼마인가?',
+    options:['앤스로픽 60%, 오픈AI 40%','앤스로픽 40%, 오픈AI 60%','둘 다 90% 이상','둘 다 적자'],
+    answer:0,
+    explanation:'매출총이익률은 앤스로픽 약 60%, 오픈AI 약 40%다. 앤스로픽은 사용자 수는 적어도 기업 종량제 API 매출이 압도적이라 마진이 높고, 오픈AI는 무료 사용자(약 10억 명)가 많아 수익화가 늦다.',
+    src:'자막: "오픈 AI 같은 경우 40% 정도 마진이 남습니다. 그리고 엔트로픽 같은 경우는 60% 마진이 남아요."'
+  },
+  {
+    id:8, type:'OX', difficulty:'m',
+    question:'발표자는 최근 반도체 주가 하락의 주된 원인을 "펀더멘탈(실적 기반)의 붕괴"로 진단한다.',
+    answer:'X',
+    explanation:'거짓이다. 발표자는 펀더멘탈은 여전히 튼튼하며, 하락의 주된 원인은 수급 부족·차익 실현·쏠림 해소·한국장 레버리지 왜곡 같은 "수급 문제"라고 본다. "가격 하락 ≠ AI 수요 붕괴".',
+    src:'자막: "제가 확실히 말씀드릴 수 있는 거 하락의 원인은요. 수급 부족입니다... 펀더멘털은 전 여전히 튼튼하다고 봅니다."'
+  },
+  {
+    id:9, type:'객관식', difficulty:'h',
+    question:'발표자가 "2027년 HBM 매출 3배"를 계산한 세 가지 상승 요소가 아닌 것은?',
+    options:['엔비디아 GPU 물량 +30% (850만→1,100만 개)','칩당 HBM 용량 +50% (192→288GB)','HBM 단가 +50% (HBM3e→HBM4)','D램 공장(팹) 신설 +100%'],
+    answer:3,
+    explanation:'HBM 매출 3배는 GPU 물량(+30%) × 칩당 용량(+50%) × 단가(+50%) = 1.3×1.5×1.5 ≈ 3배로 계산된다. "D램 팹 신설"은 여기에 들어가지 않는다(오히려 발표자는 신규 팹 공급 우려를 반박하는 입장).',
+    src:'자막: "엔비디아 AI GPU 물량... 850만 개에서 1100만 개로 30%... 칩당 HBM 용량이 192기가에서 288기가로 50%... HBM3 썼고요 이제 4 씁니다... 1.3*1.5*1.5 = HBM 매출 3배."'
+  },
+  {
+    id:10, type:'단답형', difficulty:'h',
+    question:'최근 SK하이닉스 미국 ADR이 한국 본주보다 비싸게 거래되는 현상에서, 그 프리미엄은 약 몇 %인가? (숫자만)',
+    answer:['25','25%','약 25%','약25'],
+    keyword:'25',
+    explanation:'약 25%다. 하이닉스 ADR이 본주보다 약 25% 비싸게 거래되는 프리미엄이 발생했고, 이 때문에 "본주 롱 / ADR 숏" 페어가 합리적 선택으로 거론됐다. UBS는 반대로 ADR 매수를 권고하기도 했다.',
+    src:'자막/슬라이드: "하이닉스 ADR은 9% 급락한 176.46달러... 국내장 본주의 종가(208만2천원)에 비해 약 25% 더 높은 수준이다."'
+  }
+];
+
+const state={solved:0, correct:0, done:new Set()};
+const quizEl=document.getElementById('quiz');
+
+function norm(s){return (s||'').toString().toLowerCase().replace(/\s+/g,'').replace(/[.,'"()]/g,'');}
+
+QUIZ_DATA.forEach(q=>{
+  const card=document.createElement('div');
+  card.className='q'; card.id='q'+q.id;
+  const dmap={e:['쉬움','e'],m:['보통','m'],h:['어려움','h']};
+  let inner=`<div class="top">
+      <span class="num">Q${q.id}</span>
+      <span class="type">${q.type}</span>
+      <span class="diff ${dmap[q.difficulty][1]}">${dmap[q.difficulty][0]}</span>
+    </div>
+    <div class="ask">${q.question}</div>`;
+
+  if(q.type==='객관식'){
+    inner+='<div class="opts">'+q.options.map((o,i)=>
+      `<button class="opt" data-i="${i}"><span class="k">${'ABCD'[i]}</span><span>${o}</span></button>`).join('')+'</div>';
+  } else if(q.type==='OX'){
+    inner+='<div class="ox"><button class="opt" data-v="O">O</button><button class="opt" data-v="X">X</button></div>';
+  } else {
+    inner+=`<div class="sa"><input type="text" placeholder="정답 입력..." /><button>제출</button></div>
+      <div class="hint">핵심 단어가 포함되면 정답 처리됩니다.</div>`;
+  }
+  inner+=`<div class="exp"><div class="inner"><span class="r"></span><span class="etext"></span>
+      <div class="src">${q.src}</div></div></div>`;
+  card.innerHTML=inner;
+  quizEl.appendChild(card);
+
+  const exp=card.querySelector('.exp');
+  const rlabel=card.querySelector('.r');
+  const etext=card.querySelector('.etext');
+
+  function grade(isCorrect){
+    if(state.done.has(q.id)) return;
+    state.done.add(q.id);
+    state.solved++; if(isCorrect) state.correct++;
+    rlabel.textContent=isCorrect?'✓ 정답!':'✗ 오답';
+    rlabel.style.color=isCorrect?'var(--ok)':'var(--no)';
+    etext.textContent=q.explanation;
+    exp.classList.add('show');
+    updateScore();
+  }
+
+  if(q.type==='객관식'){
+    card.querySelectorAll('.opt').forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        const i=+btn.dataset.i, ok=(i===q.answer);
+        card.querySelectorAll('.opt').forEach((b,bi)=>{
+          b.disabled=true;
+          if(bi===q.answer){b.classList.add('correct');b.insertAdjacentHTML('beforeend','<span class="badge ok">정답</span>');}
+        });
+        if(!ok){btn.classList.add('wrong');btn.insertAdjacentHTML('beforeend','<span class="badge no">오답</span>');}
+        grade(ok);
+      });
+    });
+  } else if(q.type==='OX'){
+    card.querySelectorAll('.opt').forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        const v=btn.dataset.v, ok=(v===q.answer);
+        card.querySelectorAll('.opt').forEach(b=>{
+          b.disabled=true;
+          if(b.dataset.v===q.answer){b.classList.add('correct');b.insertAdjacentHTML('beforeend','<span class="badge ok">정답</span>');}
+        });
+        if(!ok){btn.classList.add('wrong');btn.insertAdjacentHTML('beforeend','<span class="badge no">오답</span>');}
+        grade(ok);
+      });
+    });
+  } else {
+    const inp=card.querySelector('input'), sub=card.querySelector('button');
+    function submit(){
+      if(state.done.has(q.id)) return;
+      const val=norm(inp.value); if(!val){inp.focus();return;}
+      const ok = q.answer.some(a=>norm(a)===val) || (q.keyword && val.includes(norm(q.keyword)));
+      inp.disabled=true; sub.disabled=true;
+      inp.style.borderColor=ok?'var(--ok)':'var(--no)';
+      inp.style.background=ok?'var(--okbg)':'var(--nobg)';
+      if(!ok){ rlabelPrefix(); }
+      grade(ok);
+      if(!ok){ etext.textContent='입력: "'+inp.value+'" · '+q.explanation; }
+    }
+    function rlabelPrefix(){}
+    sub.addEventListener('click',submit);
+    inp.addEventListener('keydown',e=>{if(e.key==='Enter')submit();});
+  }
+});
+
+function updateScore(){
+  document.getElementById('sSolved').textContent=state.solved;
+  document.getElementById('sCorrect').textContent=state.correct;
+  const rate = state.solved? Math.round(state.correct/state.solved*100):0;
+  document.getElementById('sRate').textContent=rate;
+  const bar=document.getElementById('sBar');
+  bar.style.width=rate+'%';
+  bar.style.background = rate<40?'var(--no)' : rate<70?'#f59e0b' : 'var(--ok)';
+  if(state.solved===QUIZ_DATA.length) setTimeout(showFinal,500);
+}
+
+function showFinal(){
+  const c=state.correct, total=QUIZ_DATA.length;
+  let g,msg;
+  if(c>=9){g='A';msg='완벽에 가깝습니다. 방송 내용을 거의 다 소화했네요.';}
+  else if(c>=7){g='B';msg='훌륭합니다. 핵심 논지를 잘 이해하고 있어요.';}
+  else if(c>=5){g='C';msg='절반은 맞혔습니다. 리포트를 한 번 더 훑어보면 좋겠어요.';}
+  else {g='D';msg='아직 헷갈리는 부분이 많네요. 분석 리포트와 함께 복습해 보세요.';}
+  document.getElementById('mGrade').textContent=g;
+  document.getElementById('mScore').textContent=c+' / '+total+' 정답';
+  document.getElementById('mMsg').textContent=msg;
+  document.getElementById('modal').classList.add('show');
+}
+
+document.getElementById('mAgain').addEventListener('click',()=>{ location.reload(); });
+</script>
+</body>
+</html>

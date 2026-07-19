@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>딥시크 쇼크 2.0? — Kimi K3와 반도체 논란 완전 분석</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;0,900;1,500&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+  :root{
+    --bg:#ffffff; --bg2:#fafafa;
+    --tx:#1a1a1a; --tx2:#777777;
+    --ac:#e11d48; --ac2:#f43f5e;
+    --line:#e5e5e5;
+    --c-blue:#2563eb; --c-gray:#6b7280;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--bg); color:var(--tx);
+    font-family:'Noto Sans KR',sans-serif; font-weight:400;
+    line-height:1.75; letter-spacing:-.01em;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:680px;margin:0 auto;padding:0 22px}
+
+  /* ── HERO ── */
+  .hero{padding:64px 0 40px;border-bottom:3px solid var(--tx)}
+  .kicker{font-family:'Playfair Display',serif;font-style:italic;font-size:15px;color:var(--ac);letter-spacing:.02em}
+  .hero h1{
+    font-family:'Playfair Display',serif;font-weight:900;
+    font-size:44px;line-height:1.08;margin:14px 0 18px;letter-spacing:-.02em;
+  }
+  .hero h1 .em{color:var(--ac)}
+  .lede{font-size:17px;color:#333;font-weight:300}
+  .meta{margin-top:26px;padding-top:18px;border-top:1px solid var(--line);
+    display:flex;flex-wrap:wrap;gap:6px 16px;font-size:12.5px;color:var(--tx2)}
+  .meta b{color:var(--tx);font-weight:500}
+
+  /* ── SECTION ── */
+  section{padding:46px 0;border-bottom:1px solid var(--line)}
+  .snum{font-family:'Playfair Display',serif;font-style:italic;font-size:14px;color:var(--ac);display:block;margin-bottom:8px}
+  h2{font-family:'Playfair Display',serif;font-weight:800;font-size:28px;line-height:1.22;margin-bottom:18px;letter-spacing:-.01em}
+  h3{font-size:18px;font-weight:700;margin:30px 0 12px;color:var(--tx)}
+  p{margin:0 0 16px;font-size:15.5px}
+  p.small{font-size:13.5px;color:var(--tx2)}
+  strong{font-weight:700;color:var(--tx)}
+  .hl{background:linear-gradient(transparent 55%,rgba(225,29,72,.16) 55%);font-weight:500}
+  em.term{font-style:normal;color:var(--ac2);font-weight:500}
+
+  /* pull quote */
+  .pull{
+    font-family:'Playfair Display',serif;font-weight:700;font-size:23px;line-height:1.35;
+    color:var(--tx);border-left:4px solid var(--ac);padding:6px 0 6px 22px;margin:28px 0;
+  }
+  .pull span{color:var(--ac)}
+
+  /* callout */
+  .box{background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:20px 22px;margin:22px 0}
+  .box .t{font-weight:700;font-size:14px;color:var(--ac);margin-bottom:8px;letter-spacing:.02em}
+  .box p:last-child{margin-bottom:0}
+  .box.dark{background:#161616;border-color:#161616;color:#f2f2f2}
+  .box.dark .t{color:var(--ac2)}
+  .box.dark strong{color:#fff}
+
+  /* key-fact grid */
+  .kf{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:22px 0}
+  .kf .cell{background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:15px 14px}
+  .kf .n{font-family:'Playfair Display',serif;font-weight:800;font-size:26px;color:var(--ac);line-height:1}
+  .kf .l{font-size:12px;color:var(--tx2);margin-top:7px;line-height:1.4}
+
+  /* chart */
+  .fig{margin:26px 0}
+  .fig .cap{font-size:12.5px;color:var(--tx2);margin-top:10px;text-align:center}
+  .fig .cap b{color:var(--tx);font-weight:500}
+  .fade-in{opacity:0;transform:translateY(18px);transition:opacity .7s ease,transform .7s ease}
+  .fade-in.visible{opacity:1;transform:translateY(0)}
+  .chart-container{position:relative;max-height:340px}
+  .chart-container canvas{opacity:0;transition:opacity .4s ease;max-height:300px}
+  .chart-container.chart-ready canvas{opacity:1}
+
+  /* table */
+  .tbl{width:100%;border-collapse:collapse;margin:20px 0;font-size:13.5px;overflow:hidden;border-radius:10px;border:1px solid var(--line)}
+  .tbl th{background:var(--ac);color:#fff;font-weight:500;padding:11px 12px;text-align:left}
+  .tbl td{padding:10px 12px;border-top:1px solid var(--line);background:var(--bg2)}
+  .tbl tr td:first-child{font-weight:500;color:var(--tx)}
+
+  /* interactive */
+  .sim{background:#161616;border-radius:14px;padding:24px 22px;margin:26px 0;color:#eee}
+  .sim h4{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:#fff;margin-bottom:4px}
+  .sim .sub{font-size:12.5px;color:#999;margin-bottom:20px}
+  .sim .row{margin:18px 0}
+  .sim label{display:flex;justify-content:space-between;font-size:13px;color:#ccc;margin-bottom:9px}
+  .sim label b{color:var(--ac2);font-weight:700}
+  .sim input[type=range]{-webkit-appearance:none;width:100%;height:5px;border-radius:5px;background:#3a3a3a;outline:none}
+  .sim input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:var(--ac);cursor:pointer;border:3px solid #161616;box-shadow:0 0 0 1px var(--ac)}
+  .sim input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:var(--ac);cursor:pointer;border:3px solid #161616}
+  .sim .out{display:flex;gap:12px;margin-top:22px}
+  .sim .out .o{flex:1;background:#232323;border-radius:10px;padding:15px 12px;text-align:center}
+  .sim .out .o .ov{font-family:'Playfair Display',serif;font-weight:800;font-size:25px;color:#fff;line-height:1}
+  .sim .out .o.win{background:rgba(225,29,72,.16);outline:1px solid var(--ac)}
+  .sim .out .o .ol{font-size:11px;color:#999;margin-top:7px}
+  .sim .verdict{margin-top:18px;font-size:13.5px;line-height:1.6;color:#ddd;background:#232323;border-radius:10px;padding:14px 15px;border-left:3px solid var(--ac)}
+  .sim .reset{margin-top:16px;background:none;border:1px solid #555;color:#bbb;padding:8px 16px;border-radius:8px;font-size:12.5px;cursor:pointer;font-family:inherit}
+  .sim .reset:hover{border-color:var(--ac2);color:#fff}
+
+  /* verdict banner */
+  .banner{background:var(--ac);color:#fff;border-radius:14px;padding:26px 24px;margin:34px 0}
+  .banner .t{font-family:'Playfair Display',serif;font-weight:800;font-size:22px;margin-bottom:10px}
+  .banner p{color:rgba(255,255,255,.92);margin-bottom:10px;font-size:15px}
+  .banner p:last-child{margin-bottom:0}
+  .banner strong{color:#fff;background:rgba(0,0,0,.18);padding:1px 6px;border-radius:4px}
+
+  footer{padding:40px 0 60px;text-align:center;color:var(--tx2);font-size:12px}
+  footer .disc{margin-top:14px;font-size:11px;line-height:1.7;color:#999}
+
+  @media(max-width:480px){
+    .hero h1{font-size:34px}
+    h2{font-size:24px}
+    .kf{grid-template-columns:1fr 1fr}
+    .sim .out{flex-direction:column}
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <!-- HERO -->
+  <header class="hero">
+    <span class="kicker">AI · Semiconductor Special Report</span>
+    <h1>딥시크 쇼크 <span class="em">2.0</span>일까?<br>Kimi K3와 반도체 논란</h1>
+    <p class="lede">중국 오픈모델이 처음으로 미국 최상위 모델을 눌렀다. 시장은 "AI 과잉투자 끝"이라 외쳤지만, 숫자를 뜯어보면 이야기가 달라진다 — 왜 메모리 수요는 오히려 늘어나는가.</p>
+    <div class="meta">
+      <span>출처 <b>월스트리트 테크남(월텍남) 라이브</b></span>
+      <span>방송일 <b>2026.07.20</b></span>
+      <span>분류 <b>경제 · 기술주/반도체</b></span>
+    </div>
+  </header>
+
+  <!-- 0. 한눈에 -->
+  <section>
+    <span class="snum">Summary</span>
+    <h2>3분 요약</h2>
+    <p>이번 방송의 핵심은 하나다. <strong>중국 Kimi K3의 등장은 충격적이지만, 시장이 반응한 만큼 공포스러운 사건은 아니다.</strong> 오히려 이 모델을 돌리기 위해 엔비디아 GPU와 D램·낸드가 더 필요해진다는 게 발표자의 결론이다.</p>
+    <div class="kf">
+      <div class="cell"><div class="n">57점</div><div class="l">Kimi K3 종합 지능 지수 — 1위 페이블 5(60점)에 이은 <b>3위</b></div></div>
+      <div class="cell"><div class="n">-25%</div><div class="l">반도체 지수(SOX) 고점 대비 하락. 삼성전자 -30%, 하이닉스 -40%</div></div>
+      <div class="cell"><div class="n">2.8조</div><div class="l">Kimi K3 파라미터(가중치). HBM에 다 못 담아 D램·낸드로 내려보냄</div></div>
+      <div class="cell"><div class="n">60%</div><div class="l">앤스로픽 매출총이익률. "AI는 이미 돈이 되고 있다"</div></div>
+    </div>
+    <p class="small">※ 본 리포트는 방송 내용을 정리·해설한 자료이며 투자 권유가 아닙니다. 수치는 방송에서 제시된 값을 그대로 옮겼습니다.</p>
+  </section>
+
+  <!-- 1. Kimi K3 -->
+  <section>
+    <span class="snum">01 · The Shock</span>
+    <h2>중국이 처음으로 미국 모델을 이겼다</h2>
+    <p>사건의 발단은 중국 스타트업 <strong>문샷 AI(Moonshot AI)</strong>가 공개한 오픈모델 <strong>Kimi K3</strong>다. <em class="term">프론트엔드 코드 아레나</em>(AI끼리 웹페이지 디자인을 1:1로 겨루고 사람이 승패를 판정하는 방식)에서 기존 1위였던 클로드 페이블 5와 GPT 5.6 Sol을 눌러버렸다.</p>
+
+    <div class="fig">
+      <div class="chart-container fade-in"><canvas id="cArena" height="230"></canvas></div>
+      <div class="cap"><b>Frontend Code Arena</b> — Kimi K3가 1,679점으로 1위 (아레나 점수)</div>
+    </div>
+
+    <p>다만 발표자는 선을 긋는다. <strong>미국을 이긴 건 딱 '프론트엔드 코드' 한 분야뿐</strong>이라는 것. 가장 공신력 있는 <em class="term">종합 지능 지수</em>(Artificial Analysis Intelligence Index)로 보면 Kimi K3는 3위에 그친다.</p>
+
+    <div class="fig">
+      <div class="chart-container fade-in"><canvas id="cIntel" height="240"></canvas></div>
+      <div class="cap"><b>종합 지능 지수</b> — 1위 페이블 5(60), 2위 GPT 5.6 Sol(59), 3위 Kimi K3(57)</div>
+    </div>
+
+    <p class="pull">"1등이 중국 모델이다"라는 뉴스는 <span>과장</span>이다. 하지만 여기까지 온 것 자체가 대단한 사건인 건 맞다.</p>
+  </section>
+
+  <!-- 2. 가성비 -->
+  <section>
+    <span class="snum">02 · The Myth</span>
+    <h2>"싸다"는 착시 — 낮은 단가 ≠ 낮은 총비용</h2>
+    <p>1년 전 딥시크 쇼크가 진짜 '쇼크'였던 이유는 <strong>가격은 1/10인데 성능은 90%</strong>였기 때문이다. 그런데 Kimi K3는 다르다. 한 작업(과업)을 끝내는 데 드는 실제 비용을 보면 <strong>Kimi K3 $0.95 vs GPT 5.6 $1.04</strong>로 거의 같다.</p>
+
+    <div class="fig">
+      <div class="chart-container fade-in"><canvas id="cCost" height="240"></canvas></div>
+      <div class="cap"><b>작업당 총비용(USD)</b> · 낮을수록 저렴 — Kimi와 GPT는 사실상 동급, 페이블은 $2.75로 고가</div>
+    </div>
+
+    <p>왜 이런 착시가 생길까? <strong>토큰 단가는 Kimi가 절반이지만, 같은 일을 하는 데 토큰을 약 1.8배 더 쓰기 때문</strong>이다. 단가가 싸도 더 많이 써버리면 청구서는 똑같아진다. 아래 슬라이더로 직접 확인해 보자.</p>
+
+    <div class="sim" id="simCost">
+      <h4>가성비 시뮬레이터</h4>
+      <div class="sub">출력 100만 토큰당 단가 × 같은 일에 필요한 토큰 배수 = 작업당 총비용</div>
+      <div class="row">
+        <label><span>Kimi 출력 단가 (100만 토큰당)</span><b><span id="pP">$15</span></b></label>
+        <input type="range" id="sPrice" min="10" max="30" step="1" value="15">
+      </div>
+      <div class="row">
+        <label><span>Kimi 토큰 사용 배수 (GPT=1.0x 기준)</span><b><span id="pB">1.8x</span></b></label>
+        <input type="range" id="sBurn" min="10" max="25" step="1" value="18">
+      </div>
+      <div class="out">
+        <div class="o"><div class="ov" id="oGpt">$1.04</div><div class="ol">GPT 5.6 작업당 비용 (고정)</div></div>
+        <div class="o win" id="oKimiBox"><div class="ov" id="oKimi">$0.94</div><div class="ol">Kimi K3 작업당 비용</div></div>
+      </div>
+      <div class="verdict" id="vCost">단가를 절반으로 낮춰도, 토큰을 1.8배 쓰면 총비용은 GPT와 거의 같아진다.</div>
+      <button class="reset" id="rCost">초기값으로 리셋</button>
+    </div>
+
+    <div class="box">
+      <div class="t">더 심한 비교</div>
+      <p>일부 외신은 "Kimi가 클로드보다 5배 싸다"는 헤드라인을 뽑는다. 클로드 단가($75)와 Kimi 단가($15)만 비교한 것인데, <strong>단가가 아니라 실제 업무 완수 비용으로 보면 완전히 잘못된 비교</strong>라는 게 발표자의 지적이다.</p>
+    </div>
+  </section>
+
+  <!-- 3. 성능의 중국 -->
+  <section>
+    <span class="snum">03 · The Rise</span>
+    <h2>"가성비의 중국은 끝났다, 성능의 중국이 온다"</h2>
+    <p>발표자는 중국 AI를 무시할 수준이 아니라고 본다. 근거는 인재 시스템이다. 중국은 최고 학자에게 <em class="term">원사</em> 칭호와 조 단위 연구비를 준다. 칭화대의 AI 영재반 <strong>'야오반'</strong>은 매년 정원의 약 1%(40여 명)만 뽑는데, 이들이 지금 중국 AI를 이끌고 있다.</p>
+    <div class="box">
+      <div class="t">문샷 AI는 누구인가</div>
+      <p>2023년 3월 베이징에서 설립된 스타트업으로, <strong>중국 AI 6대 천왕(China's AI Tigers)</strong> 중 하나다. 함께 거론되는 곳으로 미니맥스, 바이촨, 즈푸(GLM), 딥시크 등이 있다.</p>
+    </div>
+    <p>로봇청소기(로보락·드리미), 전기차(지커), 드론(DJI)에서 보듯 중국 제조·AI 경쟁력은 빠르게 올라오고 있다. <strong>다만 "조심해야 한다"는 것과 "지금 공포에 빠질 문제냐"는 전혀 다른 질문</strong>이라는 게 발표자의 태도다.</p>
+    <p class="pull">문샷 창업자도 인정했다 — K3는 <span>사용자 경험 측면에서 눈에 띄는 격차</span>를 보인다고.</p>
+    <p class="small">실제 사용에서 클로드 코드·코덱스 같은 개발 환경(하네스) 위에서 돌리는 미국 모델의 완성도를 아직 따라오지 못한다는 것. 단순 챗봇 용도라면 차이가 없지만, 복잡한 에이전트 작업에선 체감 차이가 크다.</p>
+  </section>
+
+  <!-- 4. 엔비디아·메모리 -->
+  <section>
+    <span class="snum">04 · The Twist</span>
+    <h2>역설 — 중국 모델이 커질수록 메모리가 더 필요하다</h2>
+    <p>여기가 이번 방송의 핵심 반전이다. Kimi K3는 무려 <strong>2.8조 개의 가중치</strong>를 쓴다. 딥시크는 화웨이 칩으로 훈련했다고 밝혔지만, Kimi·GLM·QN 등은 그런 말을 하지 않았다 → <strong>사실상 엔비디아 칩으로 훈련했다는 간접 인정</strong>이라는 해석이다.</p>
+    <p>더 중요한 건 <em class="term">KV 캐시 오프로딩</em>이다. 가중치가 약 2.8TB로 너무 커서 GPU 옆 HBM(최대 약 1.5TB)에 다 담기지 않는다. 그러면 남는 데이터를 <strong>D램(DDR5)과 낸드 플래시로 내려보내야</strong> 한다.</p>
+
+    <div class="box dark">
+      <div class="t">그래서 결론은</div>
+      <p>모델이 발전할수록 → HBM만으론 부족 → <strong>D램·낸드 수요가 오히려 증가</strong>. 실제로 발표 당일 SK하이닉스 ADR은 소폭 상승했다.</p>
+    </div>
+
+    <h3>효율이 수요를 키운다 — 제번스 효과</h3>
+    <p><em class="term">제번스 효과</em>(효율이 좋아지면 오히려 총소비가 늘어나는 현상)를 기억하자. 토큰 단가가 내려가면 사용량이 폭발하고, 결국 <strong>GPU·메모리·네트워크 총수요는 증가</strong>한다. 1년 전 딥시크 쇼크 때도 정확히 이 시나리오대로 흘러갔다.</p>
+  </section>
+
+  <!-- 5. 구글 -->
+  <section>
+    <span class="snum">05 · The Laggard</span>
+    <h2>밀려나는 구글, 앤스로픽·오픈AI로 향하는 인재</h2>
+    <p>구글은 제미나이 3.5 프로 공개를 두 번 미뤘다(7/17 예정도 지연). 블룸버그는 현·전직 직원 10명을 인용해 <strong>코딩 성능이 내부 목표에 미달</strong>했다고 보도했다(구글 공식 인정은 아님).</p>
+    <p>이유로 발표자는 두 가지를 든다. 첫째, <strong>IPO를 앞둔 앤스로픽·오픈AI로 핵심 인력이 이동</strong>(존 점퍼 등). IPO 전 주식 보상의 유혹이 크다. 둘째, <em class="term">TPU</em> 구조가 최신 AI 트렌드(스파스 MoE)에 잘 안 맞는다는 평이다. 현재 제미나이 3.1 프로는 46점으로 중국 모델에도 밀린다.</p>
+  </section>
+
+  <!-- 6. 돈이 되는가 -->
+  <section>
+    <span class="snum">06 · The Money</span>
+    <h2>AI, 실제로 돈이 되고 있는가?</h2>
+    <p>핵심 질문은 "AI 버블이냐"가 아니라 <strong>"앤스로픽·오픈AI가 진짜 돈을 버는가"</strong>다. 발표자의 답은 "번다"이다.</p>
+
+    <div class="fig">
+      <div class="chart-container fade-in"><canvas id="cMargin" height="220"></canvas></div>
+      <div class="cap"><b>매출총이익률</b> — 앤스로픽 60%, 오픈AI 40% (전기료·GPU 감가상각 반영 후)</div>
+    </div>
+
+    <p>앤스로픽은 전체 사용자가 1억 명이 채 안 되지만, <strong>기업 종량제 API 매출</strong>이 압도적이라 돈을 많이 번다. 반면 오픈AI는 챗GPT 무료 사용자가 약 10억 명(유료는 6%뿐)이라 수익화가 늦다.</p>
+
+    <div class="kf">
+      <div class="cell"><div class="n">1%</div><div class="l">전체 유저 중 코덱스 등 AI 에이전트 활용 비중. 이 상위 1%가 토큰의 80%를 사용</div></div>
+      <div class="cell"><div class="n">$14,000</div><div class="l">월 $200 구독을 종량제로 환산한 실제 토큰 값 — 구독은 '혜자'</div></div>
+    </div>
+
+    <div class="box">
+      <div class="t">비용 효율이 트렌드가 된 이유</div>
+      <p>IPO를 앞두고(앤스로픽 26년 말, 오픈AI 27년 초 예상) <strong>수익화가 화두</strong>가 됐다. 기업들이 토큰을 무한정 쓰다가 청구서에 놀라기 시작했고(우버·메타 사례), 그래서 '싸고 좋은 모델'을 향한 경쟁이 격화됐다. 중국 모델이 계속 주목받는 이유이기도 하다.</p>
+    </div>
+  </section>
+
+  <!-- 7. 증시 -->
+  <section>
+    <span class="snum">07 · The Market</span>
+    <h2>반도체는 왜 떨어졌나 — 펀더멘탈이 아니라 수급</h2>
+    <p>반도체 지수가 25% 빠졌다고 반도체 기업이 돈을 못 버는 건 아니다. 발표자가 꼽는 하락 원인은 <strong>펀더멘탈 붕괴가 아니라 수급 문제</strong>다.</p>
+    <table class="tbl">
+      <tr><th>하락 원인</th><th>내용</th></tr>
+      <tr><td>차익 실현</td><td>올해 100% 넘게 오른 뒤 리밸런싱 압력</td></tr>
+      <tr><td>쏠림 해소</td><td>반도체 롱 비중 82%, 현금 3.6% — 더 살 돈이 없음</td></tr>
+      <tr><td>한국장 레버리지</td><td>레버리지 상품이 본주 수급을 왜곡, 외국인의 공매도 표적</td></tr>
+      <tr><td>모멘텀 악화</td><td>추세 추종·헤지펀드의 공매도 확대</td></tr>
+    </table>
+    <p class="pull">가격 하락 <span>≠</span> AI 수요 붕괴. 골드만·고베타 모멘텀 지수는 금융위기급(-30)까지 갔다.</p>
+    <p>발표자는 밸류에이션도 근거로 든다. 기술주 <em class="term">Forward P/E</em>(향후 이익 대비 주가)는 22.9배로 5년 평균(25.8배)보다 낮다. 마이크론·삼성전자·SK하이닉스의 PER은 각각 5.8·3.8·3.8배로 극히 낮은 수준이다.</p>
+  </section>
+
+  <!-- 8. 메모리 심층 -->
+  <section>
+    <span class="snum">08 · Deep Dive</span>
+    <h2>'28년 공급과잉 폭락' 시나리오, 정말 맞을까</h2>
+    <p>요즘 유행하는 하락 시나리오는 "2028년 D램 공급 과잉 → 폭락"이다. 발표자의 반론은 <strong>선반영이 지나치다</strong>는 것. 반도체 사이클은 보통 2~3분기를 미리 반영하는데, 지금은 26년 3분기에 28년 공급을 반영 중 → <strong>거의 6분기를 앞당겨 반영</strong>했다는 계산이다.</p>
+
+    <h3>주요 기관은 여전히 '공급 부족'을 본다</h3>
+    <div class="fig">
+      <div class="chart-container fade-in"><canvas id="cShort" height="230"></canvas></div>
+      <div class="cap"><b>수요-공급 격차 전망(%)</b> · 마이너스일수록 공급 부족(쇼티지) — 27년까지도 부족</div>
+    </div>
+    <table class="tbl">
+      <tr><th>기관</th><th>전망</th></tr>
+      <tr><td>UBS</td><td>27년 D램 수요 +36.2% vs 공급 +19.3% → 17%p 부족</td></tr>
+      <tr><td>모건스탠리</td><td>HBM+D램 26년 -17%, 27년 -15% 부족</td></tr>
+      <tr><td>노무라</td><td>메모리 매출 2024년 $1,810억 → 2030년 $2조6,250억</td></tr>
+      <tr><td>BofA</td><td>사이클 정점은 2028년이 아니라 2033년</td></tr>
+      <tr><td>JP모건</td><td>2028년 전 의미 있는 초과공급 어렵다, 조정은 매수 기회</td></tr>
+    </table>
+    <div class="box">
+      <div class="t">SK하이닉스 회장의 발언</div>
+      <p>최근 제주 상공회의소 포럼에서 <strong>"AI 수요가 내년 60~100% 증가, 전체 반도체 시장도 50~60% 성장하지만 내년 늘어나는 공급량은 거의 없다"</strong>고 진단했다. 심지어 "메모리 가격이 비정상적으로 높다"며 팹을 더 지어야 한다고 언급했다.</p>
+    </div>
+
+    <h3>2027년은 HBM이 상승을 이끈다</h3>
+    <p>26년이 D램·낸드 가격 상승(1년간 약 10배)의 해였다면, 27년은 HBM의 해다. 세 가지 상승분이 곱해진다. 슬라이더로 매출 배수를 직접 계산해 보자.</p>
+
+    <div class="sim" id="simHbm">
+      <h4>HBM 매출 배수 계산기</h4>
+      <div class="sub">GPU 물량 × 칩당 HBM 용량 × HBM 단가, 세 상승분의 곱 (CY26 → CY27)</div>
+      <div class="row">
+        <label><span>엔비디아 GPU 물량 증가 (850만→1,100만 개)</span><b>+<span id="hQ">30</span>%</b></label>
+        <input type="range" id="hGpu" min="0" max="60" step="5" value="30">
+      </div>
+      <div class="row">
+        <label><span>칩당 HBM 용량 증가 (192→288GB)</span><b>+<span id="hC">50</span>%</b></label>
+        <input type="range" id="hCap" min="0" max="80" step="5" value="50">
+      </div>
+      <div class="row">
+        <label><span>HBM 단가 증가 (HBM3e→HBM4)</span><b>+<span id="hPp">50</span>%</b></label>
+        <input type="range" id="hPr" min="0" max="80" step="5" value="50">
+      </div>
+      <div class="out">
+        <div class="o win"><div class="ov" id="hOut">3.0배</div><div class="ol">CY27 HBM 매출 (CY26 대비)</div></div>
+      </div>
+      <div class="verdict" id="vHbm">1.30 × 1.50 × 1.50 ≈ HBM 매출 3배. 골드만삭스는 좀 더 보수적으로 전체 HBM 시장 2배를 전망한다.</div>
+      <button class="reset" id="rHbm">기본값(방송 수치)으로 리셋</button>
+    </div>
+
+    <h3>왜 예전처럼 폭락하지 않을까 — 'HBM 락인'</h3>
+    <p>과거 D램은 <strong>범용</strong>이라 고객이 벤더(삼성↔하이닉스)를 쉽게 바꿔 갑질이 가능했다(2018년 슈퍼사이클 붕괴). 하지만 HBM은 엔비디아·브로드컴 칩에 맞춰 <strong>패키징 단계에서 최적화·특정화</strong>된다. 쉽게 바꿀 수 없어 공급사에게 유리한 <em class="term">모트</em>(해자)가 생긴다. 또 <em class="term">LTA</em>(장기공급계약)가 늘며 이익 변동성이 줄고 가시성이 올라간다.</p>
+  </section>
+
+  <!-- 9. 리스크 -->
+  <section>
+    <span class="snum">09 · The Risks</span>
+    <h2>남은 리스크 — 유가와 경쟁</h2>
+    <div class="kf">
+      <div class="cell"><div class="n">$81</div><div class="l">WTI 유가. 호르무즈 해협 재봉쇄로 브렌트 $88까지, 주간 +15%</div></div>
+      <div class="cell"><div class="n">25%</div><div class="l">SK하이닉스 ADR이 본주보다 비싼 프리미엄 (본주 롱/ADR 숏 페어 거론)</div></div>
+    </div>
+    <p>중국 리스크는 실재하지만 과대평가라는 입장이다. 중국 메모리 <strong>CXMT도 물량이 없고, 장비 수출 제재로 28년까지 증설이 어렵다</strong>. 가격도 싸지 않아 쇼티지는 중국도 마찬가지다.</p>
+  </section>
+
+  <!-- 10. 실적 -->
+  <section>
+    <span class="snum">10 · Earnings</span>
+    <h2>실적 시즌 프리뷰</h2>
+    <div class="fig">
+      <div class="chart-container fade-in"><canvas id="cEps" height="220"></canvas></div>
+      <div class="cap"><b>S&amp;P 기술주 전망</b> — 매출 +31%, EPS +54.8%로 타 섹터 압도</div>
+    </div>
+    <p>발표자는 실적 자체보다 <strong>서프라이즈율(기대 대비 실제 차이)</strong>이 중요하다고 강조한다. 특히 최근 과매도된 종목(샌디스크 -45% 등)은 실적이 좋으면 반등 가능성이 높다고 본다. 반등의 결정적 트리거는 <strong>하이퍼스케일러의 AI 캐펙스 상향 발언</strong>(모건스탠리는 27~28년 9~10% 상향 전망)이다.</p>
+  </section>
+
+  <!-- 결론 -->
+  <section style="border-bottom:none">
+    <span class="snum">Conclusion</span>
+    <h2>결론</h2>
+    <div class="banner">
+      <div class="t">AI는 실제로 돈이 되고 있다</div>
+      <p>Kimi K3는 대단하지만 <strong>딥시크 쇼크 1.0급 사건은 아니다</strong>. 훈련은 엔비디아 솔루션, D램·낸드 수요는 오히려 증가. 메모리 펀더멘탈은 여전히 튼튼하며 현재 하락은 <strong>수급 문제</strong>에 가깝다.</p>
+      <p>다만 향후 <strong>비용 효율화 경쟁</strong>과 <strong>중국 모델과의 경쟁</strong>은 계속되는 리스크로 남는다. 그리고 발표자의 마지막 당부 — <strong>고점 레버리지 금지</strong>. 결국 중요한 건 기술이 아니라 투자 습관과 멘탈 관리다.</p>
+    </div>
+    <p class="small">투자 원칙 요약: ① 없는 수치를 지어내지 않는다 ② 단가가 아니라 총비용으로 본다 ③ 가격 하락과 수요 붕괴를 구분한다 ④ 많이 오르거나 떨어질 때의 포모·패닉셀을 경계한다.</p>
+  </section>
+
+  <footer>
+    <div>딥시크 쇼크 2.0? — Kimi K3와 반도체 논란 완전 분석</div>
+    <div class="disc">본 문서는 월스트리트 테크남(월텍남) 라이브 방송(2026.07.20)의 내용을 이해를 돕기 위해 재구성한 자료입니다. 특정 종목의 매수·매도를 권유하지 않으며, 모든 수치·전망은 방송에서 인용된 값으로 실제와 다를 수 있습니다. 투자 판단과 책임은 투자자 본인에게 있습니다.</div>
+  </footer>
+
+</div>
+
+<script>
+/* ── Chart 공통 ── */
+Chart.defaults.font.family = "'Noto Sans KR', sans-serif";
+Chart.defaults.color = '#777777';
+Chart.defaults.font.size = 11;
+const AC='#e11d48', AC2='#f43f5e', DK='#1a1a1a', GY='#6b7280', BL='#2563eb';
+const noGrid={grid:{display:false},border:{display:false}};
+const softGrid={grid:{color:'#eee'},border:{display:false}};
+
+/* fade-in observer */
+const fadeObs = new IntersectionObserver((entries)=>{
+  entries.forEach((e,i)=>{
+    if(e.isIntersecting){
+      setTimeout(()=>e.target.classList.add('visible'), i*80);
+      fadeObs.unobserve(e.target);
+    }
+  });
+},{threshold:0.12});
+document.querySelectorAll('.fade-in').forEach(el=>fadeObs.observe(el));
+
+/* chart configs */
+const chartConfigs={};
+
+chartConfigs['cArena']=()=>{ new Chart(document.getElementById('cArena'),{
+  type:'bar',
+  data:{labels:['Kimi K3','Claude\nFable 5','GPT-5.6\nSol','GLM-5.2','Claude\nOpus 4.8','Grok-4.5'],
+    datasets:[{data:[1679,1631,1618,1587,1562,1558],
+      backgroundColor:[AC,DK,GY,BL,'#c9c9c9','#c9c9c9'],borderRadius:5,barPercentage:.72}]},
+  options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.parsed.x.toLocaleString()+'점'}}},
+    scales:{x:{min:1450,...softGrid,ticks:{callback:v=>v.toLocaleString()}},y:{...noGrid,ticks:{font:{size:11}}}}}});
+};
+
+chartConfigs['cIntel']=()=>{ new Chart(document.getElementById('cIntel'),{
+  type:'bar',
+  data:{labels:['페이블5','GPT5.6Sol','Kimi K3','Opus4.8','Grok4.5','Sonnet5','GLM-5.2','Gemini3.1'],
+    datasets:[{data:[60,59,57,56,54,53,51,46],
+      backgroundColor:[DK,GY,AC,'#c9c9c9','#c9c9c9','#c9c9c9',BL,'#c9c9c9'],borderRadius:5,barPercentage:.7}]},
+  options:{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.parsed.y+'점'}}},
+    scales:{y:{min:40,...softGrid},x:{...noGrid,ticks:{font:{size:10}}}}}});
+};
+
+chartConfigs['cCost']=()=>{ new Chart(document.getElementById('cCost'),{
+  type:'bar',
+  data:{labels:['Kimi K3','Qwen3.7','GPT5.5','GPT5.6Sol','Mistral','Sonnet5','Opus4.8','페이블5'],
+    datasets:[{data:[0.95,0.98,0.99,1.04,1.20,1.53,1.80,2.75],
+      backgroundColor:[AC,'#c9c9c9','#c9c9c9',GY,'#c9c9c9','#c9c9c9','#c9c9c9',DK],borderRadius:5,barPercentage:.7}]},
+  options:{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>'$'+c.parsed.y.toFixed(2)}}},
+    scales:{y:{...softGrid,ticks:{callback:v=>'$'+v}},x:{...noGrid,ticks:{font:{size:10}}}}}});
+};
+
+chartConfigs['cMargin']=()=>{ new Chart(document.getElementById('cMargin'),{
+  type:'bar',
+  data:{labels:['앤스로픽','오픈AI'],
+    datasets:[{label:'매출총이익률',data:[60,40],backgroundColor:[AC,DK],borderRadius:6,barPercentage:.55}]},
+  options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.parsed.x+'%'}}},
+    scales:{x:{max:80,...softGrid,ticks:{callback:v=>v+'%'}},y:{...noGrid,ticks:{font:{size:13,weight:'700'}}}}}});
+};
+
+chartConfigs['cShort']=()=>{ new Chart(document.getElementById('cShort'),{
+  type:'bar',
+  data:{labels:['2026년','2027년'],
+    datasets:[
+      {label:'HBM+D램 (모건스탠리)',data:[-17,-15],backgroundColor:AC,borderRadius:5,barPercentage:.6,categoryPercentage:.6},
+      {label:'낸드 플래시',data:[-15,-9],backgroundColor:BL,borderRadius:5,barPercentage:.6,categoryPercentage:.6}
+    ]},
+  options:{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{position:'bottom',labels:{boxWidth:12,font:{size:11}}},
+      tooltip:{callbacks:{label:c=>c.dataset.label+': '+c.parsed.y+'%'}}},
+    scales:{y:{max:0,...softGrid,ticks:{callback:v=>v+'%'}},x:{...noGrid,ticks:{font:{size:12}}}}}});
+};
+
+chartConfigs['cEps']=()=>{ new Chart(document.getElementById('cEps'),{
+  type:'bar',
+  data:{labels:['매출 상승률','EPS 상승률'],
+    datasets:[{data:[31,54.8],backgroundColor:[GY,AC],borderRadius:6,barPercentage:.5}]},
+  options:{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>'+'+c.parsed.y+'%'}}},
+    scales:{y:{...softGrid,ticks:{callback:v=>v+'%'}},x:{...noGrid,ticks:{font:{size:13,weight:'500'}}}}}});
+};
+
+/* chart observer */
+const chartObs = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      const canvas=e.target.querySelector('canvas');
+      if(canvas && chartConfigs[canvas.id]){
+        chartConfigs[canvas.id]();
+        e.target.classList.add('chart-ready');
+        chartObs.unobserve(e.target);
+      }
+    }
+  });
+},{threshold:0.15});
+document.querySelectorAll('.chart-container').forEach(el=>chartObs.observe(el));
+
+/* ── 가성비 시뮬레이터 ── */
+(function(){
+  const price=document.getElementById('sPrice'), burn=document.getElementById('sBurn');
+  const pP=document.getElementById('pP'), pB=document.getElementById('pB');
+  const oKimi=document.getElementById('oKimi'), oKimiBox=document.getElementById('oKimiBox'), v=document.getElementById('vCost');
+  const GPT_COST=1.04, GPT_PRICE=30; // GPT 단가 $30, 작업당 $1.04 기준
+  function upd(){
+    const p=+price.value, b=+burn.value/10;
+    pP.textContent='$'+p; pB.textContent=b.toFixed(1)+'x';
+    // GPT 작업당비용을 기준으로, 단가·배수 비례해 Kimi 비용 산출
+    const kimi = GPT_COST * (p/GPT_PRICE) * b;
+    oKimi.textContent='$'+kimi.toFixed(2);
+    if(kimi<GPT_COST-0.15){ oKimiBox.classList.add('win');
+      v.textContent='이 조건이면 Kimi가 실제로 더 싸다. 단가 인하가 토큰 낭비를 넘어서는 경우다.'; }
+    else if(kimi>GPT_COST+0.15){ oKimiBox.classList.remove('win');
+      v.textContent='단가는 싸지만 토큰을 너무 많이 써서 오히려 GPT보다 비싸진다.'; }
+    else { oKimiBox.classList.add('win');
+      v.textContent='단가를 절반으로 낮춰도, 토큰을 1.8배 쓰면 총비용은 GPT와 거의 같아진다.'; }
+  }
+  price.addEventListener('input',upd); burn.addEventListener('input',upd);
+  document.getElementById('rCost').addEventListener('click',()=>{price.value=15;burn.value=18;upd();});
+  upd();
+})();
+
+/* ── HBM 매출 계산기 ── */
+(function(){
+  const g=document.getElementById('hGpu'), c=document.getElementById('hCap'), p=document.getElementById('hPr');
+  const hQ=document.getElementById('hQ'), hC=document.getElementById('hC'), hPp=document.getElementById('hPp');
+  const out=document.getElementById('hOut'), v=document.getElementById('vHbm');
+  function upd(){
+    hQ.textContent=g.value; hC.textContent=c.value; hPp.textContent=p.value;
+    const mult=(1+g.value/100)*(1+c.value/100)*(1+p.value/100);
+    out.textContent=mult.toFixed(1)+'배';
+    if(g.value==30&&c.value==50&&p.value==50)
+      v.textContent='1.30 × 1.50 × 1.50 ≈ HBM 매출 3배. 골드만삭스는 좀 더 보수적으로 전체 HBM 시장 2배를 전망한다.';
+    else
+      v.textContent='물량('+ (1+g.value/100).toFixed(2) +') × 용량('+ (1+c.value/100).toFixed(2) +') × 단가('+ (1+p.value/100).toFixed(2) +') = '+mult.toFixed(2)+'배';
+  }
+  [g,c,p].forEach(el=>el.addEventListener('input',upd));
+  document.getElementById('rHbm').addEventListener('click',()=>{g.value=30;c.value=50;p.value=50;upd();});
+  upd();
+})();
+</script>
+</body>
+</html>

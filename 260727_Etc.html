@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VR 1기 10억 만들기 276주차 - 변동성 장세 리포트</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+:root{
+  --bg:#ffffff;--bg2:#fafafa;--text:#1a1a1a;--sub:#777777;
+  --main:#e11d48;--sub2:#f43f5e;--border:#e5e5e5;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-serif;line-height:1.75;overflow-x:hidden}
+.container{max-width:720px;margin:0 auto;padding:0 20px 80px}
+.hero{padding:48px 20px 30px;background:#0f172a;color:#fff;position:relative;overflow:hidden}
+.hero::after{content:'';position:absolute;right:-40px;top:-40px;width:200px;height:200px;background:radial-gradient(circle at center, rgba(225,29,72,.35), transparent 70%);pointer-events:none}
+.hero-inner{max-width:720px;margin:0 auto;position:relative}
+.kicker{display:inline-block;background:var(--main);color:#fff;font-size:11px;letter-spacing:.15em;padding:6px 12px;font-weight:700;margin-bottom:16px}
+.hero h1{font-family:'Playfair Display',serif;font-size:32px;line-height:1.15;font-weight:900;margin-bottom:12px}
+.hero h1 span{color:#fda4af}
+.meta{color:#cbd5e1;font-size:13px;display:flex;gap:12px;flex-wrap:wrap}
+.section{padding:34px 0 26px;border-bottom:1px solid var(--border)}
+.eyebrow{font-size:11px;letter-spacing:.2em;color:var(--main);font-weight:700;margin-bottom:8px;text-transform:uppercase}
+.h2{font-family:'Playfair Display',serif;font-size:25px;line-height:1.3;margin-bottom:12px;font-weight:700}
+.h3{font-size:17px;font-weight:700;margin:20px 0 8px}
+.p{font-size:14.5px;color:var(--text);margin-bottom:10px}
+.sub{color:var(--sub);font-size:12.5px}
+.badge{display:inline-block;background:var(--bg2);border:1px solid var(--border);padding:4px 10px;border-radius:20px;font-size:11px;margin-right:6px;margin-bottom:6px}
+.badge.main{background:var(--main);color:#fff;border-color:var(--main)}
+.badge.yellow{background:#fef08a;color:#854d0e;border-color:#facc15}
+.badge.green{background:#dcfce7;color:#166534;border-color:#86efac}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:16px;margin:12px 0}
+.quote{border-left:3px solid var(--main);padding:12px 16px;background:#fff1f2;margin:14px 0;font-size:13px;border-radius:0 10px 10px 0}
+.table-wrap{overflow-x:auto;margin:14px 0;border:1px solid var(--border);border-radius:12px}
+table{width:100%;border-collapse:collapse;background:#fff;font-size:13px;min-width:480px}
+th{background:var(--main);color:#fff;padding:11px 10px;text-align:center;font-weight:600;white-space:nowrap}
+td{padding:8px 10px;border-bottom:1px solid var(--border);text-align:center}
+td.highlight{background:#fef08a;font-weight:700}
+td.red{color:var(--main);font-weight:600}
+.kpi{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}
+.kpi div{flex:1;min-width:105px;background:#fff;border:1px solid var(--border);border-radius:12px;padding:12px;text-align:center}
+.kpi b{display:block;font-size:20px;color:var(--main)}
+.kpi span{font-size:11px;color:var(--sub)}
+/* 필수 차트 애니메이션 패턴 - 임의 변경 금지 */
+.fade-in {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.fade-in.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.chart-container {
+  position: relative;
+  max-height: 340px;
+}
+.chart-container canvas {
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  max-height: 300px;
+}
+.chart-container.chart-ready canvas {
+  opacity: 1;
+}
+.simulator{background:#fff;border:1.5px solid var(--main);border-radius:16px;padding:18px;margin:16px 0}
+input[type=range]{width:100%;accent-color:var(--main)}
+.btn{display:inline-block;background:var(--main);color:#fff;border:none;padding:10px 18px;border-radius:8px;font-weight:600;cursor:pointer;font-size:13px}
+.btn.outline{background:#fff;color:var(--main);border:1.5px solid var(--main)}
+.divider{height:1px;background:var(--border);margin:18px 0}
+.notice{background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:14px;font-size:12.5px;color:#475569;line-height:1.6}
+</style>
+</head>
+<body>
+<div class="hero">
+  <div class="hero-inner">
+    <div class="kicker">VR 1기 10억 만들기 • 276주차</div>
+    <h1>변동성 장세,<br><span>276주차</span> 중계 리포트</h1>
+    <div class="meta">
+      <span>2026.07.25 기준</span>
+      <span>7월 27일 ~ 8월 7일 예약매매</span>
+      <span>대상: TQQQ VR</span>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="section fade-in">
+    <div class="eyebrow">Overview</div>
+    <div class="h2">지금 어디쯤 와 있나</div>
+    <div class="kpi">
+      <div><b>66853.39</b><span>V값 (목표자산)<br>276주차</span></div>
+      <div><b>57216.00 $</b><span>평가금<br>현재 보유자산 평가</span></div>
+      <div><b>894개</b><span>잔여개수<br>현재 TQQQ 보유</span></div>
+      <div><b>21563.33 $</b><span>Pool (예수금)<br>매수 대기 자금</span></div>
+    </div>
+    <div class="card">
+      <p class="p" style="margin:0"><b>핵심 요약:</b> 274주차 대비 거래액 -5824.56$ 발생, Pool은 27387.89$ → 21563.33$로 감소. V값은 66689.92 → 66853.39로 소폭 상승. 평가금은 57216$로 최소 56825.38$와 최대 76881.40$ 밴드 중간 하단에서 움직이는 중. 변동성 장세에서는 <b>8개씩 지정가매수 잔량주문 + 2주간 기간·잔량 지정가 예약매도</b>로 대응.</p>
+    </div>
+    <div class="chart-container fade-in"><canvas id="myChart1" height="240"></canvas></div>
+  </div>
+
+  <div class="section fade-in">
+    <div class="eyebrow">Chapter 01 • Buy & Sell Plan</div>
+    <div class="h2">7월 27일 ~ 8월 7일, 2주간 예약매매 계획</div>
+    <p class="p">매수는 한도 25% 적용, 8개씩 지정가매수 잔량주문. 매도는 제한 없음. 기간·잔량 지정가로 2주간 예약.</p>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
+      <span class="badge main">8개씩</span><span class="badge">기간잔량 지정가</span><span class="badge yellow">최소 56825.38 / 최대 76881.40</span>
+    </div>
+
+    <div class="h3">매수계획 (하락 시 분할매수)</div>
+    <div class="table-wrap">
+      <table>
+        <tr><th>최소값</th><th>잔여개수</th><th>매수점($)</th><th>Pool($)</th></tr>
+        <tr><td class="highlight">56825.38</td><td class="highlight">894</td><td></td><td class="highlight">21563.33</td></tr>
+        <tr><td rowspan="11" style="background:#fafafa">8개씩<br>지정가매수<br>잔량주문</td><td>902</td><td class="red">63.56</td><td>21054.85</td></tr>
+        <tr><td>910</td><td class="red">63.00</td><td>20550.85</td></tr>
+        <tr><td>918</td><td class="red">62.45</td><td>20051.25</td></tr>
+        <tr><td>926</td><td class="red">61.90</td><td>19556.05</td></tr>
+        <tr><td>934</td><td class="red">61.37</td><td>19065.09</td></tr>
+        <tr><td>942</td><td class="red">60.84</td><td>18578.37</td></tr>
+        <tr><td>950</td><td class="red">60.32</td><td>18095.81</td></tr>
+        <tr><td>958</td><td class="red">59.82</td><td>17617.25</td></tr>
+        <tr><td>966</td><td class="red">59.32</td><td>17142.69</td></tr>
+        <tr><td>974</td><td class="red">58.83</td><td>16672.05</td></tr>
+        <tr><td>982</td><td class="red">58.34</td><td>16205.33</td></tr>
+      </table>
+    </div>
+
+    <div class="h3">매도계획 (상승 시 분할매도)</div>
+    <div class="table-wrap">
+      <table>
+        <tr><th>최대값</th><th>잔여개수</th><th>매도점($)</th><th>Pool($)</th></tr>
+        <tr><td class="highlight">76881.40</td><td class="highlight">894</td><td></td><td class="highlight">21563.33</td></tr>
+        <tr><td rowspan="6" style="background:#fafafa">8개씩<br>지정가매도<br>잔량주문</td><td>886</td><td class="red">86.00</td><td>22251.33</td></tr>
+        <tr><td>878</td><td class="red">86.77</td><td>22945.49</td></tr>
+        <tr><td>870</td><td class="red">87.56</td><td>23645.97</td></tr>
+        <tr><td>862</td><td class="red">88.37</td><td>24352.93</td></tr>
+        <tr><td>854</td><td class="red">89.19</td><td>25066.45</td></tr>
+        <tr><td>846</td><td class="red">90.03</td><td>25786.69</td></tr>
+      </table>
+    </div>
+
+    <div class="simulator">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <b>🎮 Pool 시뮬레이터</b><button class="btn outline" onclick="resetPool()" style="padding:6px 10px">초기화</button>
+      </div>
+      <label class="sub">가정 매수 진행 개수: <b id="buyCnt">0</b>개 (8개씩)</label>
+      <input type="range" id="buyRange" min="0" max="88" step="8" value="0">
+      <div class="kpi" style="margin-top:12px">
+        <div><b id="simPool">21563.33 $</b><span>남은 Pool</span></div>
+        <div><b id="simRemain">894개</b><span>예상 잔여개수</span></div>
+        <div><b id="simPrice">-</b><span>다음 매수점</span></div>
+      </div>
+      <p class="sub">* 표의 276주차 매수계획 기준 단순 계산. 실제 체결가는 증권사 시초가 매매 차이로 소폭 다를 수 있음.</p>
+    </div>
+  </div>
+
+  <div class="section fade-in">
+    <div class="eyebrow">Chapter 02 • Execution Log</div>
+    <div class="h2">최근 매매 내용 복기</div>
+    <div class="table-wrap">
+      <table>
+        <tr><th>최소값</th><th>잔여개수</th><th>매수점</th><th>Pool</th><th>비고</th></tr>
+        <tr><td class="highlight">56686.43</td><td class="highlight">806</td><td></td><td class="highlight">27387.89</td><td style="text-align:left"><span class="badge yellow">7/16</span> 지정가매수 8개</td></tr>
+        <tr><td></td><td>814</td><td class="red">70.33</td><td>26825.25</td><td></td></tr>
+        <tr><td></td><td>822</td><td class="red">69.64</td><td>26268.13</td><td></td></tr>
+        <tr><td></td><td>830</td><td class="red">68.96</td><td>25716.45</td><td rowspan="5" style="background:#fef3c7;text-align:left"><span class="badge yellow">7/17</span> 시초가매수 66.38$, 48개<br>지정가매수 16개</td></tr>
+        <tr><td></td><td>838</td><td class="red">68.30</td><td>25170.05</td></tr>
+        <tr><td></td><td>846</td><td class="red">67.64</td><td>24628.93</td></tr>
+        <tr><td></td><td>854</td><td class="red">67.01</td><td>24092.85</td></tr>
+        <tr><td></td><td>862</td><td class="red">66.38</td><td>23561.81</td></tr>
+        <tr><td></td><td>870</td><td>65.76</td><td>23035.73</td><td></td></tr>
+        <tr><td></td><td>878</td><td class="red">65.16</td><td>22514.45</td><td></td></tr>
+        <tr><td></td><td style="background:#dcfce7">886</td><td style="background:#dcfce7" class="red">64.56</td><td style="background:#dcfce7">21997.97</td><td style="background:#dcfce7;text-align:left"><span class="badge green">7/24</span> 지정가매수 16개</td></tr>
+        <tr><td></td><td style="background:#dcfce7">894</td><td style="background:#dcfce7" class="red">63.98</td><td style="background:#dcfce7">21486.13</td><td></td></tr>
+        <tr><td></td><td>902</td><td class="red">63.41</td><td>20978.85</td><td></td></tr>
+      </table>
+    </div>
+    <div class="notice">시초가 매매부분 때문에 증권사마다 매매액에 조금씩 다릅니다. 큰 차이 아니므로 괜찮습니다.</div>
+  </div>
+
+  <div class="section fade-in">
+    <div class="eyebrow">Chapter 03 • Status</div>
+    <div class="h2">276주차 현재 상태와 밴드</div>
+    <div class="table-wrap">
+      <table>
+        <tr><th></th><th>V값</th><th>최소</th><th>최대</th><th>거래액</th><th>처음Pool</th><th>마지막Pool</th></tr>
+        <tr><td>274주</td><td style="color:#16a34a;font-weight:700">66689.92</td><td></td><td></td><td>-5824.56</td><td>27387.89</td><td>21563.33</td></tr>
+        <tr><td>276주</td><td style="color:#16a34a;font-weight:700">66853.39</td><td style="color:#7c3aed">56825.38</td><td style="color:#7c3aed">76881.40</td><td></td><td>21563.33</td><td></td></tr>
+      </table>
+    </div>
+    <p class="p">평가금 57,216$는 최소~최대 밴드 안에서 움직이고 있으며, 그래프상 빨간 실선이 평가금, 보라 점선이 밴드(최소/최대) 입니다. 0주차부터 270주차까지 우상향하면서도 중간중간 큰 하락을 Pool로 방어한 구조.</p>
+    <div class="chart-container fade-in"><canvas id="myChart2" height="250"></canvas></div>
+    
+    <div class="h3">베타 수익과 비교</div>
+    <p class="p">TQQQ VR을 시작한 날부터 SPY 투자를 같은 조건으로 진행했다고 가정했을 때 수익률 비교.</p>
+    <div class="chart-container fade-in"><canvas id="myChart3" height="230"></canvas></div>
+    <div class="kpi">
+      <div><b>205.35%</b><span style="color:#e11d48">TQQQ VR</span></div>
+      <div><b>68.43%</b><span style="color:#2563eb">SPY</span></div>
+      <div><b>+136.92%p</b><span>초과 수익</span></div>
+    </div>
+  </div>
+
+  <div class="section fade-in">
+    <div class="eyebrow">Chapter 04 • For Beginners</div>
+    <div class="h2">지금 시작하려면 어떻게?</div>
+    <div class="card" style="border-color:var(--main)">
+      <p class="p"><b>하락장 기준 시작 가이드:</b> 평가금E가 직전 V보다 낮을 때(하락장) 아래 상태로 시작하면 276주차와 동일 라인에서 무난하게 시작 가능.</p>
+      <div class="kpi">
+        <div><b>894개</b><span>TQQQ 매수</span></div>
+        <div><b>21563.33 $</b><span>예수금 보유</span></div>
+        <div><b>2주치</b><span>예약매매 걸기</span></div>
+      </div>
+      <div class="quote">밸류리밸런싱(VR) 투자법은 라오어 개인이 1993년 미국에서 발간된 <b>‘Value Averaging’</b> 책을 응용한 투자법으로, 주식투자의 특성상 수익이나 목표달성을 보장하지는 않습니다.</div>
+    </div>
+
+    <div class="simulator">
+      <b>🧮 시작 자금 시뮬레이터</b>
+      <p class="sub" style="margin:6px 0">TQQQ 현재가를 입력하면 시작에 필요한 현금을 계산해줍니다.</p>
+      <label class="sub">TQQQ 현재가 ($)</label>
+      <input type="range" id="tqqqPrice" min="50" max="90" step="0.5" value="63.5">
+      <div style="display:flex;justify-content:space-between;margin-top:6px"><span class="sub">50$</span><span class="sub"><b id="priceVal">63.5$</b></span><span class="sub">90$</span></div>
+      <div class="kpi" style="margin-top:10px">
+        <div><b id="needStock">56769 $</b><span>주식 894개</span></div>
+        <div><b>21563 $</b><span>예수금 Pool</span></div>
+        <div><b id="totalNeed">78332 $</b><span>총 필요 자금</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section fade-in">
+    <div class="eyebrow">Chapter 05 • Long Term</div>
+    <div class="h2">장기 계획 — 위험도 낮추기</div>
+    <div style="display:flex;gap:12px;align-items:flex-start">
+      <img src="https://via.placeholder.com/80x110?text=VR+Book" style="width:80px;border-radius:8px;border:1px solid var(--border)" alt="VR 책">
+      <div>
+        <p class="p" style="margin:0"><b>라오어의 미국 주식 밸류 리밸런싱</b><br><span class="sub">레버리지가 아니면 평범한 인생을 바꿀 수 없다</span></p>
+      </div>
+    </div>
+    <div class="card">
+      <p class="p"><b>1. G값 변화 (G=10에서 시작)</b><br>
+      <span class="sub">V값이 매 기간 얼마나 커질지 정하는 성장률</span><br>
+      • 적립식 기간: 1년마다 1씩 증가<br>
+      • 거치식 기간: 6개월마다 1씩 증가</p>
+      <div class="divider"></div>
+      <p class="p"><b>2. Pool 사용한도 변화 (75%에서 시작)</b><br>
+      • 6개월마다 5%씩 감소 → 시간이 갈수록 예수금 사용을 줄여 방어력 강화</p>
+    </div>
+    <div class="chart-container fade-in"><canvas id="myChart4" height="220"></canvas></div>
+  </div>
+
+  <div class="section fade-in">
+    <div class="eyebrow">Disclaimer</div>
+    <div class="h2" style="font-size:20px">꼭 읽어주세요</div>
+    <div class="notice" style="line-height:1.8">
+      해당 자료는 VR 투자법 진행에 대한 중계일 뿐<br><br>
+      해당 방법을 추천하거나, 특정종목을 추천하지 않습니다<br>
+      매수매도를 추천하지 않으며, 수익을 보장하지 않습니다.<br><br>
+      개별적 질문에 답변할 수 없습니다<br><br>
+      투자여부에 대한 모든 판단 및 결정은 투자자 스스로 하시면 되며<br>
+      결과에 대한 책임 또한 투자자 본인에게 있습니다<br><br>
+      상기 권고사항은 금융감독원의 지침임을 안내드립니다
+    </div>
+    <div style="text-align:center;margin-top:20px">
+      <span class="badge main">VR 1기_10억만들기 276주차</span>
+      <span class="badge">2026.07.25</span>
+      <span class="badge">변동성 장세</span>
+    </div>
+  </div>
+</div>
+
+<script>
+// Fade observer - 필수 패턴
+const fadeObs = new IntersectionObserver((entries) => {
+  entries.forEach((e, i) => {
+    if (e.isIntersecting) {
+      setTimeout(() => e.target.classList.add('visible'), i * 80);
+      fadeObs.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.12 });
+document.querySelectorAll('.fade-in').forEach(el => fadeObs.observe(el));
+
+// 차트 설정 딕셔너리
+const chartConfigs = {};
+
+chartConfigs['myChart1'] = () => {
+  new Chart(document.getElementById('myChart1'), {
+    type: 'bar',
+    data: {
+      labels: ['현재 잔여', '매수 후(88개)', '매도 후(-48개)'],
+      datasets: [
+        {label:'잔여개수', data:[894, 982, 846], backgroundColor:['#e11d48','#6b7280','#2563eb'], borderRadius:6},
+      ]
+    },
+    options: {responsive:true, plugins:{legend:{display:false}, title:{display:true, text:'잔여개수 변화 시뮬레이션 (8개씩 분할)'}} , scales:{y:{beginAtZero:false}}}
+  });
+};
+
+chartConfigs['myChart2'] = () => {
+  // 평가금 밴드 모사 데이터 - 원본 그래프 흐름을 간략 재현
+  const weeks = Array.from({length: 28}, (_,i)=> i*10);
+  const evalData = [4000,5500,9000,10500,9000,8500,6000,5500,7000,9000,12000,13500,14500,20500,22500,23000,32000,28500,32000,43000,38000,42500,48000,53500,52000,47000,68000,57216];
+  const minBand = [5000,7000,10000,12000,15000,17000,14000,12000,10500,9500,11000,13500,16000,19000,21500,24000,27500,30000,35000,42000,36000,38000,40000,43000,44500,46000,55000,56825];
+  const maxBand = [6500,9000,13500,16000,17500,16000,13500,11000,10500,10000,12500,15000,18000,22000,25000,28500,32000,36500,40000,48500,42000,45000,48000,53000,54000,56000,70000,76881];
+  new Chart(document.getElementById('myChart2'), {
+    type: 'line',
+    data: {
+      labels: weeks.map(w=>w+'주'),
+      datasets: [
+        {label:'최소 밴드', data:minBand, borderColor:'#a78bfa', borderDash:[6,4], fill:false, pointRadius:0, tension:0.3},
+        {label:'평가금', data:evalData, borderColor:'#e11d48', backgroundColor:'rgba(225,29,72,.1)', fill:false, tension:0.35, borderWidth:2},
+        {label:'최대 밴드', data:maxBand, borderColor:'#8b5cf6', borderDash:[6,4], fill:false, pointRadius:0, tension:0.3},
+      ]
+    },
+    options: {responsive:true, plugins:{legend:{position:'bottom'}, title:{display:true, text:'평가금 vs 최소/최대 밴드 (원본 그래프 재구성, 현재 57,216$)'}} , scales:{y:{beginAtZero:true}}}
+  });
+};
+
+chartConfigs['myChart3'] = () => {
+  new Chart(document.getElementById('myChart3'), {
+    type: 'line',
+    data: {
+      labels: ['0','20','40','60','80','100','120','140','160','180','200','220','240','260','276주'],
+      datasets: [
+        {label:'TQQQ VR 205.35%', data:[0,-5,25,40,-10,-55,-60,-50,-25,-10,15,35,70,95,105,130,155,205], borderColor:'#e11d48', backgroundColor:'rgba(225,29,72,.12)', fill:true, tension:0.35, borderWidth:2},
+        {label:'SPY 68.43%', data:[0,3,5,10,5,-8,-12,-8,-5,0,5,15,22,28,32,35,48,68], borderColor:'#2563eb', backgroundColor:'rgba(37,99,235,.08)', fill:true, tension:0.35, borderWidth:2},
+      ]
+    },
+    options: {responsive:true, plugins:{legend:{position:'bottom'}, title:{display:true, text:'베타 수익 비교 - TQQQ VR vs SPY (같은 조건 가정)'}}, scales:{y:{ticks:{callback:v=>v+'%'}}}}
+  });
+};
+
+chartConfigs['myChart4'] = () => {
+  new Chart(document.getElementById('myChart4'), {
+    type: 'line',
+    data: {
+      labels: ['시작','6개월','1년','1.5년','2년','2.5년','3년'],
+      datasets: [
+        {label:'G값 (성장률)', data:[10,11,12,13,14,15,16], borderColor:'#e11d48', tension:0.2, yAxisID:'y'},
+        {label:'Pool 한도 %', data:[75,70,65,60,55,50,45], borderColor:'#1a1a1a', tension:0.2, yAxisID:'y1'},
+      ]
+    },
+    options: {responsive:true, interaction:{mode:'index', intersect:false}, plugins:{title:{display:true, text:'장기 위험도 낮추기 - G값↑ / Pool 한도↓'}}, scales:{y:{type:'linear', position:'left', min:5, max:20, title:{display:true,text:'G값'}}, y1:{type:'linear', position:'right', min:40, max:80, title:{display:true,text:'Pool 한도 %'}, grid:{drawOnChartArea:false}}}}
+  });
+};
+
+// 차트 옵저버 - 필수 패턴
+const chartObs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const canvas = e.target.querySelector('canvas');
+      if (canvas && chartConfigs[canvas.id]) {
+        chartConfigs[canvas.id]();
+        e.target.classList.add('chart-ready');
+        chartObs.unobserve(e.target);
+      }
+    }
+  });
+}, { threshold: 0.15 });
+document.querySelectorAll('.chart-container').forEach(el => chartObs.observe(el));
+
+// Pool 시뮬레이터
+const poolTable = [
+  {cnt:902, price:63.56, pool:21054.85},
+  {cnt:910, price:63.00, pool:20550.85},
+  {cnt:918, price:62.45, pool:20051.25},
+  {cnt:926, price:61.90, pool:19556.05},
+  {cnt:934, price:61.37, pool:19065.09},
+  {cnt:942, price:60.84, pool:18578.37},
+  {cnt:950, price:60.32, pool:18095.81},
+  {cnt:958, price:59.82, pool:17617.25},
+  {cnt:966, price:59.32, pool:17142.69},
+  {cnt:974, price:58.83, pool:16672.05},
+  {cnt:982, price:58.34, pool:16205.33},
+];
+function updatePool(){
+  const idx = parseInt(document.getElementById('buyRange').value)/8;
+  const cnt = 894 + parseInt(document.getElementById('buyRange').value);
+  document.getElementById('buyCnt').innerText = document.getElementById('buyRange').value;
+  document.getElementById('simRemain').innerText = cnt + '개';
+  if(idx===0){
+    document.getElementById('simPool').innerText = '21563.33 $';
+    document.getElementById('simPrice').innerText = '63.56 $ (다음)';
+  } else if(idx<=poolTable.length){
+    const row = poolTable[idx-1];
+    document.getElementById('simPool').innerText = row.pool.toFixed(2)+' $';
+    document.getElementById('simPrice').innerText = (poolTable[idx]?.price || '58.34')+' $';
+  }
+}
+function resetPool(){document.getElementById('buyRange').value=0;updatePool();}
+document.getElementById('buyRange').addEventListener('input', updatePool);
+updatePool();
+
+// 시작 자금 시뮬레이터
+function updateTQQQ(){
+  const price = parseFloat(document.getElementById('tqqqPrice').value);
+  document.getElementById('priceVal').innerText = price+'$';
+  const stock = (894*price).toFixed(0);
+  const total = (894*price + 21563.33).toFixed(0);
+  document.getElementById('needStock').innerText = Number(stock).toLocaleString()+' $';
+  document.getElementById('totalNeed').innerText = Number(total).toLocaleString()+' $';
+}
+document.getElementById('tqqqPrice').addEventListener('input', updateTQQQ);
+updateTQQQ();
+</script>
+</body>
+</html>

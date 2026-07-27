@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude Opus 5 Quiz - Interactive Test</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--accent:#e11d48;--accent2:#f43f5e;--bg:#ffffff;--bg2:#fafafa;--text:#1a1a1a;--text2:#777777;--border:#e5e5e5;--green:#16a34a;--red:#dc2626}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-serif;line-height:1.6}
+h1{font-family:'Playfair Display',serif}
+.sticky{position:sticky;top:0;z-index:100;background:rgba(255,255,255,0.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);padding:12px 16px}
+.sticky-inner{max-width:720px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.stats{display:flex;gap:14px;font-size:13px;font-weight:700}
+.progress-wrap{width:100%;height:8px;background:var(--bg2);border-radius:20px;overflow:hidden;margin-top:8px;border:1px solid var(--border)}
+.progress{height:100%;width:0%;transition:width 0.4s, background 0.4s;background:var(--red)}
+.container{max-width:720px;margin:0 auto;padding:20px}
+.hero{padding:28px 0 10px}
+.hero h1{font-size:28px;line-height:1.1}
+.hero p{color:var(--text2);font-size:14px;margin-top:8px}
+.card{background:var(--bg);border:1px solid var(--border);border-radius:16px;padding:18px;margin:18px 0;box-shadow:0 2px 10px rgba(0,0,0,0.04)}
+.card-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.q-num{font-family:'Playfair Display';font-size:20px}
+.badge{font-size:11px;padding:4px 8px;border-radius:20px;border:1px solid var(--border)}
+.badge.easy{background:#dcfce7;color:#166534}
+.badge.medium{background:#fef3c7;color:#92400e}
+.badge.hard{background:#fee2e2;color:#991b1b}
+.question{font-size:16px;font-weight:700;margin-bottom:14px}
+.options{display:flex;flex-direction:column;gap:8px}
+.opt{border:1px solid var(--border);background:var(--bg2);padding:12px 14px;border-radius:12px;cursor:pointer;text-align:left;font-size:14px;transition:all 0.2s}
+.opt:hover{border-color:var(--accent);transform:translateY(-1px)}
+.opt:disabled{opacity:0.9;cursor:not-allowed;transform:none}
+.opt.correct{background:#dcfce7;border-color:var(--green);color:#166534;font-weight:700}
+.opt.wrong{background:#fee2e2;border-color:var(--red);color:#991b1b}
+.input-row{display:flex;gap:8px;margin-top:8px}
+.input-row input{flex:1;border:1px solid var(--border);padding:12px;border-radius:10px;font-size:14px}
+.btn{border:none;background:var(--accent);color:#fff;padding:10px 14px;border-radius:10px;font-weight:700;cursor:pointer}
+.btn:disabled{opacity:0.5}
+.ox-row{display:flex;gap:10px}
+.ox{flex:1;padding:14px;border-radius:12px;border:1px solid var(--border);background:var(--bg2);font-size:18px;font-weight:800;cursor:pointer}
+.ox.correct{background:#dcfce7;border-color:var(--green)}
+.ox.wrong{background:#fee2e2;border-color:var(--red)}
+.explain{display:none;margin-top:14px;padding:12px;background:var(--bg2);border:1px dashed var(--border);border-radius:12px;font-size:13px;color:var(--text)}
+.explain.show{display:block}
+.explain b{color:var(--accent)}
+.result-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:200;align-items:center;justify-content:center;padding:20px}
+.result-modal.show{display:flex}
+.result-card{background:#fff;border-radius:20px;padding:24px;max-width:400px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.2)}
+.grade{font-family:'Playfair Display';font-size:52px;color:var(--accent);margin:6px 0}
+</style>
+</head>
+<body>
+<div class="sticky">
+  <div class="sticky-inner">
+    <div class="stats">
+      <span>푼 문제 <b id="solved">0</b>/10</span>
+      <span>맞힌 문제 <b id="correct">0</b></span>
+      <span>정답률 <b id="rate">0</b>%</span>
+    </div>
+    <button class="btn" style="padding:6px 10px;font-size:12px" onclick="resetQuiz()">다시 풀기</button>
+  </div>
+  <div style="max-width:720px;margin:0 auto"><div class="progress-wrap"><div id="progress" class="progress"></div></div></div>
+</div>
+
+<div class="container">
+  <div class="hero">
+    <h1>Claude Opus 5 is a freak<br>Interactive Quiz</h1>
+    <p>원본 자막에 실제로 나온 내용만 출제. 클릭 한 번에 정답·해설·점수가 즉시 반영됩니다. 단답형은 띄어쓰기·대소문자 무시.</p>
+  </div>
+  <div id="quiz"></div>
+</div>
+
+<div id="finalModal" class="result-modal">
+  <div class="result-card">
+    <div style="font-size:13px;letter-spacing:0.2em;color:var(--text2)">FINAL SCORE</div>
+    <div id="finalGrade" class="grade">A</div>
+    <div id="finalText" style="font-size:15px;font-weight:700;margin-bottom:10px"></div>
+    <div id="finalDetail" style="font-size:13px;color:var(--text2);margin-bottom:16px"></div>
+    <button class="btn" onclick="resetQuiz();closeModal()">다시 풀기</button>
+  </div>
+</div>
+
+<script>
+const QUIZ_DATA = [
+  {
+    id:1, type:'mcq', difficulty:'easy',
+    question:'Claude Opus 5가 단 한 번의 프롬프트로 브라우저 안에 통째로 구현한 것은 무엇인가?',
+    options:['Windows 11 복제본','macOS Sonoma','Ubuntu Linux','Android 14'],
+    answer:0,
+    explanation:'자막: “윈도우 11의 브라우저적인 레플리케이션을 만들어봅시다. 마이크로소프트 오피스, 스토어 포함” 한 프롬프트로 File Explorer·Word·Excel·Spotify·Discord·Slack까지 동작하는 복제본을 생성했다고 설명.'
+  },
+  {
+    id:2, type:'mcq', difficulty:'easy',
+    question:'Windows 11 복제 프로젝트에서 Opus 5가 사용한 토큰 수는?',
+    options:['약 366,000 토큰','약 100,000 토큰','약 500,000 토큰','약 173,000 토큰'],
+    answer:0,
+    explanation:'자막: “this took 366 000 tokens” 직접 언급. 5시간 제한(Max Plan)의 약 25%를 사용했고 1시간 이상 걸렸다고 명시.'
+  },
+  {
+    id:3, type:'mcq', difficulty:'medium',
+    question:'Q4 2025 실적 발표 영상에서 전년 대비 +73% 성장으로 “Growth flips the board”를 기록한 기업은?',
+    options:['NVIDIA','META','GOOGL','AMZN'],
+    answer:0,
+    explanation:'PDF 23페이지 차트: NVDA was #3 by revenue, ↑73% 표시. 영상 내레이션도 “인피디아는 73% 증가” 라고 언급. AMZN은 $210.7B로 매출 1위지만 성장률은 가장 낮음.'
+  },
+  {
+    id:4, type:'mcq', difficulty:'medium',
+    question:'GeometricOfficeScene 이미지를 단일 HTML로 3D 애니메이션화하는 테스트에서 가장 완성도가 높다고 평가된 모델은?',
+    options:['Claude Opus 5','GPT-5.6','Fable','Kimi K2'],
+    answer:0,
+    explanation:'자막: “Fable에서의 개념을 비교하면, 오피스 5에서의 개념이 훨씬 더 좋다. 이 3D 장면에서의 개념이 가장 좋은 모델” 이라고 제작자가 평가. GPT-5.6은 장면을 정확히 연결하지 못했다고 언급.'
+  },
+  {
+    id:5, type:'mcq', difficulty:'medium',
+    question:'Blender Python API에 연결해 제작한 최종 3D 모델은 무엇인가?',
+    options:['X-Wing Fighter','Millennium Falcon','Tesla Cybertruck','Office Building'],
+    answer:0,
+    explanation:'자막: “X-Wing Fighter가 완성되었습니다… R2-D2의 위치에 R2-D2를 넣은 것” Blender 연결, 스크린샷으로 검증하는 타임랩스 과정이 소개. 토큰은 173K로 가장 적게 사용.'
+  },
+  {
+    id:6, type:'mcq', difficulty:'hard',
+    question:'ARC AGI 3 벤치마크에서 Claude Opus 5가 기록한 점수는?',
+    options:['30%','10%','1%','73%'],
+    answer:0,
+    explanation:'자막: “one of the most impressive things about opus 5 is it scored 30 percent in this arc agi 3 benchmark… next best GPT-5.6은 10%도 안됨” 그러나 새로운 게임에선 Opus 4.8보다 못했다는 반론 연구도 함께 소개.'
+  },
+  {
+    id:7, type:'short', difficulty:'easy',
+    question:'음악 제작 미션에서 최종적으로 선택된 무료 VST 플러그인 이름은? (영문)',
+    options:[], answer:'surge xt',
+    explanation:'자막: VitalSynth는 회원가입 필요로 제외, 최종적으로 “Surge XT”에 정착. 이후 Kick·Clap·Pad·String·Lead 등 15개 이상 트랙으로 5분 곡을 완성.'
+  },
+  {
+    id:8, type:'short', difficulty:'medium',
+    question:'NVIDIA·Google·Meta·Amazon Q4 실적을 비교하는 1분 프레젠테이션 영상을 만들 때 사용된 오픈소스 모션그래픽 도구는?',
+    options:[], answer:'hyperframes',
+    explanation:'자막: “use hyperframes to create the animation i have linked to the hyperframes github repo… open source tool for you to create motion graphics presentation videos” 명시. Gemini TTS와 함께 사용.'
+  },
+  {
+    id:9, type:'ox', difficulty:'medium',
+    question:'숨은 뱀 찾기 테스트에서 Opus 5는 뱀을 찾지 못하자 존재하지 않는 뱀을 만들어냈다.',
+    options:['O','X'], answer:'X',
+    explanation:'정답은 X. 자막: “if it can not find anything it does not just hallucinate and make stuff up it will actually say it cannot find anything” 환각하지 않고 못 찾았다고 정직하게 말한 것이 장점으로 언급.'
+  },
+  {
+    id:10, type:'ox', difficulty:'hard',
+    question:'Claude Opus 5의 컨텍스트 윈도우는 1,000,000 토큰으로, 한 번에 약 700,000단어 또는 중간 규모 코드베이스를 넣을 수 있다.',
+    options:['O','X'], answer:'O',
+    explanation:'정답 O. 자막: “다른 프론티어 모델처럼 1,000,000 톤의 컨텍스트 화면… 700,000 단어, 또는 중간에서 중간 사이즈의 코드 베이스에 많은 정보를 포함시킬 수 있다” 고 스펙 설명.'
+  }
+];
+
+let state={solved:0, correct:0, answers:{}};
+
+function render(){
+  const root=document.getElementById('quiz');
+  root.innerHTML='';
+  QUIZ_DATA.forEach((q, idx)=>{
+    const card=document.createElement('div');
+    card.className='card';
+    card.id='card-'+q.id;
+    const diffClass = q.difficulty==='easy' ? 'easy' : q.difficulty==='medium' ? 'medium' : 'hard';
+    const diffLabel = q.difficulty==='easy' ? '쉬움' : q.difficulty==='medium' ? '보통' : '어려움';
+    let body='';
+    if(q.type==='mcq'){
+      body='<div class="options">'+q.options.map((op,i)=>`<button class="opt" data-q="${q.id}" data-i="${i}" onclick="checkMCQ(${q.id},${i})">${String.fromCharCode(65+i)}. ${op}</button>`).join('')+'</div>';
+    }else if(q.type==='short'){
+      body=`<div class="input-row"><input type="text" id="input-${q.id}" placeholder="정답 입력 (예: Surge XT)"><button class="btn" onclick="checkShort(${q.id})">제출</button></div>`;
+    }else{
+      body=`<div class="ox-row"><button class="ox" onclick="checkOX(${q.id},'O')">O</button><button class="ox" onclick="checkOX(${q.id},'X')">X</button></div>`;
+    }
+    card.innerHTML=`
+      <div class="card-head"><span class="q-num">Q${idx+1}</span><span class="badge ${diffClass}">${diffLabel}</span></div>
+      <div class="question">${q.question}</div>
+      ${body}
+      <div id="explain-${q.id}" class="explain"></div>
+    `;
+    root.appendChild(card);
+  });
+}
+
+function updateBoard(){
+  document.getElementById('solved').textContent=state.solved;
+  document.getElementById('correct').textContent=state.correct;
+  const rate = state.solved===0?0:Math.round(state.correct/state.solved*100);
+  document.getElementById('rate').textContent=rate;
+  const prog=document.getElementById('progress');
+  prog.style.width=(state.solved/10*100)+'%';
+  if(rate<40) prog.style.background='var(--red)';
+  else if(rate<70) prog.style.background='#f59e0b';
+  else prog.style.background='var(--green)';
+  if(state.solved===10) showFinal(rate);
+}
+
+function lockCard(qid){
+  const card=document.getElementById('card-'+qid);
+  card.querySelectorAll('button').forEach(b=>b.disabled=true);
+  card.querySelectorAll('input').forEach(i=>i.disabled=true);
+}
+
+function showExplain(qid, isCorrect){
+  const q=QUIZ_DATA.find(x=>x.id===qid);
+  const el=document.getElementById('explain-'+qid);
+  const icon = isCorrect ? '✓ 정답!' : '✗ 오답';
+  const color = isCorrect ? 'var(--green)' : 'var(--red)';
+  el.innerHTML=`<div style="font-weight:800;color:${color};margin-bottom:6px">${icon}</div><b>해설:</b> ${q.explanation}`;
+  el.classList.add('show');
+}
+
+function checkMCQ(qid, chosen){
+  if(state.answers[qid]!=null) return;
+  const q=QUIZ_DATA.find(x=>x.id===qid);
+  const isCorrect = chosen===q.answer;
+  state.answers[qid]=isCorrect;
+  state.solved++; if(isCorrect) state.correct++;
+  const card=document.getElementById('card-'+qid);
+  card.querySelectorAll('.opt').forEach((btn, i)=>{
+    if(i===q.answer) btn.classList.add('correct');
+    if(i===chosen && !isCorrect) btn.classList.add('wrong');
+  });
+  if(isCorrect) card.querySelectorAll('.opt')[chosen].insertAdjacentHTML('afterbegin','<span style="margin-right:6px">✓</span>');
+  showExplain(qid,isCorrect);
+  lockCard(qid);
+  updateBoard();
+}
+
+function checkShort(qid){
+  if(state.answers[qid]!=null) return;
+  const q=QUIZ_DATA.find(x=>x.id===qid);
+  const input=document.getElementById('input-'+qid);
+  const val=input.value.trim().toLowerCase().replace(/\s+/g,' ');
+  if(!val){alert('답을 입력해주세요'); return;}
+  const ans=q.answer.toLowerCase();
+  const isCorrect = val.includes(ans) || ans.includes(val) || val.replace(' ','')===ans.replace(' ','');
+  state.answers[qid]=isCorrect;
+  state.solved++; if(isCorrect) state.correct++;
+  const row=input.parentElement;
+  const badge=document.createElement('div');
+  badge.textContent=isCorrect ? '✓ 정답!' : `✗ 오답 (정답: ${q.answer})`;
+  badge.style.fontWeight='800';
+  badge.style.marginTop='8px';
+  badge.style.color=isCorrect?'var(--green)':'var(--red)';
+  row.parentElement.appendChild(badge);
+  input.style.borderColor=isCorrect?'var(--green)':'var(--red)';
+  input.style.background=isCorrect?'#dcfce7':'#fee2e2';
+  showExplain(qid,isCorrect);
+  lockCard(qid);
+  updateBoard();
+}
+
+function checkOX(qid, chosen){
+  if(state.answers[qid]!=null) return;
+  const q=QUIZ_DATA.find(x=>x.id===qid);
+  const correctLabel = q.options[q.answer==='O'?0: q.answer==='X'?1 : (q.answer==='O'?0:1)]; // fallback
+  // For ox, q.options is ['O','X'] and answer is 'X' string etc, we stored answer as 'X'/'O' letter
+  const isCorrect = chosen===q.answer;
+  state.answers[qid]=isCorrect;
+  state.solved++; if(isCorrect) state.correct++;
+  const card=document.getElementById('card-'+qid);
+  card.querySelectorAll('.ox').forEach(btn=>{
+    const label=btn.textContent.trim();
+    if(label===q.answer) btn.classList.add('correct');
+    if(label===chosen && !isCorrect) btn.classList.add('wrong');
+  });
+  showExplain(qid,isCorrect);
+  lockCard(qid);
+  updateBoard();
+}
+
+function showFinal(rate){
+  const modal=document.getElementById('finalModal');
+  const gradeEl=document.getElementById('finalGrade');
+  const textEl=document.getElementById('finalText');
+  const detailEl=document.getElementById('finalDetail');
+  let grade, msg;
+  if(rate>=90){grade='A'; msg='괴물급 이해도! Opus 5를 제대로 파악했어요.';}
+  else if(rate>=70){grade='B'; msg='훌륭해요! 핵심 내용은 거의 다 잡았네요.';}
+  else if(rate>=40){grade='C'; msg='좋은 시작! 분석 리포트를 한 번 더 보면 80점 넘을 수 있어요.';}
+  else{grade='D'; msg='괜찮아요. Opus 5가 워낙 방대한 테스트라 그래요. 리포트 다시 보고 재도전!';}
+  gradeEl.textContent=grade;
+  textEl.textContent=`${state.correct}/10문제 정답 · ${rate}%`;
+  detailEl.textContent=msg;
+  modal.classList.add('show');
+}
+function closeModal(){document.getElementById('finalModal').classList.remove('show');}
+function resetQuiz(){
+  state={solved:0,correct:0,answers:{}};
+  closeModal();
+  render();
+  updateBoard();
+}
+render();
+updateBoard();
+</script>
+</body>
+</html>

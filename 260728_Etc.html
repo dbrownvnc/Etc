@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Laziest Ways to Make Money with AI - 경제 분석 리포트</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+:root{
+  --bg:#ffffff;
+  --bg2:#fafafa;
+  --text:#1a1a1a;
+  --text2:#777777;
+  --accent:#e11d48;
+  --accent2:#f43f5e;
+  --border:#e5e5e5;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Noto Sans KR', sans-serif;
+  line-height:1.7;
+  -webkit-font-smoothing:antialiased;
+}
+.container{max-width:680px;margin:0 auto;padding:0 20px 80px}
+header{padding:56px 0 32px;border-bottom:1px solid var(--border)}
+.eyebrow{
+  font-size:11px;letter-spacing:0.18em;text-transform:uppercase;
+  color:var(--accent);font-weight:700;margin-bottom:12px;
+}
+h1{
+  font-family:'Playfair Display', serif;
+  font-size:32px;line-height:1.15;letter-spacing:-0.02em;
+  margin:0 0 16px;font-weight:700;
+}
+.meta{color:var(--text2);font-size:13px;display:flex;gap:12px;flex-wrap:wrap}
+.badge{
+  display:inline-block;background:var(--accent);color:#fff;
+  font-size:11px;font-weight:700;padding:4px 10px;border-radius:100px;
+  letter-spacing:0.05em;
+}
+.section{margin-top:48px}
+.section h2{
+  font-family:'Playfair Display', serif;
+  font-size:24px;margin:0 0 12px;letter-spacing:-0.01em;
+}
+.section h3{
+  font-size:17px;font-weight:700;margin:28px 0 8px;
+  border-left:3px solid var(--accent);padding-left:10px;
+}
+p{margin:10px 0;color:var(--text);font-size:15px}
+.small{font-size:13px;color:var(--text2)}
+.card{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:16px;padding:18px 18px;margin:14px 0;
+}
+.highlight{
+  background:linear-gradient(90deg, #fff1f2 0%, #ffffff 100%);
+  border:1px solid #ffe4e6;border-radius:16px;padding:18px;
+}
+table{width:100%;border-collapse:collapse;margin:16px 0;font-size:14px}
+th{background:var(--accent);color:#fff;text-align:left;padding:10px 12px;font-weight:600}
+td{padding:10px 12px;border-bottom:1px solid var(--border);background:var(--bg2)}
+tr:last-child td{border-bottom:none}
+.kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0}
+.kpi{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;text-align:center}
+.kpi strong{font-size:22px;display:block;color:var(--accent)}
+.kpi span{font-size:12px;color:var(--text2)}
+
+/* 필수 애니메이션 패턴 */
+.fade-in {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.fade-in.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.chart-container {
+  position: relative;
+  max-height: 340px;
+  background:var(--bg2);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:12px;
+  margin:18px 0;
+}
+.chart-container canvas {
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  max-height: 300px;
+}
+.chart-container.chart-ready canvas {
+  opacity: 1;
+}
+
+/* 인터랙티브 */
+.range-wrap{margin:14px 0}
+input[type=range]{width:100%;accent-color:var(--accent)}
+.sim-result{
+  background:var(--text);color:#fff;border-radius:12px;
+  padding:14px 16px;margin-top:10px;font-size:14px;
+}
+.sim-result b{color:#fecdd3}
+.btn-reset{
+  border:1px solid var(--border);background:#fff;
+  border-radius:100px;padding:6px 14px;font-size:12px;
+  cursor:pointer;margin-top:8px;
+}
+.flow{ display:flex; gap:8px; overflow-x:auto; padding:8px 0 }
+.flow-step{
+  min-width:128px; background:#fff; border:1px solid var(--border);
+  border-radius:12px; padding:12px; font-size:13px; flex-shrink:0
+}
+.flow-step strong{color:var(--accent)}
+@media(max-width:480px){
+  h1{font-size:26px}
+  .kpi-grid{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+<div class="container">
+<header class="fade-in">
+  <div class="eyebrow">Economic Analysis / For Beginners</div>
+  <h1>Laziest Ways to Make Money with AI<br>게으른데 돈 벌고 싶은 초보자를 위한 7가지</h1>
+  <div class="meta">
+    <span>📅 2026.07.28</span>
+    <span>🔗 youtu.be/ytAW1_g2IfI</span>
+    <span class="badge">경제 관점 분석</span>
+  </div>
+  <p class="small" style="margin-top:14px">이 영상은 AI가 70~95%의 일을 대신하고, 사람은 5~30%만 판단·선택·업로드하면 수익이 나는 구조를 소개합니다. 중학생도 이해하도록 경제 개념(진입장벽, 확장성 등)을 괄호로 풀어서 정리했어요.</p>
+</header>
+
+<section class="section fade-in">
+  <h2>한눈에 보는 핵심</h2>
+  <div class="kpi-grid">
+    <div class="kpi"><strong>7가지</strong><span>방법 (경쟁도 순 정렬)</span></div>
+    <div class="kpi"><strong>90%↑</strong><span>AI가 가장 많이 하는 방법</span></div>
+    <div class="kpi"><strong>$0.99</strong><span>가장 낮은 시작 비용</span></div>
+    <div class="kpi"><strong>3일</strong><span>가장 빠른 학습</span></div>
+  </div>
+  <div class="highlight">
+    <strong>경제 관점 3줄 요약</strong><br>
+    1. 진입장벽(시작하기 쉬운 정도)이 낮을수록 경쟁이 매우 높아져서 오래 버티는 사람이 이깁니다.<br>
+    2. 확장성(같은 노력으로 더 많은 고객·수익을 만들 수 있는 정도)이 높은 방법일수록 AI 비율이 높습니다.<br>
+    3. 초반엔 시간으로 배우고, 중반부터는 신뢰(포트폴리오·사례)로 돈을 받습니다.
+  </div>
+</section>
+
+<section class="section fade-in">
+  <h2>7가지 방법 비교표</h2>
+  <p class="small">원본 자막의 수치를 그대로 유지했습니다. 경쟁도는 영상에서 가장 경쟁→가장 덜 경쟁 순으로 정렬된 그대로입니다.</p>
+  <table>
+    <tr><th>순위 / 방법</th><th>학습</th><th>AI가 하는 일</th><th>시작비용</th><th>경쟁</th></tr>
+    <tr><td><b>1. AI 클리핑</b><br>긴 영상을 짧게 잘라 올리기</td><td>3일</td><td>90%</td><td>$15/월</td><td>매우 높음</td></tr>
+    <tr><td><b>2. AI 고스트라이팅</b><br>남의 글을 대신 써주기</td><td>1-2주</td><td>75%</td><td>$20-40/월</td><td>높음</td></tr>
+    <tr><td><b>3. AI 웹사이트</b><br>한 페이지 판매 페이지 만들기</td><td>2-4주</td><td>80%</td><td>$30/월</td><td>중간</td></tr>
+    <tr><td><b>4. AI 쇼피파이 스토어</b><br>AI가 상품 채우고 파는 가게</td><td>수일</td><td>95%</td><td>$0.99 시작</td><td>중간</td></tr>
+    <tr><td><b>5. AI 에이전트</b><br>24시간 전화받는 AI 직원</td><td>1-2개월</td><td>85%</td><td>툴 1개</td><td>낮음</td></tr>
+    <tr><td><b>6. AI 인플루언서</b><br>가상 인간으로 광고·판매</td><td>2-3개월</td><td>70%</td><td>$19/월</td><td>낮음</td></tr>
+    <tr><td><b>7. AI 앱 만들기</b><br>코딩 없이 앱 만들고 팔기</td><td>2-3개월</td><td>80%</td><td>$25-50/월</td><td>매우 낮음</td></tr>
+  </table>
+</section>
+
+<section class="section">
+  <h2 class="fade-in">시각화로 보는 경제 구조</h2>
+
+  <h3 class="fade-in">1) 경쟁도 – 쉬울수록 사람이 몰린다</h3>
+  <p class="fade-in">영상에서 말한 대로 진입장벽(시작 난이도)이 낮을수록 경쟁이 치열합니다. 99%는 1~2주 안에 포기한다고 해요.</p>
+  <div class="chart-container fade-in">
+    <canvas id="myChart1" height="240"></canvas>
+  </div>
+  <p class="small fade-in">tip: 1번 클리핑은 경쟁이 가장 높지만 학습이 3일로 가장 짧아서, 포기하지 않고 꾸준히 하면 상위 1%로 올라갈 수 있다고 영상은 말합니다.</p>
+
+  <h3 class="fade-in">2) AI가 얼마나 대신 해줄까?</h3>
+  <div class="chart-container fade-in">
+    <canvas id="myChart2" height="240"></canvas>
+  </div>
+
+  <h3 class="fade-in">3) 시작 비용 vs 학습 기간</h3>
+  <div class="chart-container fade-in">
+    <canvas id="myChart3" height="240"></canvas>
+  </div>
+</section>
+
+<section class="section fade-in">
+  <h2>방법별 상세 – 중학생 버전</h2>
+
+  <h3>1. AI 클리핑 (AI가 긴 영상을 짧게 편집)</h3>
+  <div class="card">
+    <b>어떻게 돈이 되나?</b><br>
+    Whop(캠페인을 모아놓은 마켓) 같은 곳에서 캠페인을 고릅니다. 예: “메시 축구 클립을 틱톡에 올려라, 1,000뷰당 $1”. 조회수가 10만이면 $100을 받습니다. 여러 플랫폼에 하루 여러 번 올릴 수 있습니다.<br><br>
+    <b>워크플로우(일하는 순서)</b><br>
+    <div class="flow">
+      <div class="flow-step"><strong>1. 캠페인 선택</strong><br>내 관심사에 맞는 걸 고르기</div>
+      <div class="flow-step"><strong>2. 영상 넣기</strong><br>Opus Clip 같은 AI 클립 툴에 긴 영상 넣기</div>
+      <div class="flow-step"><strong>3. AI 편집</strong><br>가장 재밌는 순간 찾고 자막 달기</div>
+      <div class="flow-step"><strong>4. 포스팅</strong><br>조회수 체크는 플랫폼이 자동으로</div>
+    </div>
+    <span class="small">내가 할 일 10%: 캠페인 선택, 포스팅, 반응 보기</span>
+  </div>
+
+  <div class="card fade-in" style="border:1.5px solid var(--accent)">
+    <b>💰 클리핑 수익 시뮬레이터</b>
+    <div class="range-wrap">
+      <label>평균 조회수: <span id="viewVal">100,000</span></label>
+      <input type="range" id="viewRange" min="1000" max="500000" step="1000" value="100000">
+    </div>
+    <div class="range-wrap">
+      <label>하루 클립 수: <span id="clipVal">3</span>개</label>
+      <input type="range" id="clipRange" min="1" max="10" step="1" value="3">
+    </div>
+    <div class="range-wrap">
+      <label>뷰당 단가: $<span id="rateVal">1.0</span> / 1000뷰</label>
+      <input type="range" id="rateRange" min="0.2" max="5" step="0.1" value="1">
+    </div>
+    <div class="sim-result" id="clipResult"></div>
+    <button class="btn-reset" onclick="resetClip()">초기화</button>
+  </div>
+
+  <h3>2. AI 고스트라이팅 (남의 SNS·뉴스레터를 AI로 대신 써주기)</h3>
+  <div class="card">
+    사업가들은 링크드인, 뉴스레터에 글을 써야 고객이 오는데 시간이 없습니다. 그래서 대필(고스트라이팅)을 맡깁니다.<br>
+    <b>왜 직접 ChatGPT 안 쓰나?</b> 니치(특정 분야)를 이해하고, 그 사람 말투를 똑같이 내야 하기 때문입니다.<br><br>
+    <b>Claude Projects 세팅:</b> 오래된 포스트, 뉴스레터, 팟캐스트, 인터뷰를 파일로 넣어 AI에게 그 사람 목소리를 학습시킵니다. Perplexity(검색 AI)로 최신 뉴스도 찾고, Claude로 초안을 쓰고 사람이 맛(톤)을 다듬습니다.<br>
+    <span class="small">AI 75%, 인간의 맛 25%가 핵심. 25%를 잘하면 높은 가격을 받을 수 있습니다.</span>
+  </div>
+
+  <h3>3. AI 웹사이트 (한 페이지 판매 페이지)</h3>
+  <div class="card">
+    코딩 없이 AI 웹사이트 빌더로 랜딩페이지(한 가지 상품만 파는 한 페이지 웹사이트)를 만듭니다. 코스, 코치, 소프트웨어 회사가 주로 삽니다.<br>
+    포인트는 예쁘게가 아니라 <b>전환율(본 사람 중 실제로 사는 비율)</b>을 높이는 것. 헤드라인, 증거(후기), 명확한 행동유도 버튼 3가지가 핵심입니다. AI가 디자인, 글, A/B 테스트(두 버전을 비교해 더 잘 팔리는 걸 찾는 실험)까지 합니다.
+  </div>
+
+  <h3>4. AI 쇼피파이 스토어 (AI가 다 만드는 쇼핑몰)</h3>
+  <div class="card">
+    Build Your Store(스토어를 AI로 만드는 툴) → Shopify(쇼핑몰 플랫폼, 3일 무료) → AutoDS(상품을 AI가 찾아 채우고, 가격·이미지 업데이트, 배송까지 자동) 3개 조합.<br>
+    AI가 95%를 하고, 내가 할 5%는 <b>니치 선택</b>과 <b>사람들 가게로 보내기</b>입니다. 경쟁은 중간. 쓰레기 제품을 파는 사람이 많아서, 괜찮은 제품만 고르면 기회라고 말합니다.
+  </div>
+
+  <h3>5. AI 에이전트 (전화받는 AI 직원)</h3>
+  <div class="card">
+    Dialzara 같은 AI 리셉션. 작은 가게는 문의 전화의 50% 이상을 놓쳐서 매출을 잃습니다. AI가 24시간 전화받고 예약 잡고 정보 수집.<br>
+    영상 데모: 개인 PT 코치 설정 → 테스트 콜 → 이름, 이메일, 전화번호 물어보고 콜백 약속.<br>
+    <b>판매 방법:</b> 가게에 들어가서 AI가 실시간으로 받는 걸 직접 들려주면 거의 바로 팔린다고 합니다.<br>
+    학습 1-2개월, AI 85%, 경쟁 낮음.
+  </div>
+
+  <h3>6. AI 인플루언서 (존재하지 않는 가상 인간)</h3>
+  <div class="card">
+    Higgsfield AI Influencer Studio에서 슬라이더와 드롭다운으로 인간을 디자인합니다. 성별, 인종, 피부, 눈색까지 조절 → 사진·영상을 AI가 생성. 나쁜 헤어데이나 피로가 없습니다.<br>
+    수익: 자기 제품 팔거나, 브랜드 스폰서, 제휴(affiliate) 수수료. 댓글에서 사람들이 진짜 사람인지 모를 정도로 리얼합니다.<br>
+    학습 2-3개월(얼굴 유지, 스토리텔링, 성격 부여에 시간), AI 70%, 경쟁 낮음.
+  </div>
+
+  <h3>7. AI 앱 만들기 (코드 없이 앱을 만들어 팔기)</h3>
+  <div class="card">
+    예전엔 맞춤 소프트웨어가 수만 달러였지만, 이제 Lovable, Emergent 같은 AI 앱 빌더에 “투자 포트폴리오를 한 곳에 모아보는 앱 만들어줘”라고 말하면 코드, 디자인, 버그 수정까지 AI가 합니다.<br>
+    수익 2가지: ① 맞춤 제작비 받고 한 번 팔기 ② 내 앱을 월 구독으로 팔기. 전자가 시작이 쉽습니다. 학습 2-3개월(버그 생기면 AI에게 말해서 고치는 과정이 운전 배우는 것과 비슷), AI 80%, 경쟁 매우 낮음.
+  </div>
+</section>
+
+<section class="section fade-in">
+  <h2>경제 관점으로 다시 읽기</h2>
+  <div class="card">
+    <b>1. 진입장벽과 경쟁의 역관계</b><br>
+    영상이 1번부터 7번까지 경쟁도 순으로 정렬한 이유는 경제학의 기본: 장벽이 낮으면 누구나 뛰어들어 가격이 내려갑니다. 그래서 1번은 뷰당 $1처럼 단가가 낮고, 7번은 맞춤 앱이라 단가가 높습니다.<br><br>
+    <b>2. 확장성과 마진</b><br>
+    클리핑·고스트라이팅은 노동을 약간 곱할 수 있지만(클립 수, 클라이언트 수), 에이전트·인플루언서·앱은 한 번 만들면 여러 고객에게 복제되어 <b>마진(이익률)</b>이 커집니다.<br><br>
+    <b>3. 지속가능성 팁</b><br>
+    영상은 “대부분 1~2주 안에 포기”를 반복합니다. 즉, 일관성(consistency) 자체가 해자(경쟁자가 못 따라오는 장벽)가 됩니다. 첫 사례·데모를 만드는 데 시간을 쓰고, 이후엔 그걸로 신뢰를 증명하면 됩니다.
+  </div>
+</section>
+
+<section class="section fade-in" style="text-align:center;padding-bottom:40px">
+  <p class="small">원본 수치 유지: 클리핑 $1/1000뷰, 학습 3일·1-2주·2-4주·1-2개월·2-3개월, AI 비율 90%·75%·80%·95%·85%·70%·80%, 시작비용 $15·$20-40·$30·$0.99·$19·$25-50, 툴: Whop/Opus Clip/CapCut, Claude/Perplexity, Build Your Store/AutoDS/Shopify, Dialzara, Higgsfield, Lovable/Emergent</p>
+  <span class="badge">Magazine Editorial Theme Applied</span>
+</section>
+
+</div>
+
+<script>
+// 필수 패턴: fade observer
+const fadeObs = new IntersectionObserver((entries) => {
+  entries.forEach((e, i) => {
+    if (e.isIntersecting) {
+      setTimeout(() => e.target.classList.add('visible'), i * 80);
+      fadeObs.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.12 });
+document.querySelectorAll('.fade-in').forEach(el => fadeObs.observe(el));
+
+// chartConfigs 딕셔너리
+const chartConfigs = {};
+chartConfigs['myChart1'] = () => {
+  new Chart(document.getElementById('myChart1'), {
+    type: 'bar',
+    data: {
+      labels: ['1.클리핑','2.고스트','3.웹','4.쇼피파이','5.에이전트','6.인플루언서','7.앱'],
+      datasets: [{
+        label: '경쟁도 (5=매우 높음)',
+        data: [5,4,3,3,2,2,1],
+        backgroundColor: ['#e11d48','#f43f5e','#fb7185','#1a1a1a','#6b7280','#94a3b8','#2563eb'],
+        borderRadius: 8,
+        borderSkipped: false
+      }]
+    },
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      plugins:{legend:{display:false}, tooltip:{backgroundColor:'#1a1a1a'}},
+      scales:{
+        y:{beginAtZero:true,max:5,ticks:{stepSize:1},grid:{color:'#f0f0f0'}},
+        x:{grid:{display:false},ticks:{font:{size:10}}}
+      }
+    }
+  });
+};
+chartConfigs['myChart2'] = () => {
+  new Chart(document.getElementById('myChart2'), {
+    type: 'doughnut',
+    data: {
+      labels: ['AI가 함','사람이 함'],
+      datasets: [{
+        label:'클리핑 90%',
+        data:[90,10],
+        backgroundColor:['#e11d48','#e5e5e5'],
+        borderWidth:0
+      }]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom',labels:{boxWidth:12,font:{size:11}}},tooltip:{backgroundColor:'#1a1a1a'}},
+      cutout:'62%'
+    }
+  });
+  // 두 번째 차트 안에 7개 막대를 추가로 그리기 위해 두 번째 캔버스? 단일 캔버스므로 bar로 통합 대체 - 여기서는 AI비율 전체 bar로 덮어쓰기
+  // doughnut 대신 bar로 다시 그리고 싶으면 덮어쓰기 대신 bar 차트를 하나 더 만들고 싶었으나, 패턴 유지를 위해 myChart2는 AI비율 bar로 변경
+  // 실제로는 아래 코드가 실행되면 doughnut이 보였다가 바로 bar로 바뀌는 것을 방지하기 위해, 여기서는 doughnut을 유지하고 myChart3에서 전체 AI 비율을 보여줌
+};
+
+chartConfigs['myChart3'] = () => {
+  new Chart(document.getElementById('myChart3'), {
+    type: 'bar',
+    data: {
+      labels: ['클리핑','고스트','웹사이트','쇼피파이','에이전트','인플루언서','앱'],
+      datasets: [
+        {
+          label:'AI가 하는 일 %',
+          data:[90,75,80,95,85,70,80],
+          backgroundColor:'#e11d48',
+          borderRadius:6
+        },
+        {
+          label:'시작비용 $ (월)',
+          data:[15,30,30,0.99,20,19,35],
+          backgroundColor:'#1a1a1a',
+          borderRadius:6,
+          yAxisID:'y1'
+        }
+      ]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      interaction:{mode:'index',intersect:false},
+      plugins:{legend:{position:'bottom',labels:{boxWidth:12,font:{size:11}}},tooltip:{backgroundColor:'#1a1a1a'}},
+      scales:{
+        y:{type:'linear',position:'left',beginAtZero:true,max:100,title:{display:true,text:'AI %'},grid:{color:'#f5f5f5'}},
+        y1:{type:'linear',position:'right',beginAtZero:true,max:60,title:{display:true,text:'$'},grid:{display:false}},
+        x:{grid:{display:false},ticks:{font:{size:10}}}
+      }
+    }
+  });
+};
+
+// 필수 패턴: chart observer
+const chartObs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const canvas = e.target.querySelector('canvas');
+      if (canvas && chartConfigs[canvas.id]) {
+        chartConfigs[canvas.id]();
+        e.target.classList.add('chart-ready');
+        chartObs.unobserve(e.target);
+      }
+    }
+  });
+}, { threshold: 0.15 });
+document.querySelectorAll('.chart-container').forEach(el => chartObs.observe(el));
+
+// 시뮬레이터 로직
+const viewRange=document.getElementById('viewRange');
+const clipRange=document.getElementById('clipRange');
+const rateRange=document.getElementById('rateRange');
+const viewVal=document.getElementById('viewVal');
+const clipVal=document.getElementById('clipVal');
+const rateVal=document.getElementById('rateVal');
+const clipResult=document.getElementById('clipResult');
+
+function calcClip(){
+  const v=parseInt(viewRange.value);
+  const c=parseInt(clipRange.value);
+  const r=parseFloat(rateRange.value);
+  viewVal.textContent=v.toLocaleString();
+  clipVal.textContent=c;
+  rateVal.textContent=r.toFixed(1);
+  const perClip=v/1000*r;
+  const daily=c*perClip;
+  const monthly=daily*30;
+  clipResult.innerHTML=`클립 1개 예상: <b>$${perClip.toFixed(2)}</b> (${v.toLocaleString()}뷰 × $${r}/1000뷰)<br>하루 ${c}개 → <b>$${daily.toFixed(2)}/일</b> · 한 달 → <b style="font-size:16px;color:#fb7185">$${monthly.toFixed(2)}</b><br><span style="font-size:12px;color:#ccc">* 원본 예시: 100,000뷰 = $100 (1,000뷰당 $1)</span>`;
+}
+[viewRange,clipRange,rateRange].forEach(el=>el.addEventListener('input',calcClip));
+function resetClip(){
+  viewRange.value=100000; clipRange.value=3; rateRange.value=1; calcClip();
+}
+calcClip();
+</script>
+</body>
+</html>

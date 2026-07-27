@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Laziest Ways to Make Money with AI - 퀴즈</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--accent:#e11d48;--accent2:#f43f5e;--bg:#ffffff;--bg2:#fafafa;--text:#1a1a1a;--text2:#777777;--border:#e5e5e5}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-serif;line-height:1.6}
+.container{max-width:680px;margin:0 auto;padding:0 16px 100px}
+.sticky{
+  position:sticky;top:0;z-index:10;
+  background:#ffffffee;backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--border);
+  padding:12px 16px;margin:0 -16px 18px;
+  display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;
+}
+.score{font-weight:700;font-size:14px}
+.progress{height:8px;background:#f1f1f1;border-radius:100px;overflow:hidden;flex:1 1 100%;margin-top:8px}
+.progress-bar{height:100%;width:0%;transition:width 0.4s ease, background 0.3s}
+header{text-align:center;padding:18px 0 10px}
+h1{font-family:'Playfair Display',serif;font-size:26px;margin:8px 0}
+.badge{display:inline-block;font-size:11px;padding:3px 8px;border-radius:100px;font-weight:700}
+.badge-easy{background:#dcfce7;color:#166534}
+.badge-mid{background:#fef9c3;color:#854d0e}
+.badge-hard{background:#fee2e2;color:#991b1b}
+.card{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:16px;padding:18px;margin:16px 0;
+  transition:transform 0.2s
+}
+.card h3{margin:0 0 10px;font-size:16px}
+.opts{display:grid;gap:8px;margin-top:10px}
+.opt{
+  border:1px solid var(--border);background:#fff;
+  border-radius:12px;padding:12px 14px;
+  font-size:14px;cursor:pointer;text-align:left;
+  transition:all 0.2s;
+}
+.opt:hover{border-color:var(--accent2)}
+.opt.correct{background:#dcfce7;border-color:#22c55e}
+.opt.wrong{background:#fee2e2;border-color:#ef4444}
+.opt:disabled{cursor:not-allowed;opacity:0.9}
+.input-row{display:flex;gap:8px;margin-top:10px}
+.input-row input{
+  flex:1;border:1px solid var(--border);border-radius:10px;
+  padding:10px 12px;font-size:14px;
+}
+.btn{
+  background:var(--accent);color:#fff;border:none;
+  border-radius:10px;padding:10px 16px;font-weight:700;
+  cursor:pointer;font-size:13px;
+}
+.btn:disabled{opacity:0.5;cursor:not-allowed}
+.ox-wrap{display:flex;gap:10px;margin-top:10px}
+.ox-btn{
+  flex:1;padding:14px;border-radius:12px;border:1px solid var(--border);
+  background:#fff;font-size:16px;font-weight:700;cursor:pointer
+}
+.explain{
+  margin-top:12px;background:#fff;border-left:3px solid var(--accent);
+  padding:12px;border-radius:8px;font-size:13px;display:none;
+}
+.explain.show{display:block}
+.result-modal{
+  display:none;position:fixed;inset:0;background:#00000066;
+  align-items:center;justify-content:center;z-index:20;padding:20px
+}
+.result-modal.show{display:flex}
+.modal-box{
+  background:#fff;border-radius:20px;padding:28px;
+  max-width:420px;width:100%;text-align:center;
+  box-shadow:0 20px 40px #0002
+}
+.grade{font-family:'Playfair Display',serif;font-size:48px;margin:8px 0;color:var(--accent)}
+</style>
+</head>
+<body>
+<div class="container">
+<div class="sticky" id="sticky">
+  <div style="display:flex;gap:16px;flex-wrap:wrap">
+    <div class="score">푼 문제 <span id="solved">0</span> / 10</div>
+    <div class="score">맞힌 문제 <span id="correct">0</span></div>
+    <div class="score">정답률 <span id="rate">0%</span></div>
+  </div>
+  <div class="progress"><div class="progress-bar" id="bar"></div></div>
+</div>
+
+<header>
+  <span style="color:var(--accent);font-size:11px;letter-spacing:0.15em;font-weight:700">INTERACTIVE QUIZ</span>
+  <h1>Laziest Ways to Make Money with AI<br>인터랙티브 퀴즈</h1>
+  <p style="font-size:13px;color:var(--text2)">원본 자막에 나온 내용만 출제 • 클릭하면 즉시 채점·해설</p>
+</header>
+
+<div id="quizRoot"></div>
+
+<div class="result-modal" id="finalModal">
+  <div class="modal-box">
+    <div style="font-size:12px;letter-spacing:0.15em;color:var(--text2);font-weight:700">FINAL RESULT</div>
+    <div class="grade" id="finalGrade">-</div>
+    <div id="finalText" style="font-size:15px;line-height:1.5"></div>
+    <div style="margin-top:16px;font-size:13px;color:var(--text2)" id="finalScore"></div>
+    <button class="btn" style="margin-top:18px;width:100%" onclick="resetQuiz()">다시 풀기</button>
+  </div>
+</div>
+</div>
+
+<script>
+const QUIZ_DATA = [
+  {
+    id:1, type:'mc', difficulty:'쉬움',
+    question:'AI 클리핑에서 영상 캠페인의 기본 단가는 얼마로 소개되었나?',
+    options:['1000뷰당 $0.1','1000뷰당 $1','1000뷰당 $5','클립 1개당 $10 고정'],
+    answer:1,
+    explanation:'원본 자막: "1달러를 1,000뷰를 받을 수 있습니다. 그래서 클립이 100,000뷰를 받을 경우, 100달러를 받습니다." - 뷰 기반 정산입니다.'
+  },
+  {
+    id:2, type:'mc', difficulty:'쉬움',
+    question:'AI 클리핑의 학습 기간(배우기 수준)은 얼마로 말했나?',
+    options:['3일 정도','3주 정도','3개월 정도','6개월 이상'],
+    answer:0,
+    explanation:'자막: "배우기의 수준은 3일 정도입니다." - 가장 빠른 방법입니다.'
+  },
+  {
+    id:3, type:'ox', difficulty:'쉬움',
+    question:'AI 클리핑에서 AI가 하는 일 비율은 90%이고, 사람이 하는 일은 캠페인 선택·포스팅·반응 보기 10%이다. (O/X)',
+    options:['O','X'],
+    answer:0,
+    explanation:'자막 그대로: "AI는 거의 모든 프로세스를 관리합니다. 그래서 저는 AI가 90%를 사용합니다." 인간 10%는 캠페인 선택, 포스팅, 관심 받기입니다.'
+  },
+  {
+    id:4, type:'mc', difficulty:'보통',
+    question:'AI 고스트라이팅에서 Claude Projects를 설정할 때, 클라이언트의 말투를 학습시키기 위해 무엇을 업로드하라고 했나?',
+    options:['주식 차트와 재무제표','오래된 소셜미디어 포스트, 뉴스레터, 팟캐스트, 인터뷰 등','게임 아이템 목록','쇼핑몰 상품 이미지'],
+    answer:1,
+    explanation:'자막: "이것은 오래된 소셜 미디어 포스트, 지난 뉴스레터, 팟캐스트, 인터뷰, 그리고 다른 모든 것을 찾을 수 있습니다." - 목소리 학습용입니다.'
+  },
+  {
+    id:5, type:'mc', difficulty:'보통',
+    question:'AI 고스트라이팅에서 AI가 하는 일과 사람이 해야 하는 일의 비율은?',
+    options:['AI 50% / 사람 50%','AI 75% / 사람 25% (맛·판단)','AI 90% / 사람 10%','AI 95% / 사람 5%'],
+    answer:1,
+    explanation:'자막: "AI는 75%를 수행합니다. AI는 연구와 글을 수행합니다. 하지만 그 25%가 맛입니다." 판단·톤이 핵심이라고 강조합니다.'
+  },
+  {
+    id:6, type:'short', difficulty:'보통',
+    question:'AI 웹사이트 중 진짜 돈이 되는 것은 어떤 형태라고 했나? (한 페이지, 한 가지 판매)',
+    options:['랜딩페이지'],
+    answerText:'랜딩페이지',
+    explanation:'자막: "진짜 돈은 웹사이트의 특정 종류의 웹사이트를 만드는 것입니다. 이 웹사이트는 한 페이지의 웹사이트입니다. 한 가지를 판매하기 위한 웹사이트입니다." - 랜딩페이지(landing page)가 정답. 전환율이 핵심입니다.'
+  },
+  {
+    id:7, type:'mc', difficulty:'보통',
+    question:'AI 쇼피파이 스토어 방법에서 AutoDS 시작 비용은 얼마로 소개되었나?',
+    options:['$0.99',' $15',' $30','무료'],
+    answer:0,
+    explanation:'자막: "Auto ds will only cost 99 cents to get started so the total here is just 99센트입니다." Build Your Store 무료, Shopify 3일 무료 체험과 함께 가장 낮은 시작비용입니다.'
+  },
+  {
+    id:8, type:'ox', difficulty:'보통',
+    question:'AI 에이전트(전화받는 AI 직원) 방법에서 작은 회사들은 하루에 50% 이상의 문의를 놓쳐서 매출을 잃는다고 했다. (O/X)',
+    options:['O','X'],
+    answer:0,
+    explanation:'자막: "작은 회사들은 보통 하루에 50% 이상의 임금을 잃게 됩니다" - 번역이 어색하지만 원문 의도는 leads(문의/판매기회)를 50% 잃는다는 의미. AI 에이전트가 이를 해결합니다.'
+  },
+  {
+    id:9, type:'mc', difficulty:'어려움',
+    question:'AI 인플루언서 제작 툴로 영상에서 직접 시연한 툴 이름은?',
+    options:['Higgsfield','Opus Clip','Dialzara','Lovable'],
+    answer:0,
+    explanation:'자막: "저는 히그스필드에 가고 AI 인플루엔서 스튜디오를 열어보기 시작합니다." - 슬라이더와 드롭다운으로 인간을 디자인하는 툴. Dialzara는 AI 에이전트, Opus Clip은 클리핑, Lovable은 앱 빌더입니다.'
+  },
+  {
+    id:10, type:'short', difficulty:'어려움',
+    question:'AI 앱 만들기에서 예시로 만든 앱은 무엇이었나? (투자 관련)',
+    options:['포트폴리오 트래커','portfolio tracker'],
+    answerText:'포트폴리오 트래커',
+    explanation:'자막: "create an app that helps people track their investments in one place a portfolio tracker" - 투자를 한 곳에서 추적하는 앱을 Emergent에 프롬프트로 만들었습니다.'
+  }
+];
+
+let state={solved:0, correct:0, answers:{}};
+
+function render(){
+  const root=document.getElementById('quizRoot');
+  root.innerHTML='';
+  QUIZ_DATA.forEach((q, idx)=>{
+    const card=document.createElement('div');
+    card.className='card';
+    const badgeClass=q.difficulty==='쉬움'?'badge-easy':q.difficulty==='보통'?'badge-mid':'badge-hard';
+    card.innerHTML=`
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span style="font-size:12px;color:var(--text2);font-weight:700">Q${idx+1}</span>
+        <span class="badge ${badgeClass}">${q.difficulty}</span>
+      </div>
+      <h3>${q.question}</h3>
+      <div class="opts" id="opts-${q.id}"></div>
+      <div class="explain" id="exp-${q.id}"></div>
+    `;
+    root.appendChild(card);
+    const optsDiv=card.querySelector(`#opts-${q.id}`);
+    if(q.type==='mc'){
+      q.options.forEach((opt,i)=>{
+        const b=document.createElement('button');
+        b.className='opt'; b.textContent=opt;
+        b.onclick=()=>gradeMC(q.id,i);
+        optsDiv.appendChild(b);
+      });
+    }else if(q.type==='ox'){
+      const wrap=document.createElement('div'); wrap.className='ox-wrap';
+      ['O','X'].forEach((label,i)=>{
+        const b=document.createElement('button'); b.className='ox-btn'; b.textContent=label;
+        b.onclick=()=>gradeOX(q.id,i);
+        wrap.appendChild(b);
+      });
+      optsDiv.appendChild(wrap);
+    }else if(q.type==='short'){
+      const row=document.createElement('div'); row.className='input-row';
+      const input=document.createElement('input'); input.type='text'; input.placeholder='정답을 입력하세요 (예: 랜딩페이지)';
+      input.id=`input-${q.id}`;
+      input.addEventListener('keydown',e=>{ if(e.key==='Enter') gradeShort(q.id); });
+      const btn=document.createElement('button'); btn.className='btn'; btn.textContent='제출';
+      btn.onclick=()=>gradeShort(q.id);
+      row.appendChild(input); row.appendChild(btn);
+      optsDiv.appendChild(row);
+    }
+  });
+}
+
+function updateSticky(){
+  const rate=state.solved? Math.round(state.correct/state.solved*100):0;
+  document.getElementById('solved').textContent=state.solved;
+  document.getElementById('correct').textContent=state.correct;
+  document.getElementById('rate').textContent=rate+'%';
+  const bar=document.getElementById('bar');
+  bar.style.width=rate+'%';
+  if(rate<40) bar.style.background='#ef4444';
+  else if(rate<70) bar.style.background='#f59e0b';
+  else bar.style.background='#22c55e';
+  if(state.solved===10) showFinal();
+}
+
+function lockQuestion(qId){
+  const card=document.getElementById(`opts-${qId}`);
+  if(!card) return;
+  card.querySelectorAll('button, input').forEach(el=>el.disabled=true);
+}
+
+function showExplain(qId, isCorrect, q){
+  const exp=document.getElementById(`exp-${qId}`);
+  exp.innerHTML=`<div style="font-weight:700;margin-bottom:4px">${isCorrect?'✓ 정답!':'✗ 오답'} ${isCorrect?'':'→ 정답: '+(q.answerText||q.options[q.answer])}</div><div>${q.explanation}</div>`;
+  exp.classList.add('show');
+}
+
+function gradeMC(qId, chosen){
+  if(state.answers[qId]!==undefined) return;
+  const q=QUIZ_DATA.find(x=>x.id===qId);
+  const isCorrect=chosen===q.answer;
+  state.answers[qId]=isCorrect;
+  state.solved++; if(isCorrect) state.correct++;
+  const opts=document.querySelectorAll(`#opts-${qId} .opt`);
+  opts.forEach((b,i)=>{
+    if(i===q.answer) b.classList.add('correct');
+    if(i===chosen && !isCorrect) b.classList.add('wrong');
+    b.disabled=true;
+  });
+  // 배지
+  const card=document.getElementById(`opts-${qId}`).parentElement;
+  const badge=document.createElement('div');
+  badge.textContent=isCorrect?'✓ 정답!':'✗ 오답';
+  badge.style.cssText=`display:inline-block;margin-top:8px;font-size:12px;font-weight:700;padding:3px 8px;border-radius:100px;background:${isCorrect?'#dcfce7':'#fee2e2'};color:${isCorrect?'#166534':'#991b1b'}`;
+  card.querySelector(`#opts-${qId}`).appendChild(badge);
+  showExplain(qId,isCorrect,q);
+  updateSticky();
+}
+
+function gradeOX(qId, chosen){
+  if(state.answers[qId]!==undefined) return;
+  const q=QUIZ_DATA.find(x=>x.id===qId);
+  const isCorrect=chosen===q.answer;
+  state.answers[qId]=isCorrect;
+  state.solved++; if(isCorrect) state.correct++;
+  const btns=document.querySelectorAll(`#opts-${qId} .ox-btn`);
+  btns.forEach((b,i)=>{
+    if(i===q.answer) {b.style.background='#dcfce7'; b.style.borderColor='#22c55e';}
+    if(i===chosen && !isCorrect){b.style.background='#fee2e2'; b.style.borderColor='#ef4444';}
+    b.disabled=true;
+  });
+  showExplain(qId,isCorrect,q);
+  updateSticky();
+}
+
+function gradeShort(qId){
+  if(state.answers[qId]!==undefined) return;
+  const q=QUIZ_DATA.find(x=>x.id===qId);
+  const input=document.getElementById(`input-${qId}`);
+  const val=input.value.trim().toLowerCase();
+  if(!val){ input.style.borderColor='#e11d48'; return; }
+  const answers=[q.answerText.toLowerCase(), ...(q.options||[]).map(s=>s.toLowerCase())];
+  const isCorrect=answers.some(a=> val.includes(a) || a.includes(val) );
+  state.answers[qId]=isCorrect;
+  state.solved++; if(isCorrect) state.correct++;
+  input.disabled=true;
+  input.style.background=isCorrect?'#dcfce7':'#fee2e2';
+  showExplain(qId,isCorrect,q);
+  updateSticky();
+}
+
+function showFinal(){
+  const modal=document.getElementById('finalModal');
+  const rate=Math.round(state.correct/10*100);
+  let grade='D', msg='조금 더 복습해봐요! 원본 자막의 수치 부분을 다시 확인하면 금방 올라가요.';
+  if(rate>=90){grade='A'; msg='완벽해요! 7가지 방법의 경제 구조를 정확히 이해했어요. 바로 실행해도 좋을 수준!';}
+  else if(rate>=70){grade='B'; msg='좋아요! 핵심은 잡았어요. 낮은 경쟁 방법(에이전트·앱)부터 하나 골라보세요.';}
+  else if(rate>=50){grade='C'; msg='절반은 맞췄어요. 클리핑 $1/1000뷰, 학습 기간, 툴 이름만 다시 체크하면 금방 B!';}
+  document.getElementById('finalGrade').textContent=grade;
+  document.getElementById('finalText').textContent=msg;
+  document.getElementById('finalScore').textContent=`총점 ${state.correct*10}점 · ${state.correct} / 10 · 정답률 ${rate}%`;
+  modal.classList.add('show');
+}
+
+function resetQuiz(){
+  state={solved:0,correct:0,answers:{}};
+  document.getElementById('finalModal').classList.remove('show');
+  render(); updateSticky();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+render(); updateSticky();
+</script>
+</body>
+</html>

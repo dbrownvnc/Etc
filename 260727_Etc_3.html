@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NVIDIA DGX Spark - AI Developer Platform Strategy</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<style>
+:root{--bg:#ffffff;--bg2:#fafafa;--text:#1a1a1a;--text2:#777777;--accent:#e11d48;--accent2:#f43f5e;--border:#e5e5e5}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-serif;line-height:1.75;-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:'Playfair Display',serif}
+.container{max-width:740px;margin:0 auto;padding:0 20px}
+.hero{padding:52px 0 26px;border-bottom:1px solid var(--border)}
+.eyebrow{font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:var(--accent);font-weight:700;margin-bottom:12px}
+.hero h1{font-size:36px;line-height:1.05;margin-bottom:12px}
+.hero .sub{color:var(--text2);font-size:15px;line-height:1.6}
+.meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+.badge{border:1px solid var(--border);background:var(--bg2);padding:5px 10px;border-radius:20px;font-size:12px}
+
+.fade-in {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.fade-in.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.chart-container {
+  position: relative;
+  max-height: 340px;
+}
+.chart-container canvas {
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  max-height: 300px;
+}
+.chart-container.chart-ready canvas {
+  opacity: 1;
+}
+.chart-box{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:14px;margin:18px 0}
+
+section{padding:34px 0;border-bottom:1px solid var(--border)}
+.num{font-family:'Playfair Display';color:var(--accent);font-size:44px;line-height:1;margin-bottom:6px}
+h2{font-size:25px;margin-bottom:12px;line-height:1.3}
+p{font-size:15px;margin-bottom:12px}
+.small{font-size:13px;color:var(--text2)}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:18px;margin:14px 0}
+.card.accent{border-left:4px solid var(--accent)}
+.kpi{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin:14px 0}
+.kpi div{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px;text-align:center}
+.kpi b{font-size:18px;color:var(--accent);display:block}
+.kpi span{font-size:11px;color:var(--text2)}
+table{width:100%;border-collapse:collapse;background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin:12px 0;font-size:14px}
+th{background:var(--accent);color:#fff;padding:10px;text-align:left}
+td{padding:10px;border-top:1px solid var(--border);font-size:13px}
+.sim{display:flex;flex-direction:column;gap:10px;margin:12px 0}
+input[type=range]{width:100%;accent-color:var(--accent)}
+.btn{border:1px solid var(--accent);background:var(--accent);color:#fff;padding:10px 14px;border-radius:10px;font-weight:700;cursor:pointer}
+.btn.ghost{background:#fff;color:var(--accent)}
+.toggle-group{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.toggle{border:1px solid var(--border);background:#fff;padding:8px 12px;border-radius:20px;font-size:13px;cursor:pointer}
+.toggle.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.flow{display:flex;flex-direction:column;gap:0;margin:16px 0}
+.step{border-left:2px solid var(--border);padding:12px 0 12px 16px;position:relative;cursor:pointer}
+.step::before{content:'';position:absolute;left:-6px;top:16px;width:10px;height:10px;border-radius:50%;background:var(--border)}
+.step.active{border-left-color:var(--accent)}
+.step.active::before{background:var(--accent)}
+.diag{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}
+.diag div{border:1px solid var(--border);border-radius:12px;padding:10px;text-align:center;font-size:12px;background:var(--bg)}
+.diag b{display:block;font-size:13px;margin-bottom:4px}
+ul{padding-left:18px;margin:8px 0}
+li{font-size:14px;margin-bottom:6px}
+.hl{color:var(--accent);font-weight:700}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="hero fade-in">
+    <div class="eyebrow">NVIDIA • DGX Spark • 2026.07.27</div>
+    <h1>젠슨황의 선물,<br>DGX Spark는 왜<br>작은 AI PC가 아닌가</h1>
+    <div class="sub">한 손에 들어오는 DGX. 128GB 통합 메모리와 GB10 슈퍼칩으로 영상 AI 서비스 전체를 로컬에서 돌린다. 토큰/초 경쟁이 아니라 엔비디아 AI 플랫폼을 개인 개발자에게 이식하는 경제 전략을 중학생도 알기 쉽게 풀어봤습니다.</div>
+    <div class="meta"><span class="badge">GB10 Grace Blackwell 슈퍼칩</span><span class="badge">128GB Unified Memory</span><span class="badge">Linux + CUDA + Docker</span></div>
+  </div>
+
+  <section class="fade-in">
+    <div class="num">01</div>
+    <h2>DGX라는 이름을 작은 상자에 붙인 이유</h2>
+    <p>DGX는 원래 데이터센터·AI 연구소용 브랜드(서버랙에 여러 GPU를 연결해 대형 모델을 학습·추론하는 시스템)입니다. 그런데 젠슨 황이 “깐부 회동” 선물로 준 DGX Spark는 <b>한 손으로 들 수 있는 크기</b>에 DGX 이름을 달았습니다.</p>
+    <div class="card accent"><b>핵심은 크기 축소가 아님</b><br><span class="small">단순히 “큰 모델을 책상에서 돌린다”를 보여주기 위한 게 아니라, <b>AI 서비스를 만드는 환경 자체를 개인에게 가져오는 것</b>. AI 앱을 소비하는 PC가 아니라 AI 서비스를 직접 만들고 실험하는 개발 장비입니다.</span></div>
+    <div class="kpi">
+      <div><b>GB10</b><span>Grace CPU(ARM 기반) + Blackwell GPU 결합</span></div>
+      <div><b>128GB</b><span>통합 메모리 (CPU+GPU 공유)</span></div>
+      <div><b>Linux</b><span>CUDA 중심 Docker 컨테이너 기반</span></div>
+    </div>
+    <p>일반 PC는 CPU 메모리와 GPU 메모리가 분리(예: GPU 24GB면 24GB 모델만). DGX Spark는 <b>CPU와 GPU가 하나의 메모리 공간을 공유(통합 메모리)</b>해서 GPU 메모리만으로는 못 올리던 대형 언어모델(LLM), 비전 언어모델(VLM)도 올릴 수 있습니다.</p>
+    <div class="chart-box chart-container fade-in"><canvas id="myChart1" height="220"></canvas></div>
+    <div class="sim card">
+      <b>🔢 통합 메모리 시뮬레이터</b>
+      <label class="small">실행하려는 모델 크기: <span id="modelSize" class="hl">70</span>B 파라미터</label>
+      <input type="range" id="modelRange" min="7" max="140" value="70">
+      <div class="small">필요 VRAM(대략): <span id="needMem" class="hl">~140GB</span> → 일반 RTX 24GB: <span id="rtxCheck" style="color:var(--accent)">불가</span> / DGX Spark 128GB(양자화 시): <span id="dgxCheck" style="color:#16a34a">가능</span></div>
+      <button class="btn ghost" onclick="resetModel()">리셋</button>
+    </div>
+  </section>
+
+  <section class="fade-in">
+    <div class="num">02</div>
+    <h2>엔비디아 제품군에서 DGX Spark의 자리</h2>
+    <table>
+      <tr><th>제품</th><th>OS·목적</th><th>타깃</th></tr>
+      <tr><td>GeForce RTX PC</td><td>Windows, 게임·영상+로컬 AI 앱 소비</td><td>일반 소비자</td></tr>
+      <tr><td>RTX Pro Workstation</td><td>설계·시뮬레이션 + AI 개발 병행</td><td>전문 크리에이터</td></tr>
+      <tr><td>RTX Spark (신형)</td><td>Windows에 개인 AI 에이전트 통합</td><td>소비자+개인 비서</td></tr>
+      <tr><td><b>DGX Spark</b></td><td><b>Linux + CUDA 컨테이너, AI 서비스 개발·검증</b></td><td><b>AI 개발자</b></td></tr>
+      <tr><td>DGX Station / GPU 서버</td><td>대규모 파인튜닝(추가 학습)·서비스 운영</td><td>팀·기업</td></tr>
+    </table>
+    <p>정리하면 <b>RTX Spark = AI를 일상으로, DGX Spark = 데이터센터 개발환경을 책상으로</b> 가져오는 전략입니다. 더 큰 모델·고부하 파인튜닝이 필요해지면 자연스럽게 상위 제품으로 확장됩니다.</p>
+    <div class="chart-box chart-container fade-in"><canvas id="myChart2" height="220"></canvas></div>
+  </section>
+
+  <section class="fade-in">
+    <div class="num">03</div>
+    <h2>데모 1: AI 블루프린트 – 서비스 전체를 로컬에서</h2>
+    <p>블루프린트(Blueprint)는 예제 코드가 아니라 <b>모델+컨테이너+API+DB가 묶인 레퍼런스 애플리케이션(참고용 완성 서비스)</b>입니다.</p>
+    <p>영상에서 사용한 것은 <b>VSS(Video Search and Summarization)</b> – 영상 파일을 넣으면 객체·행동·상황을 분석하고 자연어로 장면을 검색·요약하는 서비스.</p>
+    <div class="card">
+      <b>docker 상태에 실제로 뜬 것들</b><br>
+      <span class="small">• VSS UI (웹 화면)<br>• 영상 처리 서비스<br>• AI 모델 실행 서비스 (Vision 모델)<br>• 질문·요약 담당 Nemotron(네모트론, 엔비디아 LLM)<br>• 검색 결과 저장 Postgres DB<br>• Agent, API 서버<br>→ 하나의 프로그램이 아니라 6개 이상 컨테이너가 동시에 메모리·GPU를 점유하며 동작</span>
+    </div>
+    <p>안될공학 채널의 메타 관련 영상을 올려 “요약해줘” → 로컬 LLM이 요약. 파일 여러 개 중 “사람 등장 부분 스크린샷 해줘”도 수행. 로컬만으로 부족하면 클라우드 모델(Nemotron Super/Ultra, ChatGPT, Claude 등)을 API로 연결해 성능을 끌어올릴 수도 있습니다.</p>
+    <div class="diag">
+      <div><b>입력</b>영상 파일들</div>
+      <div><b>처리</b>비전 모델 + 임베딩</div>
+      <div><b>저장·검색</b>Postgres + API</div>
+    </div>
+    <div class="toggle-group">
+      <button class="toggle active" onclick="showVSS('local')">로컬 실행</button>
+      <button class="toggle" onclick="showVSS('hybrid')">하이브리드 (로컬+클라우드)</button>
+    </div>
+    <div id="vssDesc" class="small card">로컬: 모든 추론을 DGX Spark 내부 128GB에서 처리. 민감 데이터 외부 반출 없음, 비용 0원. 단, 초당 토큰은 서버보다 느림. 핵심은 “작은 시스템 안에서 완성된 서비스 구조가 돈다”는 검증.</div>
+  </section>
+
+  <section class="fade-in">
+    <div class="num">04</div>
+    <h2>데모 2: AI Workbench – 환경 지옥을 없애다</h2>
+    <p>Workbench는 코드 에디터가 아니라 <b>코드+모델+Docker 환경+라이브러리 설정을 프로젝트 단위로 관리하는 작업 공간</b>입니다.</p>
+    <p>영상에서는 <b>Agentic RAG(Retrieval-Augmented Generation, 문서를 검색해 답변하는 AI)</b> 프로젝트를 클론(복사)해 실행했습니다.</p>
+    <ul>
+      <li>미리 구성된 프로젝트 선택 → 컨테이너·환경 자동 준비</li>
+      <li>내 문서(안될공학 리서치 자료) 업로드 → 자동 임베딩(문장을 숫자로 변환해 검색 가능하게 만드는 작업) → 벡터 DB 구축</li>
+      <li>로컬 모델 또는 NVIDIA foundation 모델(원격) 선택 → “최근 중국 AI 영상 내용 알려줘” 질문에 내 문서 기반으로 답변</li>
+    </ul>
+    <div class="card accent"><b>경제적 포인트</b><br><span class="small">직접 구축하려면 Python 환경, Docker Compose 설정, RAG 프레임워크·벡터 DB 연결, 임베딩 모델·환경변수 호환성 맞추기 등 수십 단계가 필요. Workbench는 이를 하나의 프로젝트로 묶어 <b>환경 구성 시간(개발자가 가장 많이 낭비하는 비용)을 0에 가깝게</b> 줄입니다.</span></div>
+    <div class="chart-box chart-container fade-in"><canvas id="myChart3" height="220"></canvas></div>
+    <div class="sim card">
+      <b>💸 개발 비용 시뮬레이터: 클라우드 vs DGX Spark</b>
+      <label class="small">한 달 개발 시간: <span id="devHours" class="hl">80</span>시간</label>
+      <input type="range" id="hourRange" min="20" max="200" value="80">
+      <div class="small">클라우드 GPU(A100급 $3/시간): <span id="cloudCost" class="hl">$240</span> / DGX Spark(전기료만): 약 <span id="localCost" class="hl">$8</span><br>민감 데이터 외부 업로드 위험: <span id="risk" class="hl">클라우드 높음 / 로컬 없음</span></div>
+      <button class="btn ghost" onclick="resetCost()">초기값 리셋</button>
+    </div>
+  </section>
+
+  <section class="fade-in">
+    <div class="num">05</div>
+    <h2>데모 3: AI 에이전트 – OpenClaw + MCP</h2>
+    <p>최근 AI는 답변을 넘어 <b>파일 읽기, 프로그램 실행, 외부 서비스 호출</b>로 확장됩니다. 이를 수행하는 것이 <b>OpenClaw(오픈클러)</b> 같은 에이전트.</p>
+    <p>에이전트는 <b>MCP(Model Context Protocol, AI가 외부 도구를 호출하는 규약)나 API</b>로 도구를 호출합니다. 하나의 에이전트를 띄우려면 모델 연결·권한·네트워크·실행 환경을 구성해야 하는데, 이를 관리하는 것이 NeMo(네모) 계열 프레임워크입니다.</p>
+    <div class="card">
+      <b>온보딩에서 연결 가능한 것들</b><br>
+      <span class="small">• NVIDIA Endpoint (자체 호스팅)<br>• Open Endpoint<br>• Google Gemini, Anthropic Claude 등 클라우드 모델<br>• 로컬 모델 (DGX Spark 내부)<br>→ 설치는 Jupyter 가이드로, VSS나 Workbench에서 만든 RAG도 MCP로 연결해 “VSS에서 사람 나온 장면 찾아서 RAG 문서와 연결해줘” 같은 호출이 가능</span>
+    </div>
+    <div class="flow" id="flow">
+      <div class="step active" data-s="0"><b>Blueprint</b> – 서비스 구조 확인 (VSS: 영상→모델→DB→API)</div>
+      <div class="step" data-s="1"><b>Workbench</b> – 내 문서로 RAG 프로젝트 제작</div>
+      <div class="step" data-s="2"><b>Agent (OpenClaw)</b> – VSS·RAG를 MCP 도구로 연결해 에이전트가 호출</div>
+      <div class="step" data-s="3"><b>Scale</b> – 필요시 DGX Station/서버/클러스터로 컨테이너 그대로 확장</div>
+    </div>
+    <button class="btn" onclick="nextStep()">다음 단계 보기 →</button>
+  </section>
+
+  <section class="fade-in">
+    <div class="num">06</div>
+    <h2>경제 관점: 왜 엔비디아는 진입장벽을 낮추나</h2>
+    <p>지금까지 AI 개발 중심은 데이터센터였습니다. 하지만 <b>아이디어 검증·데이터 파이프라인·도구 호출 테스트</b>까지 모두 데이터센터에서 할 필요는 없습니다. 클라우드를 계속 쓰면 비용·사용시간·권한·민감 데이터 외부 반출 문제가 생깁니다.</p>
+    <div class="chart-box chart-container fade-in"><canvas id="myChart4" height="220"></canvas></div>
+    <table>
+      <tr><th>구분</th><th>DGX Spark 역할</th><th>경제 효과</th></tr>
+      <tr><td>개발 초기</td><td>로컬에서 아이디어·기능 검증</td><td>클라우드 비용 절감, 실패를 빨리·싸게 경험</td></tr>
+      <tr><td>중간</td><td>컨테이너 그대로 관리, 코드+환경 함께 이동</td><td>서버 이전 시 재구성 비용 감소 (호환성 유지)</td></tr>
+      <tr><td>확장</td><td>사용자·데이터 증가 시 상위 GPU 환경으로 자연 이동</td><td>엔비디아 입장: GPU 판매 + CUDA·NIM·Blueprint·Workbench 생태계 락인(Lock-in)</td></tr>
+    </table>
+    <div class="card accent"><b>큰 그림 요약</b><br><span class="small">DGX Spark 1대가 데이터센터를 대체하는 게 아니라 <b>진입 지점을 개인에게 가져오는 것</b>. 개발자는 DGX Spark에서 시작하지만 프로젝트가 커질수록 더 큰 NVIDIA GPU 환경으로 이동. 엔비디아가 확장하려는 것은 GPU 개수가 아니라 <b>CUDA·컨테이너·NIM·Blueprint·Workbench·에이전트 프레임워크까지 포함한 소프트웨어 생태계</b>입니다. GTC Taipei에서 발표된 RTX Spark가 Windows 소비자 쪽, DGX Spark가 Linux 개발자 쪽으로 전방위 확장을 담당합니다.</span></div>
+    <p class="small" style="margin-top:18px">원본 자막 근거: “AI 앱을 소비하기 위한 PC라기보다는 AI 서비스를 직접 만들고 실험하기 위한 개발 장비” / “복잡한 구조 전체를 로컬에서 만들고 검증을 할 수 있다” / “로컬에서 만든 실험이 완전히 다른 세계에 갇히지 않고 상위 GPU 환경으로 이어질 수 있도록” / “진입 장벽을 낮추는 거죠”</p>
+  </section>
+</div>
+
+<script>
+const fadeObs = new IntersectionObserver((entries) => {
+  entries.forEach((e, i) => {
+    if (e.isIntersecting) {
+      setTimeout(() => e.target.classList.add('visible'), i * 80);
+      fadeObs.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.12 });
+document.querySelectorAll('.fade-in').forEach(el => fadeObs.observe(el));
+
+const chartConfigs = {};
+chartConfigs['myChart1'] = () => {
+  new Chart(document.getElementById('myChart1'), {
+    type:'bar',
+    data:{
+      labels:['RTX 4090 24GB','RTX Pro 48GB','DGX Spark 128GB Unified','DGX Station'],
+      datasets:[{label:'가용 메모리 (GB)', data:[24,48,128,256], backgroundColor:['#6b7280','#1a1a1a','#e11d48','#2563eb'], borderRadius:8}]
+    },
+    options:{responsive:true, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true, grid:{color:'#f0f0f0'}}, x:{grid:{display:false}}}}
+  });
+};
+chartConfigs['myChart2'] = () => {
+  new Chart(document.getElementById('myChart2'), {
+    type:'radar',
+    data:{
+      labels:['게임·소비','전문 작업','Windows AI 에이전트','Linux AI 개발','대규모 학습'],
+      datasets:[
+        {label:'RTX PC', data:[9,4,3,2,1], borderColor:'#6b7280', backgroundColor:'rgba(107,114,128,0.1)'},
+        {label:'DGX Spark', data:[2,5,2,9,4], borderColor:'#e11d48', backgroundColor:'rgba(225,29,72,0.15)'}
+      ]
+    },
+    options:{responsive:true, scales:{r:{beginAtZero:true, max:10}}}
+  });
+};
+chartConfigs['myChart3'] = () => {
+  new Chart(document.getElementById('myChart3'), {
+    type:'bar',
+    data:{
+      labels:['환경 세팅','DB 구축','모델 연결','RAG 테스트','서버 이전'],
+      datasets:[
+        {label:'수동 구축 (시간)', data:[8,4,3,2,6], backgroundColor:'#1a1a1a', borderRadius:6},
+        {label:'Workbench 사용 (시간)', data:[0.5,0.2,0.3,0.5,0.5], backgroundColor:'#e11d48', borderRadius:6}
+      ]
+    },
+    options:{responsive:true, plugins:{tooltip:{mode:'index'}}, scales:{y:{beginAtZero:true, grid:{color:'#f0f0f0'}}, x:{grid:{display:false}}}}
+  });
+};
+chartConfigs['myChart4'] = () => {
+  new Chart(document.getElementById('myChart4'), {
+    type:'line',
+    data:{
+      labels:['아이디어','프로토타입','검증','소규모 운영','대규모 확장'],
+      datasets:[
+        {label:'로컬(DGX Spark) 비중', data:[95,80,60,40,10], borderColor:'#e11d48', tension:0.4, fill:false},
+        {label:'클라우드/서버 비중', data:[5,20,40,60,90], borderColor:'#1a1a1a', tension:0.4, fill:false}
+      ]
+    },
+    options:{responsive:true, plugins:{legend:{position:'bottom'}}, scales:{y:{beginAtZero:true, max:100, grid:{color:'#f0f0f0'}}, x:{grid:{display:false}}}}
+  });
+};
+
+const chartObs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const canvas = e.target.querySelector('canvas');
+      if (canvas && chartConfigs[canvas.id]) {
+        chartConfigs[canvas.id]();
+        e.target.classList.add('chart-ready');
+        chartObs.unobserve(e.target);
+      }
+    }
+  });
+}, { threshold: 0.15 });
+document.querySelectorAll('.chart-container').forEach(el => chartObs.observe(el));
+
+// simulators
+function resetModel(){document.getElementById('modelRange').value=70; updateModel();}
+function updateModel(){
+  const b=parseInt(document.getElementById('modelRange').value);
+  document.getElementById('modelSize').textContent=b;
+  const need=b*2; // ~2GB per B in FP16
+  document.getElementById('needMem').textContent='~'+need+'GB';
+  document.getElementById('rtxCheck').textContent= need<=24 ? '가능' : '불가';
+  document.getElementById('rtxCheck').style.color= need<=24 ? '#16a34a' : '#e11d48';
+  // with 4bit quantization, 128GB can hold ~200B+
+  const quantNeed=need*0.25;
+  document.getElementById('dgxCheck').textContent= quantNeed<=128 ? '가능 (양자화)' : '불가';
+}
+document.getElementById('modelRange')?.addEventListener('input',updateModel);
+updateModel();
+
+function resetCost(){document.getElementById('hourRange').value=80; updateCost();}
+function updateCost(){
+  const h=parseInt(document.getElementById('hourRange').value);
+  document.getElementById('devHours').textContent=h;
+  document.getElementById('cloudCost').textContent='$'+(h*3);
+  document.getElementById('localCost').textContent='$'+Math.round(h*0.1);
+}
+document.getElementById('hourRange')?.addEventListener('input',updateCost);
+updateCost();
+
+function showVSS(type){
+  document.querySelectorAll('.toggle').forEach(b=>b.classList.remove('active'));
+  event.target.classList.add('active');
+  const el=document.getElementById('vssDesc');
+  if(type==='local') el.textContent='로컬: 모든 추론을 DGX Spark 내부 128GB에서 처리. 민감 데이터 외부 반출 없음, 비용 0원. 단, 초당 토큰은 서버보다 느림. 핵심은 “작은 시스템 안에서 완성된 서비스 구조가 돈다”는 검증.';
+  else el.textContent='하이브리드: 비디오 이해는 로컬, LLM 요약은 Nemotron Super/Ultra API로. 필요할 때만 클라우드 연결. DGX Spark에서도 API 연결을 미리 테스트할 수 있어 나중에 서버로 옮겨도 같은 코드로 동작.';
+}
+let cur=0;
+function nextStep(){
+  const steps=document.querySelectorAll('.step');
+  steps.forEach(s=>s.classList.remove('active'));
+  cur=(cur+1)%steps.length;
+  steps[cur].classList.add('active');
+  steps[cur].scrollIntoView({behavior:'smooth',block:'center'});
+}
+</script>
+</body>
+</html>

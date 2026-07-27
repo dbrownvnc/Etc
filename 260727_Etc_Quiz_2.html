@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DGX Spark Quiz - Interactive Test</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--accent:#e11d48;--bg:#fff;--bg2:#fafafa;--text:#1a1a1a;--text2:#777777;--border:#e5e5e5;--green:#16a34a;--red:#dc2626}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-serif;line-height:1.6}
+h1{font-family:'Playfair Display',serif}
+.sticky{position:sticky;top:0;z-index:100;background:rgba(255,255,255,0.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);padding:12px 16px}
+.sticky-inner{max-width:720px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.stats{display:flex;gap:14px;font-size:13px;font-weight:700}
+.progress-wrap{width:100%;height:8px;background:var(--bg2);border-radius:20px;overflow:hidden;margin-top:8px;border:1px solid var(--border)}
+.progress{height:100%;width:0%;transition:width 0.4s, background 0.4s;background:var(--red)}
+.container{max-width:720px;margin:0 auto;padding:20px}
+.hero{padding:28px 0 10px}
+.hero h1{font-size:26px;line-height:1.15}
+.hero p{color:var(--text2);font-size:14px;margin-top:8px}
+.card{background:var(--bg);border:1px solid var(--border);border-radius:16px;padding:18px;margin:18px 0;box-shadow:0 2px 10px rgba(0,0,0,0.04)}
+.card-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.q-num{font-family:'Playfair Display';font-size:20px}
+.badge{font-size:11px;padding:4px 8px;border-radius:20px;border:1px solid var(--border)}
+.badge.easy{background:#dcfce7;color:#166534}
+.badge.medium{background:#fef3c7;color:#92400e}
+.badge.hard{background:#fee2e2;color:#991b1b}
+.question{font-size:16px;font-weight:700;margin-bottom:14px}
+.options{display:flex;flex-direction:column;gap:8px}
+.opt{border:1px solid var(--border);background:var(--bg2);padding:12px 14px;border-radius:12px;cursor:pointer;text-align:left;font-size:14px;transition:all 0.2s}
+.opt:hover{border-color:var(--accent);transform:translateY(-1px)}
+.opt:disabled{opacity:0.9;cursor:not-allowed;transform:none}
+.opt.correct{background:#dcfce7;border-color:var(--green);color:#166534;font-weight:700}
+.opt.wrong{background:#fee2e2;border-color:var(--red);color:#991b1b}
+.input-row{display:flex;gap:8px;margin-top:8px}
+.input-row input{flex:1;border:1px solid var(--border);padding:12px;border-radius:10px;font-size:14px}
+.btn{border:none;background:var(--accent);color:#fff;padding:10px 14px;border-radius:10px;font-weight:700;cursor:pointer}
+.btn:disabled{opacity:0.5}
+.ox-row{display:flex;gap:10px}
+.ox{flex:1;padding:14px;border-radius:12px;border:1px solid var(--border);background:var(--bg2);font-size:18px;font-weight:800;cursor:pointer}
+.ox.correct{background:#dcfce7;border-color:var(--green)}
+.ox.wrong{background:#fee2e2;border-color:var(--red)}
+.explain{display:none;margin-top:14px;padding:12px;background:var(--bg2);border:1px dashed var(--border);border-radius:12px;font-size:13px;color:var(--text)}
+.explain.show{display:block}
+.result-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:200;align-items:center;justify-content:center;padding:20px}
+.result-modal.show{display:flex}
+.result-card{background:#fff;border-radius:20px;padding:24px;max-width:400px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.2)}
+.grade{font-family:'Playfair Display';font-size:52px;color:var(--accent);margin:6px 0}
+</style>
+</head>
+<body>
+<div class="sticky">
+  <div class="sticky-inner">
+    <div class="stats">
+      <span>푼 문제 <b id="solved">0</b>/10</span>
+      <span>맞힌 문제 <b id="correct">0</b></span>
+      <span>정답률 <b id="rate">0</b>%</span>
+    </div>
+    <button class="btn" style="padding:6px 10px;font-size:12px" onclick="resetQuiz()">다시 풀기</button>
+  </div>
+  <div style="max-width:720px;margin:0 auto"><div class="progress-wrap"><div id="progress" class="progress"></div></div></div>
+</div>
+
+<div class="container">
+  <div class="hero">
+    <h1>DGX Spark: 단순한 AI PC가 아니다<br>Interactive Quiz</h1>
+    <p>원본 자막에 실제 등장한 내용만 출제. GB10·128GB·VSS·Workbench·OpenClaw 핵심을 확인하세요.</p>
+  </div>
+  <div id="quiz"></div>
+</div>
+
+<div id="finalModal" class="result-modal">
+  <div class="result-card">
+    <div style="font-size:13px;letter-spacing:0.2em;color:var(--text2)">FINAL SCORE</div>
+    <div id="finalGrade" class="grade">A</div>
+    <div id="finalText" style="font-size:15px;font-weight:700;margin-bottom:10px"></div>
+    <div id="finalDetail" style="font-size:13px;color:var(--text2);margin-bottom:16px"></div>
+    <button class="btn" onclick="resetQuiz();closeModal()">다시 풀기</button>
+  </div>
+</div>
+
+<script>
+const QUIZ_DATA = [
+  {
+    id:1, type:'mcq', difficulty:'easy',
+    question:'DGX Spark에 탑재된 슈퍼칩 이름은?',
+    options:['GB10 Grace Blackwell 슈퍼칩','H100 Tensor Core','A100 Ampere','RTX 5090'],
+    answer:0,
+    explanation:'자막: “DGX Spark에는 엔비디아의 GB10 그레이스 블랙웰 슈퍼칩이 들어가는데요. ARM 기반 그레이스 CPU랑 블랙웰 GPU를 하나의 시스템 안에 결합” 이라고 명시.'
+  },
+  {
+    id:2, type:'mcq', difficulty:'easy',
+    question:'DGX Spark의 가장 눈에 띄는 메모리 특징은?',
+    options:['128GB 통합 시스템 메모리 (CPU+GPU 공유)','24GB GDDR6 분리','16GB LPDDR5','32GB HBM2 분리'],
+    answer:0,
+    explanation:'자막: “가장 눈에 띄는 부분은 128GB 통합 시스템 메모리… 일반적인 PC에서는 CPU 메모리랑 GPU 메모리랑 분리지만 DGX Spark는 하나의 메모리 공간을 공유”'
+  },
+  {
+    id:3, type:'mcq', difficulty:'medium',
+    question:'DGX Spark와 RTX Spark의 차이로 옳은 설명은?',
+    options:['RTX Spark는 Windows+개인 AI 에이전트 통합, DGX Spark는 Linux+CUDA 컨테이너 기반 AI 서비스 개발·검증','둘 다 같은 Windows 게임용 PC','DGX Spark는 게임 전용, RTX Spark는 서버 전용','둘 다 데이터센터용 서버랙 제품'],
+    answer:0,
+    explanation:'자막: “RTX 스파크가 AI 에이전트를 일상적인 윈도우 환경으로 가져오는 제품이라면 DGX 스파크는 데이터 센터에서 사용하던 AI 개발 환경을 개인 개발자한테 가져오는 제품”'
+  },
+  {
+    id:4, type:'mcq', difficulty:'medium',
+    question:'첫 번째 데모에 사용된 AI 블루프린트 VSS의 정식 명칭은?',
+    options:['Video Search and Summarization','Vision Super System','Vector Search Service','Virtual Studio Suite'],
+    answer:0,
+    explanation:'자막: “오늘 사용할 거는 Video Search and Summarization 그러니까 줄여서 VSS 블루프린트… 영상 속 객체나 행동, 상황을 분석하고 자연어로 특정 장면을 검색”'
+  },
+  {
+    id:5, type:'mcq', difficulty:'medium',
+    question:'VSS 블루프린트 실행 시 docker에 함께 올라온 구성 요소가 아닌 것은?',
+    options:['크롬 브라우저 히스토리','VSS UI','Nemotron (LLM)','Postgres DB'],
+    answer:0,
+    explanation:'자막: “목록을 보면 하나의 프로그램만 실행되는 게 아니죠. 영상 처리 서비스, AI 모델 실행 서비스, 에이전트랑 데이터베이스… VSS UI랑 에이전트, Nemotron, Postgres 등이 각각의 컨테이너로 올라와 있다”'
+  },
+  {
+    id:6, type:'mcq', difficulty:'hard',
+    question:'DGX Spark가 보여주려는 핵심 가치는?',
+    options:['AI 서비스 전체 구조를 로컬에서 만들고 검증할 수 있다','초당 토큰 수 벤치마크 1위','가장 싼 게이밍 PC','데이터센터를 완전히 대체'],
+    answer:0,
+    explanation:'자막: “AI의 결과만 보고 성능이 얼마나 좋냐 보여주는 데모가 아니라 실제 개발자들이 AI 서비스를 어떤 구조로 운영할지 그 전체를 이 작은 시스템에서 모두 다 돌릴 수 있다… 마치 거대한 서버에서 개발하는 것처럼”'
+  },
+  {
+    id:7, type:'short', difficulty:'easy',
+    question:'두 번째 데모에서 사용된 프로젝트 관리 도구로, 코드·모델·Docker 환경·라이브러리를 프로젝트 단위로 관리하는 작업 공간은? (영문)',
+    options:[], answer:'ai workbench',
+    explanation:'자막: “여기서 사용하는 도구가 엔비디아 AI 워크벤치… 단순히 코드를 입력하는 개발 프로그램이 아니라 AI 프로젝트에 필요한 코드랑 모델뿐만이 아니라 도커 환경이랑 라이브러리 설정까지 프로젝트 단위로 구성·관리하는 작업 공간”'
+  },
+  {
+    id:8, type:'short', difficulty:'medium',
+    question:'세 번째 데모의 에이전트 이름으로, MCP나 API로 도구를 호출해 작업을 수행하는 오픈소스 에이전트는? (영문)',
+    options:[], answer:'openclaw',
+    explanation:'자막: “실제 작업을 수행한 에이전트가 바로 오픈클러입니다. 오픈클러는 사용자의 요청을 이해하고 필요한 도구를 선택한 뒤에 MCP나 API로 호출을 해서 결과를 정리”'
+  },
+  {
+    id:9, type:'ox', difficulty:'medium',
+    question:'DGX Spark는 일반적인 소비자용 Windows가 기본 운영체제이며, 단순히 AI 앱을 소비하기 위한 AI PC로 분류된다.',
+    options:['O','X'], answer:'X',
+    explanation:'정답 X. 자막: “기본적으로는 일반적인 소비자용 운영체제가 아니고요. 리눅스 기반… AI 앱을 소비하기 위한 PC라기보다는 AI 서비스를 직접 만들고 실험하기 위한 개발 장비” 라고 오해를 바로잡음.'
+  },
+  {
+    id:10, type:'ox', difficulty:'hard',
+    question:'엔비디아는 DGX Spark를 통해 CUDA·NIM·블루프린트·워크벤치·에이전트 프레임워크까지 포함한 AI 소프트웨어 생태계를 개인 개발자 환경으로 확장하려는 전략을 가지고 있다.',
+    options:['O','X'], answer:'O',
+    explanation:'정답 O. 자막: “결국 엔비디아가 확장하려는 거는 GPU 판매량만이 아니에요. CUDA랑 컨테이너, NIMI랑 블루프린트, AI 워크벤치랑 에이전트 프레임워크까지 데이터 센터에서 사용하던 생태계를 개인 개발 환경으로 이어가려는 거죠… 진입 장벽을 낮추는 거죠”'
+  }
+];
+
+let state={solved:0, correct:0, answers:{}};
+function render(){
+  const root=document.getElementById('quiz');
+  root.innerHTML='';
+  QUIZ_DATA.forEach((q, idx)=>{
+    const card=document.createElement('div');
+    card.className='card';
+    card.id='card-'+q.id;
+    const diffClass = q.difficulty==='easy' ? 'easy' : q.difficulty==='medium' ? 'medium' : 'hard';
+    const diffLabel = q.difficulty==='easy' ? '쉬움' : q.difficulty==='medium' ? '보통' : '어려움';
+    let body='';
+    if(q.type==='mcq'){
+      body='<div class="options">'+q.options.map((op,i)=>`<button class="opt" data-q="${q.id}" data-i="${i}" onclick="checkMCQ(${q.id},${i})">${String.fromCharCode(65+i)}. ${op}</button>`).join('')+'</div>';
+    }else if(q.type==='short'){
+      body=`<div class="input-row"><input type="text" id="input-${q.id}" placeholder="정답 입력"><button class="btn" onclick="checkShort(${q.id})">제출</button></div>`;
+    }else{
+      body=`<div class="ox-row"><button class="ox" onclick="checkOX(${q.id},'O')">O</button><button class="ox" onclick="checkOX(${q.id},'X')">X</button></div>`;
+    }
+    card.innerHTML=`
+      <div class="card-head"><span class="q-num">Q${idx+1}</span><span class="badge ${diffClass}">${diffLabel}</span></div>
+      <div class="question">${q.question}</div>
+      ${body}
+      <div id="explain-${q.id}" class="explain"></div>
+    `;
+    root.appendChild(card);
+  });
+}
+function updateBoard(){
+  document.getElementById('solved').textContent=state.solved;
+  document.getElementById('correct').textContent=state.correct;
+  const rate = state.solved===0?0:Math.round(state.correct/state.solved*100);
+  document.getElementById('rate').textContent=rate;
+  const prog=document.getElementById('progress');
+  prog.style.width=(state.solved/10*100)+'%';
+  if(rate<40) prog.style.background='var(--red)';
+  else if(rate<70) prog.style.background='#f59e0b';
+  else prog.style.background='var(--green)';
+  if(state.solved===10) showFinal(rate);
+}
+function lockCard(qid){
+  const card=document.getElementById('card-'+qid);
+  card.querySelectorAll('button').forEach(b=>b.disabled=true);
+  card.querySelectorAll('input').forEach(i=>i.disabled=true);
+}
+function showExplain(qid, isCorrect){
+  const q=QUIZ_DATA.find(x=>x.id===qid);
+  const el=document.getElementById('explain-'+qid);
+  const icon = isCorrect ? '✓ 정답!' : '✗ 오답';
+  const color = isCorrect ? 'var(--green)' : 'var(--red)';
+  el.innerHTML=`<div style="font-weight:800;color:${color};margin-bottom:6px">${icon}</div><b>해설:</b> ${q.explanation}`;
+  el.classList.add('show');
+}
+function checkMCQ(qid, chosen){
+  if(state.answers[qid]!=null) return;
+  const q=QUIZ_DATA.find(x=>x.id===qid);
+  const isCorrect = chosen===q.answer;
+  state.answers[qid]=isCorrect;
+  state.solved++; if(isCorrect) state.correct++;
+  const card=document.getElementById('card-'+qid);
+  card.querySelectorAll('.opt').forEach((btn, i)=>{
+    if(i===q.answer) btn.classList.add('correct');
+    if(i===chosen && !isCorrect) btn.classList.add('wrong');
+  });
+  showExplain(qid,isCorrect);
+  lockCard(qid);
+  updateBoard();
+}
+function checkShort(qid){
+  if(state.answers[qid]!=null) return;
+  const q=QUIZ_DATA.find(x=>x.id===qid);
+  const input=document.getElementById('input-'+qid);
+  const val=input.value.trim().toLowerCase().replace(/\s+/g,' ');
+  if(!val){alert('답을 입력해주세요'); return;}
+  const ans=q.answer.toLowerCase();
+  const isCorrect = val.includes(ans) || ans.includes(val) || val.replace(/\s+/g,'')===ans.replace(/\s+/g,'');
+  state.answers[qid]=isCorrect;
+  state.solved++; if(isCorrect) state.correct++;
+  const badge=document.createElement('div');
+  badge.textContent=isCorrect ? '✓ 정답!' : `✗ 오답 (정답: ${q.answer})`;
+  badge.style.fontWeight='800'; badge.style.marginTop='8px'; badge.style.color=isCorrect?'var(--green)':'var(--red)';
+  input.parentElement.parentElement.appendChild(badge);
+  input.style.borderColor=isCorrect?'var(--green)':'var(--red)';
+  input.style.background=isCorrect?'#dcfce7':'#fee2e2';
+  showExplain(qid,isCorrect);
+  lockCard(qid);
+  updateBoard();
+}
+function checkOX(qid, chosen){
+  if(state.answers[qid]!=null) return;
+  const q=QUIZ_DATA.find(x=>x.id===qid);
+  const isCorrect = chosen===q.answer;
+  state.answers[qid]=isCorrect;
+  state.solved++; if(isCorrect) state.correct++;
+  const card=document.getElementById('card-'+qid);
+  card.querySelectorAll('.ox').forEach(btn=>{
+    const label=btn.textContent.trim();
+    if(label===q.answer) btn.classList.add('correct');
+    if(label===chosen && !isCorrect) btn.classList.add('wrong');
+  });
+  showExplain(qid,isCorrect);
+  lockCard(qid);
+  updateBoard();
+}
+function showFinal(rate){
+  const modal=document.getElementById('finalModal');
+  const gradeEl=document.getElementById('finalGrade');
+  const textEl=document.getElementById('finalText');
+  const detailEl=document.getElementById('finalDetail');
+  let grade, msg;
+  if(rate>=90){grade='A'; msg='DGX Spark의 진짜 가치, 플랫폼 전략까지 완벽히 이해했어요!';}
+  else if(rate>=70){grade='B'; msg='훌륭해요! 통합 메모리·블루프린트·Workbench 핵심을 잡았네요.';}
+  else if(rate>=40){grade='C'; msg='좋은 시작! 리포트의 제품군 비교표와 비용 시뮬레이터를 다시 보면 80점 넘길 수 있어요.';}
+  else{grade='D'; msg='괜찮아요. DGX 이름이 왜 붙었는지, 로컬에서 전체 서비스가 돈다는 점만 기억해도 절반 성공!';}
+  gradeEl.textContent=grade;
+  textEl.textContent=`${state.correct}/10문제 정답 · ${rate}%`;
+  detailEl.textContent=msg;
+  modal.classList.add('show');
+}
+function closeModal(){document.getElementById('finalModal').classList.remove('show');}
+function resetQuiz(){
+  state={solved:0,correct:0,answers:{}};
+  closeModal();
+  render();
+  updateBoard();
+}
+render();
+updateBoard();
+</script>
+</body>
+</html>

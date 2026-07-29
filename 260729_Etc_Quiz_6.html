@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Can You Make 3D Game with AI - Quiz</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--main:#e11d48; --main2:#f43f5e; --bg:#ffffff; --bg2:#fafafa; --text:#1a1a1a; --text2:#777777; --border:#e5e5e5; --ok:#16a34a; --bad:#dc2626}
+*{box-sizing:border-box; margin:0; padding:0}
+body{font-family:'Noto Sans KR', sans-serif; background:var(--bg); color:var(--text); line-height:1.6}
+.topbar{position:sticky; top:0; z-index:50; background:white; border-bottom:1px solid var(--border); padding:12px 16px; box-shadow:0 2px 12px rgba(0,0,0,0.06)}
+.topbar-inner{max-width:680px; margin:0 auto; display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap}
+.stats{display:flex; gap:12px; font-size:13px; font-weight:700}
+.stats span{background:var(--bg2); padding:4px 10px; border-radius:999px; border:1px solid var(--border)}
+.progress{height:8px; background:#f1f5f9; border-radius:999px; overflow:hidden; width:100%; margin-top:8px}
+.progress > div{height:100%; width:0%; transition:width 0.4s, background 0.3s}
+.container{max-width:680px; margin:0 auto; padding:20px 16px 100px}
+.header{padding:18px 0 8px}
+.header h1{font-family:'Playfair Display', serif; font-size:26px; line-height:1.2}
+.header p{color:var(--text2); font-size:13px; margin-top:6px}
+.card{background:white; border:1px solid var(--border); border-radius:16px; padding:18px; margin:16px 0; box-shadow:0 2px 8px rgba(0,0,0,0.03)}
+.qhead{display:flex; justify-content:space-between; align-items:center; margin-bottom:10px}
+.qnum{font-family:'Playfair Display', serif; font-weight:800; font-size:14px; letter-spacing:0.06em}
+.badge{font-size:11px; font-weight:700; padding:4px 8px; border-radius:999px; border:1px solid var(--border)}
+.badge.easy{background:#f0fdf4; color:#15803d; border-color:#bbf7d0}
+.badge.normal{background:#fff7ed; color:#c2410c; border-color:#fed7aa}
+.badge.hard{background:#fff1f2; color:var(--main); border-color:#fecdd3}
+.qtext{font-size:15px; font-weight:500; margin-bottom:14px}
+.opts{display:flex; flex-direction:column; gap:8px}
+.opt{appearance:none; width:100%; text-align:left; background:var(--bg2); border:1px solid var(--border); padding:12px 14px; border-radius:12px; font-size:14px; cursor:pointer; transition:all 0.18s}
+.opt:hover{border-color:var(--text); transform:translateY(-1px)}
+.opt.correct{background:#dcfce7; border-color:var(--ok); color:#14532d; font-weight:700}
+.opt.wrong{background:#fee2e2; border-color:var(--bad); color:#7f1d1d}
+.opt:disabled{cursor:not-allowed; opacity:0.95}
+.ox-wrap{display:flex; gap:10px}
+.ox{flex:1; padding:14px; font-size:18px; font-weight:800; border-radius:12px; border:1px solid var(--border); background:var(--bg2); cursor:pointer}
+.short-wrap{display:flex; gap:8px}
+.short-wrap input{flex:1; padding:12px 14px; border-radius:12px; border:1px solid var(--border); font-size:14px}
+.btn-submit{padding:12px 16px; background:var(--main); color:white; border:none; border-radius:12px; font-weight:700; cursor:pointer}
+.btn-submit:disabled{opacity:0.5}
+.explain{margin-top:12px; background:var(--bg2); border:1px solid var(--border); border-radius:12px; padding:12px; font-size:13px; display:none; line-height:1.6}
+.explain.show{display:block}
+.tag-ok{display:inline-block; background:var(--ok); color:white; padding:2px 8px; border-radius:999px; font-size:11px; font-weight:700; margin-right:6px}
+.tag-bad{display:inline-block; background:var(--bad); color:white; padding:2px 8px; border-radius:999px; font-size:11px; font-weight:700; margin-right:6px}
+.result-modal{position:fixed; inset:0; background:rgba(0,0,0,0.5); display:none; align-items:center; justify-content:center; z-index:100; padding:20px}
+.result-modal.show{display:flex}
+.result-card{background:white; border-radius:20px; padding:24px; max-width:420px; width:100%; text-align:center; border:2px solid var(--main)}
+.result-card h2{font-family:'Playfair Display', serif; font-size:24px; margin-bottom:8px}
+.grade{font-size:48px; font-weight:800; margin:12px 0; color:var(--main)}
+.btn-reset{margin-top:16px; width:100%; padding:14px; background:var(--text); color:white; border:none; border-radius:12px; font-weight:700; cursor:pointer}
+@media(max-width:400px){.header h1{font-size:22px}}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="stats">
+      <span>푼 문제 <b id="solved">0</b> / 10</span>
+      <span>맞힌 문제 <b id="correct">0</b></span>
+      <span>정답률 <b id="rate">0%</b></span>
+    </div>
+  </div>
+  <div style="max-width:680px; margin:0 auto"><div class="progress"><div id="bar" style="background:var(--bad)"></div></div></div>
+</div>
+
+<div class="container">
+  <div class="header">
+    <h1>3D 지식 없이 AI로 게임 만들 수 있을까요? - 퀴즈</h1>
+    <p>원본 자막에 나온 내용만으로 출제된 10문제. 클릭 즉시 채점 + 해설 자동 표시</p>
+  </div>
+  <div id="quiz"></div>
+</div>
+
+<div class="result-modal" id="resultModal">
+  <div class="result-card">
+    <h2>최종 결과</h2>
+    <div class="grade" id="finalGrade">A</div>
+    <p id="finalText" style="font-size:14px"></p>
+    <div style="margin-top:12px; font-size:13px; color:var(--text2)">총점 <b id="finalScore"></b> / 10</div>
+    <button class="btn-reset" onclick="resetQuiz()">다시 풀기</button>
+  </div>
+</div>
+
+<script>
+const QUIZ_DATA = [
+  {
+    id: 1,
+    type: 'multiple',
+    difficulty: 'easy',
+    question: '발표자의 본업은 무엇인가요?',
+    options: ['서버 프로그래머', '3D 캐릭터 아티스트', '게임 기획자', '영상 편집자'],
+    answer: 0,
+    explanation: '정답: 서버 프로그래머. 원본 자막 첫 부분 “저는 서버 프로그래머입니다.” 라고 직접 밝힙니다. 그래서 Blender나 모델링 용어를 전혀 몰랐다고 설명합니다.'
+  },
+  {
+    id: 2,
+    type: 'ox',
+    difficulty: 'easy',
+    question: '발표자는 Blender, 모델링, 리깅을 잘 알고 있었다.',
+    options: ['O', 'X'],
+    answer: 1,
+    explanation: '정답: X. 자막에 “Blender 모름, 모델링 모름, 리깅 모름”이라고 강조합니다. 실무에서 관심 없는 단어들이었다고 말합니다.'
+  },
+  {
+    id: 3,
+    type: 'multiple',
+    difficulty: 'easy',
+    question: '발표자가 “든든한 AI 동료”라고 소개한 두 가지는?',
+    options: ['ChatGPT와 Midjourney', 'Codex와 Claude Code', 'Copilot과 Bard', 'Tripo와 Hunyuan'],
+    answer: 1,
+    explanation: '정답: Codex와 Claude Code. 영상에서 “그래도 AI 동료는 있었습니다 - Codex, Claude Code”라고 자막으로 보여줍니다.'
+  },
+  {
+    id: 4,
+    type: 'multiple',
+    difficulty: 'normal',
+    question: '딸깍 한 번으로 3D 모델을 만들어주는 사이트로 언급된 두 서비스는?',
+    options: ['Mixamo와 Blender', 'Hunyuan 3D와 Tripo', 'Unity와 Unreal', 'Figma와 Notion'],
+    answer: 1,
+    explanation: '정답: Hunyuan 3D, Tripo. 자막: “Hunyuan 3D, Tripo 같은 서비스가 있었고 그 중에 무료로 써볼 수 있는 Hunyuan을 많이 써봤다”'
+  },
+  {
+    id: 5,
+    type: 'short',
+    difficulty: 'normal',
+    question: 'AI 생성 모델을 Godot에 넣으니 문제가 생겼다. 원인은 폴리곤 수가 너무 많아서였다. 폴리곤을 줄이는 기능으로 자막에 나온 영어 단어를 쓰시오.',
+    options: [],
+    answer: ['decimate', 'Decimate', '데시메이트'],
+    explanation: '정답: Decimate. 자막: “폴리곤 수를 줄여야 했습니다. AI에게 물어보니 블렌더에서 리토폴로지나 데시메이트 같은 걸 해야 한다고 했습니다.” Decimate는 자동 폴리곤 감소 기능입니다.'
+  },
+  {
+    id: 6,
+    type: 'ox',
+    difficulty: 'normal',
+    question: 'AI가 애니메이션을 위해 추천해준 사이트는 Mixamo이다.',
+    options: ['O', 'X'],
+    answer: 0,
+    explanation: '정답: O. 자막: “AI에게 물어봤더니 믹스아모라는 사이트를 알려주더라고요. 내 3D 모델을 넣으면 자동으로 뼈를 심어주고 걷기나 뛰기 같은 애니메이션을 적용할 수 있는 사이트”'
+  },
+  {
+    id: 7,
+    type: 'multiple',
+    difficulty: 'normal',
+    question: 'Mixamo의 핵심 기능으로 맞는 설명은?',
+    options: ['텍스처를 자동으로 그려준다', '3D 모델을 넣으면 자동으로 뼈를 심고 애니메이션을 입혀준다', '폴리곤 수를 늘려준다', '게임을 자동으로 출시해준다'],
+    answer: 1,
+    explanation: '정답: 자동으로 뼈를 심고 애니메이션 적용. 원본: “자동으로 뼈를 심어주고 걷기나 뛰기 같은 애니메이션도 적용할 수 있는 사이트”'
+  },
+  {
+    id: 8,
+    type: 'multiple',
+    difficulty: 'normal',
+    question: '맵 제작에서 발표자가 깨달은 더 나은 방법은 무엇인가?',
+    options: ['말로만 계속 시킨다', '컨셉 이미지를 먼저 만들고 Blender MCP로 구현한다', 'Blender를 켜자마자 끈다', '폴리곤을 무조건 늘린다'],
+    answer: 1,
+    explanation: '정답: 컨셉 이미지를 먼저 만들고 Blender MCP로 구현. 자막: “말로만 시키는 것보다 먼저 기준이 되는 이미지를 만들어주는 게 훨씬 낫더라고요. 채찍피티에게 컨셉 이미지를 만들고 Blender MCP에 맡겼더니 훨씬 그럴듯한 맵이 나왔다”'
+  },
+  {
+    id: 9,
+    type: 'short',
+    difficulty: 'hard',
+    question: '맵 컨셉 이미지를 먼저 만들어달라고 요청한 AI의 이름은? (자막 표기: 채찍피트)',
+    options: [],
+    answer: ['chatgpt', 'ChatGPT', '챗지피티', '채찍피트', 'chat gpt'],
+    explanation: '정답: ChatGPT(자막에서는 채찍피트로 표기). 원문: “채찍피트에게 맵 컨셉 이미지를 먼저 만들어달라고 했습니다.” 실제 서비스는 ChatGPT를 말합니다.'
+  },
+  {
+    id: 10,
+    type: 'multiple',
+    difficulty: 'hard',
+    question: '이 영상 최종 결론으로 가장 알맞은 것은?',
+    options: ['AI가 3D 게임을 100% 완성해준다', 'AI는 시작하게 해주지만 완성까지는 직접 공부해야 한다', '3D는 2D보다 쉽다', 'Blender는 쓸모없다'],
+    answer: 1,
+    explanation: '정답: AI는 완성해주진 않지만 시작하게 해준다. 자막: “AI가 3D 게임을 완성해주진 않습니다. 그런데 3D를 아예 모르는 사람이 처음 발을 들여놓게는 만들어줍니다. 2D보다 더 많은 기본 지식이 필요했고 결국 사람이 공부해야 하는 부분도 많았습니다.”'
+  }
+];
+
+let state = { solved: 0, correct: 0, answered: new Set() };
+
+function render(){
+  const container = document.getElementById('quiz');
+  container.innerHTML = '';
+  QUIZ_DATA.forEach((q, idx)=>{
+    const wrap = document.createElement('div');
+    wrap.className = 'card';
+    wrap.id = 'q'+q.id;
+    const diffLabel = q.difficulty==='easy'?'쉬움':q.difficulty==='normal'?'보통':'어려움';
+    const diffClass = q.difficulty==='easy'?'easy':q.difficulty==='normal'?'normal':'hard';
+    let body = '';
+    if(q.type==='multiple'){
+      body = `<div class="opts">`+q.options.map((opt,i)=>`<button class="opt" data-q="${q.id}" data-i="${i}">${i+1}. ${opt}</button>`).join('')+`</div>`;
+    }else if(q.type==='ox'){
+      body = `<div class="ox-wrap"><button class="ox" data-q="${q.id}" data-i="0">O</button><button class="ox" data-q="${q.id}" data-i="1">X</button></div>`;
+    }else{
+      body = `<div class="short-wrap"><input type="text" id="input-${q.id}" placeholder="정답을 입력하세요"><button class="btn-submit" data-q="${q.id}">제출</button></div>`;
+    }
+    wrap.innerHTML = `
+      <div class="qhead"><span class="qnum">Q${idx+1}</span><span class="badge ${diffClass}">${diffLabel}</span></div>
+      <div class="qtext">${q.question}</div>
+      ${body}
+      <div class="explain" id="exp-${q.id}"></div>
+    `;
+    container.appendChild(wrap);
+  });
+  attachEvents();
+}
+
+function attachEvents(){
+  document.querySelectorAll('.opt, .ox').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const qid = parseInt(btn.dataset.q);
+      const sel = parseInt(btn.dataset.i);
+      if(state.answered.has(qid)) return;
+      grade(qid, sel);
+    });
+  });
+  document.querySelectorAll('.btn-submit').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const qid = parseInt(btn.dataset.q);
+      if(state.answered.has(qid)) return;
+      const input = document.getElementById('input-'+qid);
+      const val = input.value.trim();
+      if(!val){ alert('답을 입력해 주세요'); return; }
+      gradeShort(qid, val);
+    });
+  });
+}
+
+function grade(qid, selected){
+  const q = QUIZ_DATA.find(x=>x.id===qid);
+  const isCorrect = selected===q.answer;
+  const card = document.getElementById('q'+qid);
+  const opts = card.querySelectorAll('.opt, .ox');
+  opts.forEach((o, i)=>{
+    o.disabled = true;
+    if(i===q.answer) o.classList.add('correct');
+    if(i===selected && !isCorrect) o.classList.add('wrong');
+  });
+  showExplain(qid, isCorrect, q);
+  updateState(isCorrect, qid);
+}
+
+function gradeShort(qid, value){
+  const q = QUIZ_DATA.find(x=>x.id===qid);
+  const norm = value.toLowerCase().trim();
+  const accepted = q.answer.map(a=>a.toLowerCase().trim());
+  const isCorrect = accepted.some(a=> norm===a || norm.includes(a) || a.includes(norm) );
+  const card = document.getElementById('q'+qid);
+  const input = document.getElementById('input-'+qid);
+  const btn = card.querySelector('.btn-submit');
+  input.disabled = true; btn.disabled = true;
+  input.style.borderColor = isCorrect ? '#16a34a' : '#dc2626';
+  input.style.background = isCorrect ? '#dcfce7' : '#fee2e2';
+  showExplain(qid, isCorrect, q);
+  updateState(isCorrect, qid);
+}
+
+function showExplain(qid, isCorrect, q){
+  const exp = document.getElementById('exp-'+qid);
+  exp.innerHTML = `<div>${isCorrect?'<span class="tag-ok">✓ 정답!</span>':'<span class="tag-bad">✗ 오답</span>'} ${q.explanation}</div>`;
+  exp.classList.add('show');
+}
+
+function updateState(isCorrect, qid){
+  if(state.answered.has(qid)) return;
+  state.answered.add(qid);
+  state.solved++;
+  if(isCorrect) state.correct++;
+  document.getElementById('solved').textContent = state.solved;
+  document.getElementById('correct').textContent = state.correct;
+  const rate = Math.round(state.correct / state.solved * 100) || 0;
+  const totalRate = Math.round(state.correct / 10 * 100);
+  document.getElementById('rate').textContent = totalRate + '%';
+  const bar = document.getElementById('bar');
+  bar.style.width = totalRate + '%';
+  if(totalRate<40) bar.style.background = '#dc2626';
+  else if(totalRate<70) bar.style.background = '#f97316';
+  else bar.style.background = '#16a34a';
+  if(state.solved===10){
+    setTimeout(showFinal, 400);
+  }
+}
+
+function showFinal(){
+  const modal = document.getElementById('resultModal');
+  const score = state.correct;
+  const rate = score*10;
+  let grade='D', msg='';
+  if(rate>=90){ grade='A'; msg='완벽해요! 3D AI 도전기 핵심을 정확히 이해했어요 🎉'; }
+  else if(rate>=70){ grade='B'; msg='잘했어요! 이제 Blender 기초만 조금 더 배우면 바로 시작할 수 있어요'; }
+  else if(rate>=50){ grade='C'; msg='좋아요! 영상을 한 번 더 보면 Retopology와 Mixamo 흐름이 더 명확해질 거예요'; }
+  else { grade='D'; msg='괜찮아요! 중학생 수준으로 정리된 리포트를 먼저 읽고 다시 도전해봐요'; }
+  document.getElementById('finalGrade').textContent = grade;
+  document.getElementById('finalText').textContent = msg;
+  document.getElementById('finalScore').textContent = score;
+  modal.classList.add('show');
+}
+
+function resetQuiz(){
+  state = { solved:0, correct:0, answered:new Set() };
+  document.getElementById('solved').textContent='0';
+  document.getElementById('correct').textContent='0';
+  document.getElementById('rate').textContent='0%';
+  document.getElementById('bar').style.width='0%';
+  document.getElementById('resultModal').classList.remove('show');
+  render();
+}
+
+render();
+</script>
+</body>
+</html>

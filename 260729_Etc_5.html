@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AMD Helios Report - Anthropic Order and 4x Growth</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+:root{
+  --bg:#ffffff; --bg2:#fafafa; --text:#1a1a1a; --sub:#777777;
+  --main:#e11d48; --subaccent:#f43f5e; --border:#e5e5e5;
+  --chart1:#e11d48; --chart2:#1a1a1a; --chart3:#6b7280; --chart4:#2563eb;
+}
+*{box-sizing:border-box; margin:0; padding:0}
+body{font-family:'Noto Sans KR', sans-serif; background:var(--bg); color:var(--text); line-height:1.7; -webkit-font-smoothing:antialiased;}
+.container{max-width:720px; margin:0 auto; padding:0 20px 100px;}
+header{padding:56px 0 32px; border-bottom:2px solid var(--text);}
+.kicker{font-size:12px; letter-spacing:0.18em; color:var(--main); font-weight:700; text-transform:uppercase; margin-bottom:12px;}
+h1{font-family:'Playfair Display', serif; font-size:34px; line-height:1.15; margin-bottom:16px;}
+h1 span{color:var(--main);}
+.meta{color:var(--sub); font-size:13px; display:flex; gap:12px; flex-wrap:wrap;}
+.badge{display:inline-block; background:var(--text); color:#fff; font-size:11px; padding:4px 10px; border-radius:999px; letter-spacing:0.05em;}
+.lead{background:var(--bg2); border-left:4px solid var(--main); padding:18px 18px; margin:28px 0; font-size:16px; border-radius:4px;}
+h2{font-family:'Playfair Display', serif; font-size:22px; margin:48px 0 14px; position:relative; padding-left:14px;}
+h2::before{content:''; position:absolute; left:0; top:6px; bottom:6px; width:4px; background:var(--main); border-radius:2px;}
+h3{font-size:16px; font-weight:700; margin:22px 0 10px;}
+p{font-size:15px; margin:10px 0; color:var(--text);}
+.small{font-size:13px; color:var(--sub);}
+.card{background:var(--bg2); border:1px solid var(--border); border-radius:12px; padding:18px; margin:16px 0;}
+.card.highlight{border-color:var(--main); background:#fff5f7;}
+.table-wrap{overflow-x:auto; margin:14px 0; border-radius:8px; border:1px solid var(--border);}
+table{width:100%; border-collapse:collapse; font-size:13px;}
+th{background:var(--main); color:#fff; text-align:left; padding:10px 12px; font-weight:600;}
+td{padding:10px 12px; border-top:1px solid var(--border); background:var(--bg2);}
+tr:nth-child(even) td{background:#fff;}
+.tag{display:inline-block; font-size:11px; padding:2px 8px; border-radius:999px; background:var(--text); color:#fff; margin-right:4px;}
+/* Required Chart Pattern */
+.fade-in{opacity:0; transform:translateY(18px); transition:opacity 0.7s ease, transform 0.7s ease;}
+.fade-in.visible{opacity:1; transform:translateY(0);}
+.chart-container{position:relative; max-height:340px; background:var(--bg2); border:1px solid var(--border); border-radius:12px; padding:14px 10px 6px; margin:18px 0;}
+.chart-container canvas{opacity:0; transition:opacity 0.4s ease; max-height:300px;}
+.chart-container.chart-ready canvas{opacity:1;}
+/* Interactives */
+.slider-row{display:flex; align-items:center; gap:12px; margin:10px 0;}
+input[type=range]{flex:1; accent-color:var(--main);}
+.btn{display:inline-flex; align-items:center; justify-content:center; padding:10px 14px; border-radius:10px; border:1px solid var(--border); background:#fff; font-size:13px; cursor:pointer; transition:all .2s;}
+.btn.active{background:var(--main); color:#fff; border-color:var(--main);}
+.btn:hover{transform:translateY(-1px);}
+.result-box{background:#1a1a1a; color:#fff; border-radius:10px; padding:14px 16px; font-size:14px; margin:12px 0; display:flex; flex-direction:column; gap:6px;}
+.result-box b{color:#ffb3c1; font-weight:700;}
+.flow{display:flex; gap:8px; overflow-x:auto; padding:8px 0;}
+.flow-step{min-width:128px; flex:1; background:#fff; border:1px solid var(--border); border-radius:10px; padding:12px; cursor:pointer; transition:.2s;}
+.flow-step.active{border-color:var(--main); box-shadow:0 4px 16px rgba(225,29,72,.15);}
+.flow-step .num{font-size:11px; color:var(--main); font-weight:700;}
+.kpi-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:12px 0;}
+.kpi{background:#fff; border:1px solid var(--border); border-radius:10px; padding:12px;}
+.kpi .v{font-size:20px; font-weight:800; color:var(--main);}
+ul{padding-left:18px; font-size:14px;}
+li{margin:6px 0;}
+</style>
+</head>
+<body>
+<div class="container">
+<header class="fade-in">
+<div class="kicker">WALL STREET TECH NOTE / 2026.07.29</div>
+<h1>앤트로픽이 <span>AMD 헬리오스</span> 주문,<br>내년 4배 성장하는 AMD</h1>
+<div class="meta"><span class="badge">경제 분석</span><span>원본: youtube Aeq9ohZmR30</span><span>정리 밀도 60% · 중학생 레벨</span></div>
+</header>
+
+<div class="lead fade-in">
+<b>한 줄 결론:</b> AMD는 CPU+GPU+네트워킹을 한 랙에 넣은 <b>Helios(헬리오스)</b>로 OpenAI·메타 6GW급 + 앤트로픽 2GW급 = 총 14GW(약 3500억 달러·500조원) 예약을 만들었고, TSMC에 4배 물량을 발주하며 실적 가시성을 증명했습니다. 엔비디아를 대체한다기보다 AI 시장 자체가 커지며 <b>둘 다 크는</b> 그림입니다.
+</div>
+
+<h2 class="fade-in">1. 14GW 계약은 얼마나 큰가?</h2>
+<div class="card fade-in">
+<p>영상에서 말한 구조는 이렇습니다.</p>
+<ul>
+<li><b>OpenAI + 메타</b>: 각 6기가와트(GW)급 데이터센터 구축 협력</li>
+<li><b>앤트로픽(Anthropic)</b>: 최근 추가 2GW 계약</li>
+<li><b>합계</b>: 14GW</li>
+<li>1GW당 데이터센터 GPU 가격을 약 <b>250억 달러</b>(25B)로 보면, <b>14 × 250억 = 3,500억 달러</b> 규모. 한화로 500조 원이 넘는 예약 매출 개념.</li>
+</ul>
+<p class="small">* 실제 매출 인식은 수년에 걸쳐 나눠지고, 서버·네트워킹·소프트웨어 포함 여부에 따라 달라집니다.</p>
+</div>
+
+<div class="card highlight fade-in">
+<h3>🧮 인터랙티브 수익 시뮬레이터</h3>
+<p class="small">슬라이더로 GW와 단가를 바꿔보세요. 결과가 즉시 계산됩니다.</p>
+<div class="slider-row"><label style="width:70px;font-size:13px;">총 GW</label><input type="range" id="gwRange" min="1" max="20" value="14" step="1"><span id="gwVal" class="tag">14 GW</span></div>
+<div class="slider-row"><label style="width:70px;font-size:13px;">단가</label><input type="range" id="priceRange" min="10" max="40" value="25" step="1"><span id="priceVal" class="tag">$25B</span></div>
+<div class="result-box" id="revResult"></div>
+<button class="btn" onclick="resetRev()">초기값 리셋</button>
+</div>
+
+<h2 class="fade-in">2. Helios 랙스케일 — 냉장고 한 대에 슈퍼컴퓨터를</h2>
+<p class="fade-in">예전엔 수백 대 서버가 하던 일을 <b>랙(Rack, 서버를 꽂는 냉장고 크기 철제 캐비닛) 하나</b>로 하겠다는 아이디어가 <b>랙스케일(Rack-scale)</b>입니다.</p>
+<div class="card fade-in">
+<div class="flow" id="flow">
+<div class="flow-step active" data-i="0"><div class="num">STEP 1</div><b>분산 학습</b><br><span class="small">AI 모델은 GPU 수십~수백 개가 동시에 하나의 모델을 학습</span></div>
+<div class="flow-step" data-i="1"><div class="num">STEP 2</div><b>병목 발생</b><br><span class="small">서버가 흩어져 있으면 데이터 교환 지연 → 성능 병목</span></div>
+<div class="flow-step" data-i="2"><div class="num">STEP 3</div><b>Helios 해법</b><br><span class="small">GPU 72개 + CPU 18개 + Pensando 네트워킹 칩을 초고속 인터커넥트로 연결</span></div>
+<div class="flow-step" data-i="3"><div class="num">STEP 4</div><b>효과</b><br><span class="small">72개가 하나의 거대한 GPU처럼 동작</span></div>
+</div>
+<p id="flowDesc" class="small" style="margin-top:10px; background:#fff; padding:10px; border-radius:8px; border:1px dashed var(--border);">현재: 분산 학습 시 GPU 간 통신이 가장 중요한 병목입니다.</p>
+</div>
+
+<h2 class="fade-in">3. 심장 MI455X — HBM4 432GB의 의미</h2>
+<div class="card fade-in">
+<p>Helios의 심장은 <b>MI455X</b> GPU. 핵심은 메모리(데이터를 임시로 담는 초고속 창고)입니다.</p>
+<ul>
+<li>엔비디아 베라 루빈 200(차세대 GPU 라인): <b>HBM4 288GB</b></li>
+<li>AMD MI455X: <b>HBM4 432GB</b> (1.5배 많음)</li>
+<li>2년 전 GPT-4급 대형 모델 파라미터를 단일 GPU에서 처리할 수 있는 수준</li>
+<li>펜산도(Pensando, AMD가 인수한 네트워킹 칩 회사) 칩으로 렉 내부/랙 간 초고속 통신 풀스택 지원</li>
+</ul>
+</div>
+<div class="chart-container fade-in"><canvas id="memChart" height="220"></canvas></div>
+<div class="chart-container fade-in"><canvas id="perfChart" height="240"></canvas></div>
+<p class="small fade-in">영상 그래프 설명: 노란색 베라루빈 vs 파란색 MI455X 연산 능력은 비슷, 메모리 용량에서 AMD 우위. 현행 MI355(빨강)는 엔비디아 블랙웰(초록)을 소프트웨어 최적화로 따라잡는 중.</p>
+
+<h2 class="fade-in">4. “말뿐이냐”를 깬 증거 — TSMC 발주 4배</h2>
+<div class="card fade-in">
+<p>모건스탠리 조사 TSMC CoWoS(칩을 쌓는 첨단 패키징 공정) 물량:</p>
+<ul>
+<li>엔비디아: 780장 → 1,222장 (+50%대)</li>
+<li>브로드컴: 300장 → 484장 (+40%대)</li>
+<li><b>AMD: 130장 → 530장 (약 4.07배)</b> — 브로드컴 추월</li>
+</ul>
+<p class="small">절대값은 엔비디아가 압도적이지만 성장률은 AMD가 최고. 발주를 넣었다는 건 고객(오픈AI/메타/앤트로픽)과의 공동 검증을 거쳤다는 신호로 해석.</p>
+</div>
+<div class="chart-container fade-in"><canvas id="cowosChart" height="240"></canvas></div>
+
+<div class="card highlight fade-in">
+<h3>📦 발주 성장률 시뮬레이터</h3>
+<p class="small">2026년 물량을 바꿔보면 2027년 4배 가시성을 체감할 수 있습니다.</p>
+<div class="slider-row"><label style="width:90px;font-size:13px;">2026 물량</label><input type="range" id="w26" min="50" max="300" value="130"><span id="w26v" class="tag">130장</span></div>
+<div class="slider-row"><label style="width:90px;font-size:13px;">배수</label><input type="range" id="mult" min="1" max="6" value="4.07" step="0.05"><span id="multv" class="tag">4.07배</span></div>
+<div class="result-box" id="waferResult"></div>
+</div>
+
+<h2 class="fade-in">5. CUDA 독점을 깰 수 있을까? — ROCm.AI</h2>
+<p class="fade-in"><b>CUDA(쿠다)</b>는 엔비디아 GPU를 프로그래밍하는 언어·생태계. 개발자들이 15년 넘게 쌓은 코드가 있어 강력한 해자(경쟁우위)입니다.</p>
+<div class="card fade-in">
+<p>AMD의 해법:</p>
+<ul>
+<li>자체 언어 <b>ROCm(록엠)</b>에 <b>AI를 붙여(ROCm.AI)</b> 커널(계산 최소 단위)을 자동 튜닝</li>
+<li>영상 그래프 기준 약 <b>16배 성능 향상</b> 주장</li>
+<li>한계: 실제 고객이 CUDA에서 얻는 생산성을 적은 인력으로 대체 가능한지는 추가 검증 필요. 엔비디아도 오픈소스로 생태계 방어 중.</li>
+</ul>
+</div>
+
+<h2 class="fade-in">6. CPU와 GPU가 1:1로 매칭되는 시대</h2>
+<p class="fade-in">AI 에이전트(도구를 스스로 쓰는 AI 비서)는 도구 호출을 많이 하는데, 이건 <b>CPU(두뇌 역할, 명령·제어)</b>가 합니다. 그래서 예전 1 CPU : 8 GPU에서 이제는 1:1로.</p>
+<div class="chart-container fade-in"><canvas id="cpuGpuChart" height="220"></canvas></div>
+<div class="kpi-grid fade-in">
+<div class="kpi"><div class="small">Traditional LLM</div><div class="v">12% CPU</div><div class="small">GPU가 대부분</div></div>
+<div class="kpi"><div class="small">Agentic AI</div><div class="v">50% CPU</div><div class="small">CPU 수요 급증</div></div>
+</div>
+<p class="small fade-in">AMD는 CPU도 잘하는 회사라 이 변화가 유리. 출처: TrendForce 2025년 4월 자료 (영상 인용).</p>
+
+<h2 class="fade-in">7. 재무 — 3총사 중 AMD가 가장 싸다?</h2>
+<div class="table-wrap fade-in">
+<table>
+<tr><th>구분</th><th>주가 변화(5/1~7/24)</th><th>선행 PER</th><th>특징</th></tr>
+<tr><td><b>AMD</b></td><td>+56.0% (521.95)</td><td>~40배</td><td>신고가 근처 유지</td></tr>
+<tr><td>ARM</td><td>+20.4% (260.01)</td><td>~90배</td><td>급등 후 급락</td></tr>
+<tr><td>인텔</td><td>+8.6% (92.32)</td><td>~90배</td><td>급등 후 급락</td></tr>
+<tr><td>엔비디아</td><td>-4.5% (206.84)</td><td>-</td><td>선방</td></tr>
+</table>
+</div>
+<div class="chart-container fade-in"><canvas id="epsChart" height="260"></canvas></div>
+<div class="card fade-in">
+<p><b>컨센서스 EPS(주당순이익) 추정치:</b></p>
+<ul>
+<li>2026년 12월: $7.45, 성장률 78.63%, PER 70.07배</li>
+<li>2027년 12월: $13.72, 성장률 <b>84.24%</b>, PER 38.03배</li>
+<li>2028년 12월: $19.93, 성장률 45.23%, PER 26.19배</li>
+</ul>
+<p class="small">영상 기준 27년 말에는 포워드 PER가 40배 아래로 내려오며 이익 성장이 밸류를 정당화할 수 있다는 논리.</p>
+</div>
+
+<h2 class="fade-in">8. 결론 및 체크리스트</h2>
+<div class="card fade-in">
+<ul>
+<li>✅ <b>계약 → 발주 → 실적 가시성</b>으로 이어지는 흐름 확인 (14GW, TSMC 4배)</li>
+<li>✅ <b>제품 경쟁력</b>은 메모리 용량에서 우위, 연산은 비등, 랙스케일 설계는 엔비디아 NVL72와 유사</li>
+<li>⚠️ <b>검증 필요</b>: Helios 실제 안정성/성능, ROCm.AI의 CUDA 대체 생산성</li>
+<li>💡 <b>투자 관점 힌트(영상 주장)</b>: AI 시장은 커서 AMD와 엔비디아가 함께 클 수 있고, CPU 3사 중 상대적 밸류는 AMD가 낮아 보임. 다만 매수매도 추천 아님.</li>
+</ul>
+</div>
+
+<div class="card fade-in" style="text-align:center;">
+<p class="small">본 리포트는 영상 자막과 캡처 자료를 중학생 수준으로 재구성한 요약본입니다. 수치는 원본 그대로 유지하되 투자 조언이 아닙니다.</p>
+<p style="margin-top:8px;"><span class="tag">Helios</span><span class="tag">MI455X</span><span class="tag">CoWoS 4x</span><span class="tag">ROCm.AI 16x</span></p>
+</div>
+</div>
+
+<script>
+// Fade Observer
+const fadeObs = new IntersectionObserver((entries) => {
+  entries.forEach((e, i) => {
+    if (e.isIntersecting) {
+      setTimeout(() => e.target.classList.add('visible'), i * 80);
+      fadeObs.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.12 });
+document.querySelectorAll('.fade-in').forEach(el => fadeObs.observe(el));
+
+// Revenue Calculator
+const gwRange=document.getElementById('gwRange');
+const priceRange=document.getElementById('priceRange');
+const gwVal=document.getElementById('gwVal');
+const priceVal=document.getElementById('priceVal');
+const revResult=document.getElementById('revResult');
+function updateRev(){
+  const gw=parseInt(gwRange.value);
+  const price=parseInt(priceRange.value);
+  const total=gw*price;
+  const krw=Math.round(total*1380); // rough 1380
+  gwVal.textContent=gw+" GW";
+  priceVal.textContent="$"+price+"B";
+  revResult.innerHTML=`<div>💰 예상 매출: <b>$${total}B (약 ${total*100}억 달러)</b></div><div>한화 약 <b>${krw.toLocaleString()}B원 → ${ (krw/1000).toFixed(1)}조원</b></div><div class="small" style="color:#ccc">계산식: ${gw}GW × $${price}B = $${total}B (영상 기준 14GW×$25B=$350B)</div>`;
+}
+gwRange.addEventListener('input', updateRev);
+priceRange.addEventListener('input', updateRev);
+function resetRev(){gwRange.value=14; priceRange.value=25; updateRev();}
+updateRev();
+
+// Wafer simulator
+const w26=document.getElementById('w26'); const mult=document.getElementById('mult');
+const w26v=document.getElementById('w26v'); const multv=document.getElementById('multv'); const waferResult=document.getElementById('waferResult');
+function updateWafer(){
+  const a=parseInt(w26.value); const m=parseFloat(mult.value);
+  const b=Math.round(a*m);
+  w26v.textContent=a+'장'; multv.textContent=m.toFixed(2)+'배';
+  waferResult.innerHTML=`<div>2026: <b>${a}장</b> → 2027: <b>${b}장</b></div><div>증가분 <b>${b-a}장 (+${((m-1)*100).toFixed(1)}%)</b> — 영상 AMD는 130→530장</div>`;
+}
+w26.addEventListener('input', updateWafer); mult.addEventListener('input', updateWafer); updateWafer();
+
+// Flow steps
+document.querySelectorAll('.flow-step').forEach(el=>{
+  el.addEventListener('click', ()=>{
+    document.querySelectorAll('.flow-step').forEach(s=>s.classList.remove('active'));
+    el.classList.add('active');
+    const texts=["분산 학습 시 GPU 간 통신이 가장 중요한 병목입니다.","서버가 흩어져 있으면 지연이 커져 GPU가 빨라도 전체가 느려집니다.","Helios는 72 GPU + 18 CPU + Pensando 칩을 한 랙에 묶어 초고속으로 연결합니다.","마치 하나의 거대 GPU처럼 동작해 대형 AI 모델 학습 속도가 빨라집니다."];
+    document.getElementById('flowDesc').textContent=texts[parseInt(el.dataset.i)];
+  });
+});
+
+// Chart Configs - Required pattern
+const chartConfigs = {};
+
+chartConfigs['memChart'] = () => {
+  new Chart(document.getElementById('memChart'), {
+    type:'bar',
+    data:{
+      labels:['NVIDIA Vera Rubin 200','AMD MI455X'],
+      datasets:[{label:'HBM4 메모리 (GB)', data:[288,432], backgroundColor:['#1a1a1a','#e11d48'], borderRadius:8}]
+    },
+    options:{
+      responsive:true, animation:{duration:900},
+      plugins:{legend:{display:false}, title:{display:true, text:'HBM 메모리 용량 비교 — 단일 GPU에서 큰 모델 처리', font:{size:13}}, tooltip:{callbacks:{label:c=>c.raw+' GB'}}},
+      scales:{y:{beginAtZero:true, grid:{color:'#f0f0f0'}}}
+    }
+  });
+};
+
+chartConfigs['perfChart'] = () => {
+  new Chart(document.getElementById('perfChart'), {
+    type:'radar',
+    data:{
+      labels:['연산 능력','메모리 용량','네트워킹','랙 스케일 완성도','소프트웨어 성숙도'],
+      datasets:[
+        {label:'Vera Rubin 200', data:[9,6,9,9,10], borderColor:'#1a1a1a', backgroundColor:'rgba(26,26,26,0.08)', pointBackgroundColor:'#1a1a1a'},
+        {label:'MI455X Helios', data:[8.7,9,8.5,8.5,6.5], borderColor:'#e11d48', backgroundColor:'rgba(225,29,72,0.12)', pointBackgroundColor:'#e11d48'}
+      ]
+    },
+    options:{responsive:true, animation:{duration:1000}, plugins:{legend:{position:'bottom'}}, scales:{r:{min:0,max:10, ticks:{display:false}}}}
+  });
+};
+
+chartConfigs['cowosChart'] = () => {
+  new Chart(document.getElementById('cowosChart'), {
+    type:'bar',
+    data:{
+      labels:['NVIDIA','Broadcom','AMD','MediaTek','AWS/Annapurna'],
+      datasets:[
+        {label:'2026e', data:[780,300,130,40,62], backgroundColor:'#6b7280'},
+        {label:'2027e', data:[1222,484,530,180,90], backgroundColor:'#e11d48'}
+      ]
+    },
+    options:{
+      responsive:true, animation:{duration:1000},
+      plugins:{legend:{position:'bottom'}, title:{display:true, text:'TSMC CoWoS 수요 — AMD 13만→53만장 약 4배 (모건스탠리)', font:{size:12}}},
+      scales:{y:{beginAtZero:true}}
+    }
+  });
+};
+
+chartConfigs['cpuGpuChart'] = () => {
+  new Chart(document.getElementById('cpuGpuChart'), {
+    type:'bar',
+    data:{
+      labels:['Traditional LLM','Agentic AI'],
+      datasets:[
+        {label:'CPU', data:[12,50], backgroundColor:'#e11d48'},
+        {label:'GPU', data:[88,50], backgroundColor:'#1a1a1a'}
+      ]
+    },
+    options:{
+      responsive:true, animation:{duration:900},
+      indexAxis:'y',
+      plugins:{legend:{position:'bottom'}, title:{display:true, text:'CPU:GPU 비중 변화 — 에이전틱 AI에서 1:1 매칭'}},
+      scales:{x:{stacked:true, max:100, ticks:{callback:v=>v+'%'}}, y:{stacked:true}}
+    }
+  });
+};
+
+chartConfigs['epsChart'] = () => {
+  new Chart(document.getElementById('epsChart'), {
+    type:'line',
+    data:{
+      labels:['2026.12','2027.12','2028.12','2029.12','2030.12'],
+      datasets:[
+        {label:'EPS 추정치 ($)', data:[7.45,13.72,19.93,23.95,37.07], borderColor:'#e11d48', backgroundColor:'rgba(225,29,72,0.15)', fill:true, tension:0.3, yAxisID:'y'},
+        {label:'성장률 (%)', data:[78.63,84.24,45.23,20.15,54.8], borderColor:'#2563eb', backgroundColor:'transparent', tension:0.3, yAxisID:'y1', borderDash:[5,4]}
+      ]
+    },
+    options:{
+      responsive:true, animation:{duration:1100},
+      plugins:{legend:{position:'bottom'}},
+      scales:{
+        y:{position:'left', title:{display:true, text:'EPS ($)'}, grid:{color:'#f5f5f5'}},
+        y1:{position:'right', title:{display:true, text:'성장률 %'}, grid:{display:false}}
+      }
+    }
+  });
+};
+
+// Chart Observer
+const chartObs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const canvas = e.target.querySelector('canvas');
+      if (canvas && chartConfigs[canvas.id]) {
+        chartConfigs[canvas.id]();
+        e.target.classList.add('chart-ready');
+        chartObs.unobserve(e.target);
+      }
+    }
+  });
+}, { threshold: 0.15 });
+document.querySelectorAll('.chart-container').forEach(el => chartObs.observe(el));
+</script>
+</body>
+</html>

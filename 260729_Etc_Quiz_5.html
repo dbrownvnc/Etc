@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AMD Helios - Interactive Quiz 10 Questions</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--main:#e11d48; --main2:#f43f5e; --bg:#ffffff; --bg2:#fafafa; --text:#1a1a1a; --sub:#777; --border:#e5e5e5; --green:#16a34a; --red:#dc2626; --orange:#ea580c}
+*{box-sizing:border-box; margin:0; padding:0}
+body{font-family:'Noto Sans KR', sans-serif; background:var(--bg); color:var(--text); line-height:1.6;}
+.sticky{position:sticky; top:0; z-index:100; background:#fff; border-bottom:2px solid var(--text); padding:12px 16px; display:flex; flex-direction:column; gap:8px;}
+.top-row{display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;}
+.badge{font-size:12px; background:var(--text); color:#fff; padding:4px 10px; border-radius:999px;}
+.score{font-size:14px; font-weight:700; display:flex; gap:12px;}
+.progress{height:8px; background:var(--bg2); border-radius:999px; overflow:hidden; border:1px solid var(--border);}
+.progress-bar{height:100%; width:0%; background:var(--red); transition:width .4s, background .4s;}
+.container{max-width:720px; margin:0 auto; padding:20px 16px 120px;}
+h1{font-family:'Playfair Display', serif; font-size:26px; margin:18px 0 6px;}
+.sub{color:var(--sub); font-size:13px; margin-bottom:18px;}
+.card{background:#fff; border:1px solid var(--border); border-radius:14px; padding:18px; margin:14px 0; transition:.2s;}
+.card.solved{border-color:var(--main);}
+.q-head{display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; gap:8px;}
+.q-num{font-weight:800; font-size:15px;}
+.diff{font-size:11px; padding:3px 8px; border-radius:999px; color:#fff;}
+.diff.easy{background:#16a34a} .diff.medium{background:#f59e0b} .diff.hard{background:#dc2626}
+.q-text{font-size:15px; font-weight:600; margin:8px 0 14px;}
+.options{display:flex; flex-direction:column; gap:8px;}
+.opt{padding:12px 14px; border:1px solid var(--border); border-radius:10px; background:var(--bg2); text-align:left; cursor:pointer; font-size:14px; transition:.18s;}
+.opt:hover{border-color:var(--main); transform:translateY(-1px);}
+.opt.correct{background:#dcfce7; border-color:var(--green); color:#065f46; font-weight:700;}
+.opt.wrong{background:#fee2e2; border-color:var(--red); color:#991b1b;}
+.opt:disabled{cursor:not-allowed; opacity:0.9;}
+.input-row{display:flex; gap:8px;}
+input[type=text]{flex:1; padding:12px; border:1px solid var(--border); border-radius:10px; font-size:14px;}
+.btn{padding:10px 14px; border-radius:10px; border:1px solid var(--border); background:var(--text); color:#fff; cursor:pointer; font-size:13px; font-weight:700;}
+.btn:disabled{opacity:.5; cursor:not-allowed;}
+.btn.ox{min-width:64px; font-size:18px;}
+.explain{margin-top:12px; padding:12px; background:#fff5f7; border:1px dashed var(--main); border-radius:10px; font-size:13px; display:none;}
+.explain.show{display:block; animation:fadeIn .3s;}
+@keyframes fadeIn{from{opacity:0; transform:translateY(6px)} to{opacity:1; transform:translateY(0)}}
+.final{margin-top:28px; padding:22px; border:2px solid var(--main); border-radius:16px; background:var(--bg2); text-align:center; display:none;}
+.final.show{display:block;}
+.grade{font-family:'Playfair Display', serif; font-size:42px; color:var(--main); margin:8px 0;}
+.reset{margin-top:14px; background:var(--main); border-color:var(--main);}
+</style>
+</head>
+<body>
+<div class="sticky">
+<div class="top-row">
+<span class="badge">AMD Helios 퀴즈 · 10문제</span>
+<div class="score"><span id="solved">푼 문제 0/10</span><span id="correct">맞힌 문제 0</span><span id="rate">정답률 0%</span></div>
+</div>
+<div class="progress"><div class="progress-bar" id="pbar"></div></div>
+</div>
+<div class="container">
+<h1>앤트로픽이 AMD 헬리오스 주문, 내년 4배 성장하는 AMD</h1>
+<p class="sub">원본 자막 기반 · 클릭 한 번에 채점 + 해설 자동 표시 · 모바일 최적화</p>
+<div id="quiz"></div>
+<div class="final" id="final">
+<div style="font-size:13px; color:var(--sub);">FINAL SCORE</div>
+<div class="grade" id="finalGrade">A</div>
+<div id="finalText" style="font-size:15px; font-weight:700;"></div>
+<div id="finalDetail" class="sub" style="margin-top:8px;"></div>
+<button class="btn reset" onclick="resetQuiz()">다시 풀기</button>
+</div>
+</div>
+
+<script>
+const QUIZ_DATA=[
+{id:1, type:'mc', difficulty:'easy', question:'AMD와 최근 2GW 추가 계약을 맺은 회사는?', options:['OpenAI','Meta','Anthropic (앤트로픽)','Broadcom'], answer:2, explanation:'정답: Anthropic. 영상 초반 자막: “가장 최근에는 엔트로픽이랑 2기가와트급의 계약을 추가로 따냈습니다.” OpenAI·메타는 각 6GW, 앤트로픽은 추가 2GW로 총 14GW라고 설명.'},
+{id:2, type:'mc', difficulty:'medium', question:'영상에서 제시한 14GW 규모 예상 매출 계산식은?', options:['1GW=100억$ → 총 1,400억$','1GW=250억$ → 총 3,500억$','1GW=500억$ → 총 7,000억$','1GW=25억$ → 총 350억$'], answer:1, explanation:'정답: 1GW=250억 달러 ×14 = 3,500억 달러. 자막: “1기가와트당 데이터센터 GPU 가격이 대략 250억 달러… 14 곱하기 250을 하게 되면 대략 이제 3,500억 달러… 한화로 치면 500조 원이 넘는 매출이 예약”'},
+{id:3, type:'mc', difficulty:'medium', question:'AMD Helios 랙의 구성으로 맞는 것은?', options:['GPU 72개 + CPU 18개','GPU 18개 + CPU 72개','GPU 8개 + CPU 1개','GPU 100개만'], answer:0, explanation:'정답: GPU 72개 + CPU 18개. 자막: “GPU 72개, CPU 18개를 서버 렉 하나에 때려박은 거예요. 엔비디아의 NVL72를 생각하시면 될 것 같아요.” 여기에 Pensando 네트워킹 칩 포함.'},
+{id:4, type:'ox', difficulty:'easy', question:'Helios의 핵심 개념인 랙스케일(Rack-scale)은 GPU가 서로 다른 서버에 흩어져 있을 때 생기는 네트워크 지연 병목을 해결하려는 설계이다.', options:['O','X'], answer:0, explanation:'정답: O. 자막: “GPU가 서로 다른 서버에 흩어져 있으면 네트워크 지연 때문에… 전체 시스템 성능이 병목에 걸리게 돼요. 그리고 AMD의 헬리오스도요 이 문제를 해결하려고… 마치 72개의 GPU가요 하나의 거대한 GPU처럼 작동하게”'},
+{id:5, type:'short', difficulty:'medium', question:'MI455X에 탑재된 HBM4 메모리 용량은? (숫자+GB 포함, 예: 432GB)', answer:['432GB','432','HBM4 432GB','432 GB'], explanation:'정답: 432GB. 자막: “이 안에 들어가는 메모리가 HBM4 432GB가 들어가거든요… 2년 전 GPT-4급 대형 모델 파라미터를 단일 GPU 한 대에서 처리”. 비교 대상인 엔비디아 베라 루빈 200은 288GB.'},
+{id:6, type:'mc', difficulty:'medium', question:'엔비디아 베라 루빈 200과 AMD MI455X의 메모리 용량 비교로 옳은 것은?', options:['둘 다 288GB','엔비디아 432GB vs AMD 288GB','엔비디아 288GB vs AMD 432GB','둘 다 432GB'], answer:2, explanation:'정답: 엔비디아 288GB vs AMD 432GB. 영상 표 설명: “엔비디아 같은 경우는 HBM4를 288GB 때려박았고 AMD 같은 경우는 432GB를 넣었기 때문에 맨 끝에 있는 HBM 용량에서 좀 차이가 납니다.”'},
+{id:7, type:'mc', difficulty:'hard', question:'TSMC CoWoS 발주량에서 AMD의 성장률은?', options:['13만장 → 53만장, 약 4배','30만장 → 48만장, 약 1.6배','78만장 → 122만장, 약 1.5배','13만장 → 30만장, 약 2.3배'], answer:0, explanation:'정답: 13만→53만장 약 4배. 자막: “AMD는 53만장 물량을 할당… 13만장에서 53만장으로 무려 4배 이상 늡니다.” 엔비디아는 78만→122만(약 50%↑), 브로드컴 30만→48만(약 40%↑).'},
+{id:8, type:'short', difficulty:'easy', question:'AMD가 CUDA를 대체하기 위해 AI로 커널을 튜닝한다는 소프트웨어 플랫폼 이름은?', answer:['ROCm','ROCm.AI','ROCM','록엠'], explanation:'정답: ROCm / ROCm.AI. 자막: “원래 AMD에 ROCM이라는 언어가 있거든요. 여기 ROCM.AI라고 붙여져 있어요. 커널을 개선하고 튜닝하는데 AI가 이걸 대신해주다 보니까… 대략 16배 정도의 성능 향상”'},
+{id:9, type:'ox', difficulty:'medium', question:'에이전틱 AI 시대에는 CPU와 GPU 비율이 기존 1:8에서 1:1로 바뀌어 CPU 수요가 늘어난다.', options:['O','X'], answer:0, explanation:'정답: O. 자막: “AI 에이전트 시대가 오면서 CPU랑 GPU가 1대1로 매칭이 되기 시작합니다. 예전에는 CPU 하나에 GPU 8대… 에이전트들이 이 도구들을 엄청나게 많이 쓴단 말이에요. 근데 그 도구를 쓰는 건 보통 CPU가 하는 일입니다.”'},
+{id:10, type:'mc', difficulty:'hard', question:'영상에서 언급된 AMD의 2027년 12월 기준 EPS 성장률 예상치는?', options:['78.63%','84.24%','45.23%','20.15%'], answer:1, explanation:'정답: 84.24%. 표: 2027년 12월 EPS 추정치 13.72, 전년 대비 성장률 84.24%. 2026년 78.63%, 2028년 45.23%. 자막: “2027년 12월 달을 기준으로… 전년 대비 성장률이 대략 84%라는 거의 뭐 미친 성장률”'},
+];
+
+let state={solved:0, correct:0};
+const quizEl=document.getElementById('quiz');
+
+function render(){
+  quizEl.innerHTML='';
+  QUIZ_DATA.forEach((q, idx)=>{
+    const card=document.createElement('div'); card.className='card'; card.id='card-'+q.id;
+    const diffLabel = q.difficulty==='easy'?'쉬움':q.difficulty==='medium'?'보통':'어려움';
+    const diffClass = q.difficulty;
+    let inner=`<div class="q-head"><span class="q-num">Q${idx+1}. ${q.type==='mc'?'객관식':q.type==='ox'?'OX':'단답형'}</span><span class="diff ${diffClass}">${diffLabel}</span></div>
+    <div class="q-text">${q.question}</div>`;
+    if(q.type==='mc'){
+      inner+=`<div class="options">`+q.options.map((opt,i)=>`<button class="opt" data-q="${q.id}" data-i="${i}">${String.fromCharCode(65+i)}. ${opt}</button>`).join('')+`</div>`;
+    } else if(q.type==='ox'){
+      inner+=`<div class="options" style="flex-direction:row"><button class="opt btn ox" data-q="${q.id}" data-i="0">O</button><button class="opt btn ox" data-q="${q.id}" data-i="1">X</button></div>`;
+    } else {
+      inner+=`<div class="input-row"><input type="text" id="input-${q.id}" placeholder="정답을 입력하세요"><button class="btn" data-q="${q.id}" data-submit="1">제출</button></div>`;
+    }
+    inner+=`<div class="explain" id="exp-${q.id}"></div>`;
+    card.innerHTML=inner;
+    quizEl.appendChild(card);
+  });
+  attach();
+}
+function attach(){
+  document.querySelectorAll('.opt').forEach(btn=>{
+    btn.addEventListener('click', (e)=>{
+      const qid=parseInt(e.currentTarget.dataset.q);
+      const choice=parseInt(e.currentTarget.dataset.i);
+      grade(qid, choice, null);
+    });
+  });
+  document.querySelectorAll('[data-submit]').forEach(btn=>{
+    btn.addEventListener('click', (e)=>{
+      const qid=parseInt(e.currentTarget.dataset.q);
+      const input=document.getElementById('input-'+qid);
+      grade(qid, null, input.value.trim());
+    });
+  });
+  document.querySelectorAll('input[type=text]').forEach(inp=>{
+    inp.addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ const qid=parseInt(e.target.id.split('-')[1]); grade(qid, null, e.target.value.trim()); }});
+  });
+}
+function grade(qid, choiceIdx, textAns){
+  const q=QUIZ_DATA.find(x=>x.id===qid);
+  const card=document.getElementById('card-'+qid);
+  if(card.classList.contains('solved')) return;
+  let isCorrect=false;
+  if(q.type==='mc' || q.type==='ox'){
+    isCorrect = (choiceIdx===q.answer);
+    const opts=card.querySelectorAll('.opt');
+    opts.forEach((o,i)=>{
+      o.disabled=true;
+      if(i===q.answer) o.classList.add('correct');
+      if(i===choiceIdx && !isCorrect) o.classList.add('wrong');
+    });
+    // badge
+    const badge=document.createElement('div'); badge.style.marginTop='8px'; badge.style.fontSize='13px'; badge.style.fontWeight='700';
+    badge.textContent = isCorrect? '✓ 정답!' : '✗ 오답 — 정답은 '+ (q.type==='ox'? q.options[q.answer] : String.fromCharCode(65+q.answer))+'번';
+    badge.style.color=isCorrect? '#16a34a':'#dc2626';
+    card.querySelector('.q-text').appendChild(badge);
+  } else {
+    // short answer - case insensitive, allow list
+    const normalized=textAns.toLowerCase().replace(/\s+/g,'');
+    const answers = q.answer.map(a=>a.toLowerCase().replace(/\s+/g,''));
+    isCorrect = answers.some(a=> normalized.includes(a.replace(/hbm4/,'').replace(/gb/,'').trim()) || normalized===a || normalized.includes(a) );
+    // Special for ROCm, 432GB etc
+    if(!isCorrect){
+      // looser check
+      if(q.id===5 && (normalized.includes('432'))) isCorrect=true;
+      if(q.id===8 && (normalized.includes('rocm') || normalized.includes('록엠'))) isCorrect=true;
+    }
+    const input=card.querySelector('input'); const btn=card.querySelector('[data-submit]');
+    if(input) input.disabled=true; if(btn) btn.disabled=true;
+    const opts=card.querySelector('.input-row');
+    const fb=document.createElement('div'); fb.style.marginTop='8px'; fb.style.fontSize='13px'; fb.style.fontWeight='700';
+    fb.textContent = isCorrect? '✓ 정답! '+q.answer[0] : '✗ 오답 — 정답은 '+q.answer[0];
+    fb.style.color=isCorrect? '#16a34a':'#dc2626';
+    opts.insertAdjacentElement('afterend', fb);
+    const correctHint=card.querySelectorAll('.opt');
+  }
+  // explanation
+  const expEl=document.getElementById('exp-'+qid);
+  expEl.innerHTML=`<b style="color:var(--main)">해설</b><br>${q.explanation}`;
+  expEl.classList.add('show');
+  card.classList.add('solved');
+  state.solved+=1;
+  if(isCorrect) state.correct+=1;
+  updateSticky();
+  if(state.solved===10) showFinal();
+}
+function updateSticky(){
+  document.getElementById('solved').textContent=`푼 문제 ${state.solved}/10`;
+  document.getElementById('correct').textContent=`맞힌 문제 ${state.correct}`;
+  const rate = state.solved? Math.round(state.correct/state.solved*100):0;
+  document.getElementById('rate').textContent=`정답률 ${rate}%`;
+  const bar=document.getElementById('pbar');
+  bar.style.width= (state.solved/10*100)+'%';
+  if(rate<40) bar.style.background='var(--red)';
+  else if(rate<70) bar.style.background='var(--orange)';
+  else bar.style.background='var(--green)';
+}
+function showFinal(){
+  const final=document.getElementById('final');
+  const rate=Math.round(state.correct/10*100);
+  let grade='D', msg='조금 더 복습이 필요해요!';
+  if(rate>=90){grade='A'; msg='완벽해요! AMD 헬리오스를 꿰뚫으셨네요 🎉';}
+  else if(rate>=70){grade='B'; msg='훌륭해요! 핵심을 잘 잡으셨어요.';}
+  else if(rate>=40){grade='C'; msg='좋아요! 한 번 더 보면 더 확실해질 거예요.';}
+  document.getElementById('finalGrade').textContent=grade;
+  document.getElementById('finalText').textContent=`총점 ${state.correct*10}점 / 100점 — ${msg}`;
+  document.getElementById('finalDetail').textContent=`정답률 ${rate}% · 오답은 해설을 다시 확인해보세요. 원본 영상 자막 근거를 모두 포함했습니다.`;
+  final.classList.add('show');
+  final.scrollIntoView({behavior:'smooth'});
+}
+function resetQuiz(){
+  state={solved:0, correct:0};
+  updateSticky();
+  document.getElementById('final').classList.remove('show');
+  render();
+}
+render();
+updateSticky();
+</script>
+</body>
+</html>

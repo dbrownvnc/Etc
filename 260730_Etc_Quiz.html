@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 70 Years History - Interactive Quiz</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;800&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --accent:#e11d48;
+  --accent2:#f43f5e;
+  --bg:#ffffff;
+  --bg2:#fafafa;
+  --text:#1a1a1a;
+  --text2:#777777;
+  --border:#e5e5e5;
+  --green:#16a34a;
+  --orange:#ea580c;
+  --red:#dc2626;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Noto Sans KR', sans-serif;
+  line-height:1.6;
+}
+.header{
+  max-width:720px;
+  margin:0 auto;
+  padding:28px 20px 18px;
+}
+.kicker{color:var(--accent); font-weight:700; font-size:12px; letter-spacing:0.16em; text-transform:uppercase}
+.title{font-family:'Playfair Display', serif; font-size:30px; font-weight:800; line-height:1.2; margin:8px 0 6px}
+.sub{color:var(--text2); font-size:14px}
+.sticky{
+  position:sticky; top:0; z-index:20;
+  background:rgba(255,255,255,0.95);
+  backdrop-filter: blur(8px);
+  border-bottom:1px solid var(--border);
+  padding:12px 20px;
+  display:flex; flex-direction:column; gap:8px;
+}
+.sticky-top{
+  display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;
+  max-width:720px; margin:0 auto; width:100%;
+}
+.scores{display:flex; gap:12px; font-size:13px; font-weight:700}
+.scores span{background:var(--bg2); border:1px solid var(--border); padding:4px 10px; border-radius:999px}
+.progress-wrap{height:8px; background:#f3f4f6; border-radius:999px; overflow:hidden; max-width:720px; margin:0 auto; width:100%}
+.progress{height:100%; width:0%; background:var(--red); transition:width .4s, background .4s}
+.wrap{max-width:720px; margin:0 auto; padding:16px 20px 100px}
+.card{
+  background:white;
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:18px;
+  margin:16px 0;
+  transition:border-color .2s;
+}
+.card.solved{border-color:#e5e7eb}
+.q-head{display:flex; justify-content:space-between; align-items:center; margin-bottom:10px}
+.q-num{font-weight:800; font-size:14px; display:flex; gap:8px; align-items:center}
+.badge-diff{font-size:11px; padding:3px 8px; border-radius:999px; border:1px solid var(--border); color:var(--text2)}
+.badge-diff.easy{background:#fef2f2; color:var(--accent); border-color:#fecaca}
+.badge-diff.medium{background:#f3f4f6; color:#111}
+.badge-diff.hard{background:#1a1a1a; color:white}
+.q-text{font-size:16px; font-weight:600; margin:6px 0 14px; line-height:1.5}
+.options{display:grid; gap:8px}
+.opt{
+  text-align:left;
+  padding:12px 14px;
+  border:1px solid var(--border);
+  border-radius:12px;
+  background:white;
+  cursor:pointer;
+  font-size:14px;
+  line-height:1.5;
+  transition:all .18s;
+}
+.opt:hover{border-color:var(--accent); transform:translateY(-1px)}
+.opt.correct{background:#dcfce7; border-color:var(--green); color:#14532d}
+.opt.wrong{background:#fee2e2; border-color:var(--red); color:#7f1d1d}
+.opt:disabled{cursor:default; opacity:0.95}
+.opt .tag{float:right; font-size:12px; font-weight:800}
+.input-row{display:flex; gap:8px; margin-top:6px}
+.input-row input{
+  flex:1;
+  padding:12px 14px;
+  border:1px solid var(--border);
+  border-radius:10px;
+  font-size:14px;
+}
+.btn{
+  border:1px solid var(--border);
+  background:white;
+  padding:10px 16px;
+  border-radius:999px;
+  font-weight:700;
+  font-size:13px;
+  cursor:pointer;
+}
+.btn.primary{background:var(--accent); color:white; border-color:var(--accent)}
+.btn:disabled{opacity:0.6; cursor:default}
+.explain{
+  display:none;
+  margin-top:14px;
+  padding:14px;
+  background:var(--bg2);
+  border:1px solid var(--border);
+  border-radius:12px;
+  font-size:13px;
+  line-height:1.6;
+}
+.explain.show{display:block}
+.explain b{color:var(--accent)}
+.ox-row{display:flex; gap:10px}
+.ox-btn{
+  flex:1;
+  padding:14px;
+  border:1px solid var(--border);
+  border-radius:12px;
+  background:white;
+  font-size:18px;
+  font-weight:800;
+  cursor:pointer;
+}
+.ox-btn.correct{background:#dcfce7; border-color:var(--green)}
+.ox-btn.wrong{background:#fee2e2; border-color:var(--red)}
+.final{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.5);
+  z-index:50;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+}
+.final.show{display:flex}
+.final-card{
+  background:white;
+  border-radius:20px;
+  padding:24px;
+  max-width:420px;
+  width:100%;
+  text-align:center;
+  border:1px solid var(--border);
+}
+.grade{
+  font-family:'Playfair Display', serif;
+  font-size:54px;
+  font-weight:800;
+  color:var(--accent);
+  line-height:1;
+  margin:8px 0;
+}
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="kicker">QUIZ • 10 QUESTIONS</div>
+  <div class="title">AI 70 Years History<br>Interactive Quiz</div>
+  <div class="sub">원본 자막 기반 10문제 • 클릭 즉시 채점 • 해설 자동 표시 • 모바일 360px 최적화</div>
+</div>
+
+<div class="sticky" id="stickyBar">
+  <div class="sticky-top">
+    <div class="scores">
+      <span id="solvedCount">Solved 0 / 10</span>
+      <span id="correctCount">Correct 0</span>
+      <span id="accuracy">Accuracy 0%</span>
+    </div>
+  </div>
+  <div class="progress-wrap"><div class="progress" id="progressBar"></div></div>
+</div>
+
+<div class="wrap" id="quizWrap"></div>
+
+<div class="final" id="finalModal">
+  <div class="final-card">
+    <div style="font-size:12px; letter-spacing:0.15em; color:var(--accent); font-weight:800">FINAL SCORE</div>
+    <div class="grade" id="finalGrade">B</div>
+    <div style="font-size:18px; font-weight:700" id="finalScoreText">7 / 10</div>
+    <div style="font-size:13px; color:var(--text2); margin:10px 0 18px" id="finalMsg">Great job!</div>
+    <button class="btn primary" onclick="resetQuiz()" style="width:100%; padding:14px">Retry Quiz</button>
+  </div>
+</div>
+
+<script>
+const QUIZ_DATA = [
+  {
+    id:1,
+    type:'mc',
+    difficulty:'easy',
+    question:'인공지능(Artificial Intelligence)이라는 용어가 처음 만들어진 곳은?',
+    options:[
+      '1955년 존 매카시가 록펠러 재단에 낸 연구비 신청서',
+      '1956년 MIT 공개 강의',
+      '1982년 일본 제5세대 컴퓨터 계획서',
+      '2012년 알렉스넷 논문'
+    ],
+    answer:0,
+    explanation:'자막: "1955년 여름 다트머스 대학의 28살 수학 조교수 존 매카시가 록펠러 재단에 연구비를 신청... 이 신청서에서 인공지능이라는 말이 처음 만들어집니다." 본인은 "뭐라고든 불러야 했으니" 지었다고 회고.'
+  },
+  {
+    id:2,
+    type:'mc',
+    difficulty:'easy',
+    question:'초창기 30년간 AI가 실패한 핵심 이유는?',
+    options:[
+      '컴퓨터가 너무 빨라서 제어가 안 됐다',
+      '사람이 규칙을 직접 적어 넣으려 했는데, 예외가 규칙보다 더 빨리 늘어났다',
+      '인터넷이 없어서 데이터를 못 구했다',
+      '전기가 부족해서 학습이 중단됐다'
+    ],
+    answer:1,
+    explanation:'자막: "다리가 넷이다... 털이 있다... 짖는다... 규칙을 하나 고치면 예외가 둘 생깁니다. 규칙을 늘리는 속도보다 예외가 늘어나는 속도가 더 빨랐던 겁니다."'
+  },
+  {
+    id:3,
+    type:'mc',
+    difficulty:'medium',
+    question:'최초의 AI 프로그램으로 불리는 로직 시어리스트(Logic Theorist)는?',
+    options:[
+      '체스 챔피언을 이긴 프로그램',
+      '버트런드 러셀의 수학 원리 정리 52개 중 38개 증명, 하나는 러셀보다 짧았다',
+      '일본어 소설 번역 프로그램',
+      '자율주행차 제어 프로그램'
+    ],
+    answer:1,
+    explanation:'자막: "앨런 뉴얼과 허버트 사이먼이 만든 로직 시어리스트... 수학의 정리를 스스로 증명... 52개 중 38개 증명, 하나는 러셀보다 짧았다." 당시 종이 설계도여서 가족·학생이 손으로 계산.'
+  },
+  {
+    id:4,
+    type:'mc',
+    difficulty:'medium',
+    question:'2012년 이미지넷 대회에서 알렉스넷의 성적은?',
+    options:[
+      '오차율 26.2%로 2위',
+      '오차율 15.3%로 1위, 2위와 10.9%p 차이 압도적 우승',
+      '오차율 40% 최하위',
+      '실격'
+    ],
+    answer:1,
+    explanation:'원본 수치: "2위 팀 오차율 26.2% 예년 수준... 알렉스넷 15.3%, 격차 10.9%p. 다른 팀들이 1년에 1% 줄이던 걸 한 번에 10% 넘게 줄임."'
+  },
+  {
+    id:5,
+    type:'mc',
+    difficulty:'medium',
+    question:'페이페이 리가 정리한 현대 AI 3요소는?',
+    options:[
+      '규칙·추론·탐색',
+      '신경망·빅데이터·GPU 연산',
+      '데이터·클라우드·보안',
+      '언어·시각·청각'
+    ],
+    answer:1,
+    explanation:'자막: "현대 인공지능의 세 가지 근본 요소가 처음으로 한자리에 모인 순간... 첫째 신경망, 둘째 빅데이터, 셋째 GPU 연산."'
+  },
+  {
+    id:6,
+    type:'mc',
+    difficulty:'hard',
+    question:'2006년 젠슨 황이 CUDA를 도입한 이유는?',
+    options:[
+      '게임 그래픽을 더 예쁘게 만들기 위해',
+      '데이터를 이미지인 척 위장하지 않고 일반 개발자가 GPU에 직접 접근해 일반 연산을 할 수 있게 하기 위해',
+      '인터넷 속도 향상',
+      'CPU 제거'
+    ],
+    answer:1,
+    explanation:'자막: "그래픽카드로 일반 연산하려면 데이터를 이미지인 척 위장... 게임 개발 도구를 통해서만 접근... 그 과정을 건너뛰고 일반 개발자도 직접 접근할 수 있게 만든 기술." 시총 15억 달러까지 떨어질 위험 감수.'
+  },
+  {
+    id:7,
+    type:'ox',
+    difficulty:'easy',
+    question:'ChatGPT 같은 언어모델은 진리를 탐구하도록 훈련받았다.',
+    options:['O','X'],
+    answer:'X',
+    explanation:'자막: "진리를 탐구하거나 사실을 확인하도록 훈련받지 않았습니다. 오직 다음에 올 가장 그럴듯한 단어를 맞히는 데에만 집중합니다. 환각은 고장이 아니라 필연."'
+  },
+  {
+    id:8,
+    type:'ox',
+    difficulty:'medium',
+    question:'AI가 strawberry의 r 개수를 틀리는 이유는 글자를 직접 보지 않고 토큰과 숫자 ID로만 보기 때문이다.',
+    options:['O','X'],
+    answer:'O',
+    explanation:'자막: "인공지능은 글자를 보지 않습니다. 토큰이라는 덩어리 단위로... 496, 675, 15717번... 모델 눈에는 글자 아예 없음."'
+  },
+  {
+    id:9,
+    type:'short',
+    difficulty:'medium',
+    question:'오차를 뒤에서 앞으로 되짚어가며 각 층의 책임을 나누어 계산하는 학습법은? (한글 또는 영문)',
+    answer:['역전파','backpropagation','backprop','백프로파게이션'],
+    explanation:'자막: "바로 역전파입니다. 오차를 뒤에서 앞으로 되짚어가며 각 층의 숫자가 틀린 답에 얼마나 책임이 있는지 나눠 계산." 1980년대에 나왔으나 계산량 부족으로 실행 못 하다가 GPU로 가능.'
+  },
+  {
+    id:10,
+    type:'short',
+    difficulty:'hard',
+    question:'2024년 9월 OpenAI가 내놓은, 답하기 전 긴 생각을 쓰도록 훈련시켜 AIME 13%→83%로 올린 모델은? (영상에서 5원)',
+    answer:['o1','o1-preview','o1 mini','5원','오원','o1 reasoning','o1 모델'],
+    explanation:'자막: "2024년 9월 오픈AI가 5원 모델... 구조 바꾼 것 아니고 크기 키운 것도 아니다. 답하기 전 스스로 긴 생각 쓰도록 훈련... AIME 이전 13% → 83%."'
+  }
+];
+
+let state={solved:0, correct:0, answers:{}};
+
+function render(){
+  const wrap=document.getElementById('quizWrap');
+  wrap.innerHTML='';
+  QUIZ_DATA.forEach((q, idx)=>{
+    const card=document.createElement('div');
+    card.className='card';
+    card.id=`card-${q.id}`;
+    const diffClass=q.difficulty==='easy'?'easy': q.difficulty==='hard'?'hard':'medium';
+    const diffLabel=q.difficulty==='easy'?'쉬움': q.difficulty==='hard'?'어려움':'보통';
+    card.innerHTML=`
+      <div class="q-head">
+        <div class="q-num">Q${idx+1}. <span class="badge-diff ${diffClass}">${diffLabel}</span></div>
+        <div style="font-size:11px; color:#999">${q.type==='mc'?'객관식': q.type==='ox'?'OX':'단답형'}</div>
+      </div>
+      <div class="q-text">${q.question}</div>
+      <div class="q-body" id="body-${q.id}"></div>
+      <div class="explain" id="explain-${q.id}"><b>해설:</b> ${q.explanation}</div>
+    `;
+    wrap.appendChild(card);
+    const body=card.querySelector(`#body-${q.id}`);
+    if(q.type==='mc'){
+      const optWrap=document.createElement('div'); optWrap.className='options';
+      q.options.forEach((opt,i)=>{
+        const btn=document.createElement('button');
+        btn.className='opt';
+        btn.innerHTML=`${String.fromCharCode(65+i)}. ${opt} <span class="tag"></span>`;
+        btn.onclick=()=>checkMC(q.id,i);
+        optWrap.appendChild(btn);
+      });
+      body.appendChild(optWrap);
+    } else if(q.type==='ox'){
+      const row=document.createElement('div'); row.className='ox-row';
+      ['O','X'].forEach(v=>{
+        const btn=document.createElement('button');
+        btn.className='ox-btn';
+        btn.textContent=v;
+        btn.onclick=()=>checkOX(q.id,v);
+        row.appendChild(btn);
+      });
+      body.appendChild(row);
+    } else {
+      const row=document.createElement('div'); row.className='input-row';
+      row.innerHTML=`<input type="text" id="input-${q.id}" placeholder="정답 입력"><button class="btn primary" id="btn-${q.id}">제출</button>`;
+      body.appendChild(row);
+      const input=row.querySelector('input');
+      const btn=row.querySelector('button');
+      btn.onclick=()=>checkShort(q.id);
+      input.addEventListener('keydown', e=>{ if(e.key==='Enter') checkShort(q.id) });
+    }
+  });
+}
+
+function updateBoard(){
+  const acc = state.solved===0?0:Math.round(state.correct/state.solved*100);
+  document.getElementById('solvedCount').textContent=`Solved ${state.solved} / 10`;
+  document.getElementById('correctCount').textContent=`Correct ${state.correct}`;
+  document.getElementById('accuracy').textContent=`Accuracy ${acc}%`;
+  const bar=document.getElementById('progressBar');
+  bar.style.width=acc+'%';
+  if(acc<=40) bar.style.background='var(--red)';
+  else if(acc<=70) bar.style.background='var(--orange)';
+  else bar.style.background='var(--green)';
+  if(state.solved===10){
+    setTimeout(showFinal, 400);
+  }
+}
+
+function checkMC(qId, chosenIdx){
+  if(state.answers[qId]!==undefined) return;
+  const q=QUIZ_DATA.find(x=>x.id===qId);
+  const isCorrect=chosenIdx===q.answer;
+  const card=document.getElementById(`card-${qId}`);
+  const opts=card.querySelectorAll('.opt');
+  opts.forEach((btn,i)=>{
+    btn.disabled=true;
+    if(i===q.answer){
+      btn.classList.add('correct');
+      btn.querySelector('.tag').textContent='✓ Correct!';
+    } else if(i===chosenIdx && !isCorrect){
+      btn.classList.add('wrong');
+      btn.querySelector('.tag').textContent='✗ Wrong';
+    }
+  });
+  state.answers[qId]=isCorrect;
+  state.solved++; if(isCorrect) state.correct++;
+  document.getElementById(`explain-${qId}`).classList.add('show');
+  card.classList.add('solved');
+  updateBoard();
+}
+
+function checkOX(qId, chosen){
+  if(state.answers[qId]!==undefined) return;
+  const q=QUIZ_DATA.find(x=>x.id===qId);
+  const isCorrect=chosen===q.answer;
+  const card=document.getElementById(`card-${qId}`);
+  const btns=card.querySelectorAll('.ox-btn');
+  btns.forEach(btn=>{
+    btn.disabled=true;
+    if(btn.textContent===q.answer){
+      btn.classList.add('correct');
+    }
+  });
+  if(!isCorrect){
+    btns.forEach(btn=>{
+      if(btn.textContent===chosen) btn.classList.add('wrong');
+      if(btn.textContent===q.answer) btn.textContent= q.answer + ' ✓ 정답!';
+    });
+    const wrongBtn=Array.from(btns).find(b=>b.textContent.startsWith(chosen));
+    if(wrongBtn && !wrongBtn.textContent.includes('오답')) wrongBtn.textContent= chosen + ' ✗ 오답';
+  } else {
+    const correctBtn=Array.from(btns).find(b=>b.textContent===q.answer);
+    if(correctBtn) correctBtn.textContent= q.answer + ' ✓ 정답!';
+  }
+  state.answers[qId]=isCorrect;
+  state.solved++; if(isCorrect) state.correct++;
+  document.getElementById(`explain-${qId}`).classList.add('show');
+  card.classList.add('solved');
+  updateBoard();
+}
+
+function checkShort(qId){
+  if(state.answers[qId]!==undefined) return;
+  const q=QUIZ_DATA.find(x=>x.id===qId);
+  const input=document.getElementById(`input-${qId}`);
+  const val=input.value.trim().toLowerCase();
+  if(!val){ input.style.borderColor='var(--red)'; return; }
+  const answers = Array.isArray(q.answer)? q.answer : [q.answer];
+  const normAnswers = answers.map(a=>a.toLowerCase().trim());
+  let isCorrect = normAnswers.some(a=> val.includes(a) || a.includes(val) || val===a);
+  const card=document.getElementById(`card-${qId}`);
+  const btn=document.getElementById(`btn-${qId}`);
+  input.disabled=true; btn.disabled=true;
+  if(isCorrect){
+    input.style.borderColor='var(--green)';
+    input.style.background='#dcfce7';
+    btn.textContent='✓ Correct!';
+    btn.style.background='var(--green)'; btn.style.color='white';
+  } else {
+    input.style.borderColor='var(--red)';
+    input.style.background='#fee2e2';
+    btn.textContent='✗ Wrong';
+    btn.style.background='var(--red)'; btn.style.color='white';
+    const explain=document.getElementById(`explain-${qId}`);
+    const ansLine=document.createElement('div');
+    ansLine.style.marginTop='8px'; ansLine.style.fontWeight='700'; ansLine.style.color='var(--green)';
+    ansLine.textContent=`정답 예시: ${answers[0]}`;
+    explain.appendChild(ansLine);
+  }
+  document.getElementById(`explain-${qId}`).classList.add('show');
+  state.answers[qId]=isCorrect;
+  state.solved++; if(isCorrect) state.correct++;
+  updateBoard();
+}
+
+function showFinal(){
+  const acc=Math.round(state.correct/10*100);
+  let grade='D', msg='';
+  if(acc>=90){grade='A'; msg='Perfect! You fully understand 70 years of AI history.'}
+  else if(acc>=80){grade='B'; msg='Excellent! You caught most key concepts.'}
+  else if(acc>=70){grade='C'; msg='Good! Review AlexNet and Transformer sections once more.'}
+  else {grade='D'; msg='Good start! Re-read the report, focus on rule vs learning difference.'}
+  document.getElementById('finalGrade').textContent=grade;
+  document.getElementById('finalScoreText').textContent=`${state.correct} / 10 (${acc}%)`;
+  document.getElementById('finalMsg').textContent=msg;
+  document.getElementById('finalModal').classList.add('show');
+}
+
+function resetQuiz(){
+  state={solved:0, correct:0, answers:{}};
+  document.getElementById('finalModal').classList.remove('show');
+  render();
+  updateBoard();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+render();
+updateBoard();
+</script>
+</body>
+</html>

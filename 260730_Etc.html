@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 70 Years History - Magazine Editorial Report</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;800&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+:root{
+  --bg:#ffffff;
+  --bg2:#fafafa;
+  --text:#1a1a1a;
+  --text2:#777777;
+  --accent:#e11d48;
+  --accent2:#f43f5e;
+  --border:#e5e5e5;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Noto Sans KR', sans-serif;
+  line-height:1.7;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3{
+  font-family:'Playfair Display', serif;
+  letter-spacing:-0.02em;
+}
+a{color:var(--accent); text-decoration:none}
+.header{
+  padding:48px 20px 32px;
+  max-width:720px;
+  margin:0 auto;
+  border-bottom:1px solid var(--border);
+}
+.kicker{
+  color:var(--accent);
+  font-weight:700;
+  font-size:12px;
+  letter-spacing:0.18em;
+  text-transform:uppercase;
+}
+.title{
+  font-size:36px;
+  line-height:1.15;
+  margin:12px 0 16px;
+  font-weight:800;
+}
+.subtitle{
+  color:var(--text2);
+  font-size:17px;
+  line-height:1.6;
+}
+.meta{
+  margin-top:18px;
+  display:flex;
+  gap:12px;
+  flex-wrap:wrap;
+  font-size:12px;
+  color:var(--text2);
+}
+.meta span{border:1px solid var(--border); padding:4px 10px; border-radius:999px; background:var(--bg2)}
+.wrap{
+  max-width:720px;
+  margin:0 auto;
+  padding:0 20px 80px;
+}
+.section{
+  padding:40px 0 24px;
+  border-bottom:1px solid var(--border);
+}
+.section:last-child{border:none}
+.eyebrow{
+  font-size:12px;
+  font-weight:700;
+  color:var(--accent);
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+  margin-bottom:8px;
+}
+.h2{
+  font-size:28px;
+  line-height:1.25;
+  margin:0 0 12px;
+}
+.h3{
+  font-size:19px;
+  margin:28px 0 10px;
+  font-family:'Noto Sans KR', sans-serif;
+  font-weight:700;
+}
+.p{
+  font-size:16px;
+  color:var(--text);
+  margin:0 0 14px;
+}
+.small{
+  font-size:13px;
+  color:var(--text2);
+}
+.callout{
+  background:var(--bg2);
+  border:1px solid var(--border);
+  border-left:4px solid var(--accent);
+  padding:16px 18px;
+  border-radius:12px;
+  margin:18px 0;
+}
+.table-wrap{overflow-x:auto; margin:18px 0}
+table{
+  width:100%;
+  border-collapse:collapse;
+  background:var(--bg2);
+  border:1px solid var(--border);
+  border-radius:12px;
+  overflow:hidden;
+}
+th{
+  background:var(--accent);
+  color:white;
+  text-align:left;
+  padding:12px 14px;
+  font-size:14px;
+}
+td{
+  padding:12px 14px;
+  border-top:1px solid var(--border);
+  font-size:14px;
+}
+.tag{
+  display:inline-block;
+  background:#ffe4e6;
+  color:var(--accent);
+  font-size:11px;
+  font-weight:700;
+  padding:3px 8px;
+  border-radius:999px;
+  margin-right:6px;
+}
+.fade-in {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.fade-in.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.chart-container {
+  position: relative;
+  max-height: 340px;
+  background:var(--bg2);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:16px;
+  margin:20px 0;
+}
+.chart-container canvas {
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  max-height: 300px;
+}
+.chart-container.chart-ready canvas {
+  opacity: 1;
+}
+.sim-box{
+  background:var(--bg2);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:18px;
+  margin:20px 0;
+}
+.sim-title{
+  font-weight:700;
+  font-size:15px;
+  margin-bottom:12px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.btn{
+  appearance:none;
+  border:1px solid var(--border);
+  background:white;
+  padding:8px 14px;
+  border-radius:999px;
+  font-size:13px;
+  font-weight:600;
+  cursor:pointer;
+  transition:all .2s;
+}
+.btn:hover{border-color:var(--accent); color:var(--accent)}
+.btn.primary{background:var(--accent); color:white; border-color:var(--accent)}
+.btn.primary:hover{background:var(--accent2)}
+input[type="range"]{width:100%; accent-color:var(--accent)}
+input[type="text"]{
+  width:100%;
+  padding:12px 14px;
+  border:1px solid var(--border);
+  border-radius:10px;
+  font-size:14px;
+  font-family:'Noto Sans KR', sans-serif;
+}
+.check-row{display:flex; gap:10px; flex-wrap:wrap; margin:10px 0}
+.check-row label{
+  border:1px solid var(--border);
+  background:white;
+  padding:8px 12px;
+  border-radius:999px;
+  font-size:13px;
+  cursor:pointer;
+}
+.check-row input{margin-right:6px}
+.result-pill{
+  display:inline-block;
+  padding:6px 12px;
+  border-radius:999px;
+  font-size:13px;
+  font-weight:700;
+  margin-top:10px;
+}
+.flip-grid{display:grid; grid-template-columns:1fr; gap:12px; margin:16px 0}
+.flip-card{
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:14px 16px;
+  background:white;
+  cursor:pointer;
+  transition:all .2s;
+}
+.flip-card:hover{border-color:var(--accent)}
+.flip-card .front{font-weight:700; font-size:14px}
+.flip-card .back{display:none; margin-top:8px; font-size:13px; color:var(--text2)}
+.flip-card.open .back{display:block}
+.badge{
+  font-size:11px;
+  padding:2px 8px;
+  border-radius:999px;
+  background:var(--accent);
+  color:white;
+  margin-left:6px;
+}
+.canvas-wrap{width:100%; height:220px; border-radius:12px; background:white; border:1px solid var(--border); overflow:hidden; position:relative}
+.legend{display:flex; gap:10px; flex-wrap:wrap; margin:10px 0}
+.legend span{font-size:11px; color:var(--text2)}
+@media(min-width:720px){
+  .flip-grid{grid-template-columns:1fr 1fr}
+  .title{font-size:44px}
+}
+</style>
+</head>
+<body>
+<div class="header fade-in">
+  <div class="kicker">MAGAZINE EDITORIAL • AI HISTORY</div>
+  <div class="title">인공지능 70년,<br>두 달이면 된다는<br>오만에서 시작된 여정</div>
+  <div class="subtitle">1955년 연구비 신청서 한 장에서 2026년 AGI 선언까지. 규칙으로 세상을 적으려던 시도는 왜 실패했고, 게임용 그래픽카드 두 장이 어떻게 역사를 바꿨나.</div>
+  <div class="meta">
+    <span>📺 원본: 인공지능 70년 역사 완벽정리 몰아보기</span>
+    <span>🔗 youtu.be/Wza8S2KkPgw</span>
+    <span>📅 2026.07.30</span>
+    <span>✍️ 전문 관점 요약</span>
+  </div>
+</div>
+
+<div class="wrap">
+
+<!-- PROLOGUE -->
+<div class="section fade-in">
+  <div class="eyebrow">PROLOGUE</div>
+  <div class="h2">왜 AI를 쓰면서도 설명하지 못할까</div>
+  <p class="p">우리는 매일 AI를 씁니다. 그런데 <b>AI가 뭐냐</b>고 물으면 멈칫합니다. 자동차가 마법으로 굴러간다고 믿는 것과 같습니다. 이 리포트는 <b>신경망(뇌를 본뜬 연결 구조)</b>, <b>딥러닝(층을 깊게 쌓은 학습)</b>, <b>파라미터(기계 안에 있는 조절 가능한 숫자)</b>를 중학생도 이해하게 순서대로 풀었습니다.</p>
+  <div class="callout">
+    <b>이 영상의 핵심 질문 3개</b><br>
+    1) 왜 30년간 규칙으로 개를 정의하지 못했나?<br>
+    2) 왜 20년간 풀리지 않던 학습법이 게이머의 책상에서 풀렸나?<br>
+    3) 왜 똑똑해진 AI가 strawberry의 r 개수를 못 셀까?
+  </div>
+</div>
+
+<!-- CHAPTER 1 -->
+<div class="section fade-in">
+  <div class="eyebrow">CHAPTER 01 • 1955-1986</div>
+  <div class="h2">규칙으로 세상을 적으려던 30년</div>
+  <p class="p">시작은 <b>1955년 여름, 다트머스 대학 조교수 존 매카시(28세)</b>가 록펠러 재단에 낸 연구비 신청서였습니다. <b>"10명의 연구자가 8주만 모이면 기계가 사람처럼 생각하게 만들 수 있다"</b>. 여기서 <b>Artificial Intelligence(인공지능)</b>라는 말이 처음 만들어집니다. 정작 매카시는 <span class="small">"뭐라고든 불러야 해서 그렇게 불렀을 뿐"</span>이라고 회고했습니다.</p>
+  <p class="p">록펠러 재단은 절반만 지원합니다. 당시 최고 컴퓨터가 지금 스마트폰보다 <b>약 100만 배 느렸기</b> 때문입니다. 회의는 1956년 여름 8주간 열렸지만, 끝까지 남은 사람은 1명뿐이었습니다.</p>
+
+  <div class="h3">첫 AI 프로그램은 종이 위였다</div>
+  <p class="p">그 회의에 설계도 하나가 도착했지만 아무도 주목하지 않았습니다. <b>앨런 뉴얼과 허버트 사이먼의 로직 시어리스트(Logic Theorist)</b> – 수학 정리를 스스로 증명하는 프로그램입니다. 기계에서 돌리지도 못해 가족과 학생들에게 부품 역할을 맡겨 손으로 계산했습니다. 1957년 실제 컴퓨터에서 <b>러셀의 수학 원리 정리 52개 중 38개 증명</b>, 하나는 러셀의 증명보다 짧았습니다. 훗날 최초의 AI 프로그램으로 불립니다.</p>
+
+  <div class="h3">개 한 마리도 정의하지 못한 이유</div>
+  <p class="p">당시 AI는 한 가지 방법뿐이었습니다. <b>사람이 규칙을 적어 넣는 것</b>입니다.</p>
+  
+  <div class="sim-box fade-in">
+    <div class="sim-title">🎮 인터랙티브: 규칙으로 개 정의하기 시뮬레이터</div>
+    <p class="small">아래 특징을 체크해서 개를 정의해보세요. 예외가 얼마나 빨리 생기는지 체험합니다.</p>
+    <div class="check-row" id="ruleChecks">
+      <label><input type="checkbox" value="legs"> 다리 4개</label>
+      <label><input type="checkbox" value="fur"> 털이 있다</label>
+      <label><input type="checkbox" value="bark"> 짖는다</label>
+      <label><input type="checkbox" value="follow"> 사람을 따른다</label>
+    </div>
+    <div id="ruleResult" class="result-pill" style="background:#f3f4f6; color:#111">규칙을 선택하세요</div>
+    <div class="small" id="ruleDetail" style="margin-top:8px"></div>
+  </div>
+
+  <p class="p">규칙을 고칠 때마다 예외가 2배로 늘었습니다. 세상은 규칙으로 적기엔 너무 복잡했습니다. 이를 깨닫는 데 30년이 걸렸습니다.</p>
+
+  <div class="table-wrap fade-in">
+  <table>
+    <tr><th>연도</th><th>과도한 예언</th><th>실제 결과</th></tr>
+    <tr><td><b>1957</b> 사이먼</td><td>10년 안에 컴퓨터가 체스 챔피언 이김</td><td>40년 걸림 (1997년 Deep Blue)</td></tr>
+    <tr><td><b>1965</b> 사이먼</td><td>20년이면 기계가 인간의 모든 일을 대신</td><td>빗나감</td></tr>
+    <tr><td><b>1970</b> 민스키</td><td>3~8년 안에 평균 인간 지능 기계 등장</td><td>빗나감</td></tr>
+  </table>
+  </div>
+
+  <p class="p">1966년 미국 정부 조사 보고서는 <b>"10년 넘게 투자한 기계번역은 사람보다 느리고 부정확하며 2배 비싸다"</b>고 결론냈습니다. 1973년 영국 정부도 <b>"약속한 성과를 낸 발견이 없다"</b>며 연구비를 끊습니다. <b>AI Winter(인공지능 겨울)</b>가 시작됩니다. AI라는 단어는 신청서에 쓰면 안 되는 단어가 됩니다.</p>
+
+  <div class="h3">뜻밖의 경쟁: 일본 vs 미국, 같은 실패</div>
+  <p class="p">1982년 일본 <b>제5세대 컴퓨터(540억 엔, 10년)</b> – 사람과 대화하고 스스로 프로그램 짜는 컴퓨터. 미국은 국방부 <b>전략 컴퓨팅 계획(10억 달러)</b> – 스스로 적을 찾는 자율주행과 스카이넷 같은 지휘체계. 터미네이터 1편은 바로 이듬해 1984년 개봉합니다. 둘 다 실패했습니다. 이유는 같았습니다. 여전히 <b>사람이 규칙을 적어 넣는 방식</b>이었기 때문입니다.</p>
+
+  <div class="callout"><b>1장 핵심:</b> 첫 30년 실패 이유는 규칙 중심이었기 때문. 규칙을 늘리는 속도보다 예외가 늘리는 속도가 더 빨랐습니다. 필요한 건 규칙이 아니라 스스로 배우는 신경망이었습니다.</div>
+</div>
+
+<!-- CHAPTER 2 -->
+<div class="section fade-in">
+  <div class="eyebrow">CHAPTER 02 • 1986-2012</div>
+  <div class="h2">침실에서 시작된 반전, 알렉스넷</div>
+  <p class="p">20년간 아무도 풀지 못한 문제가 있었습니다. <b>신경망을 여러 층 쌓으면 훈련시킬 방법이 없는 문제</b>입니다. 마지막 층은 답을 직접 만들어서 얼마나 틀렸는지 보이지만, 첫 번째 층은 최종 답을 얼마나 망쳤는지 계산할 방법이 없었습니다. 노란 노트에 손으로 계산하던 시절입니다.</p>
+
+  <div class="h3">역전파(뒤에서 앞으로 책임 나누기)</div>
+  <p class="p"><b>역전파(Backpropagation)</b>는 오차를 뒤에서 앞으로 되짚어가며 각 층의 숫자가 얼마나 책임 있는지 나누어 계산하는 방법입니다. 1980년대에 이미 나왔습니다. 문제는 계산량입니다. <b>6천만 개 숫자를 120만 장 사진으로 수억 번 고쳐야</b> 했습니다.</p>
+
+  <div class="sim-box fade-in">
+    <div class="sim-title">🧠 역전파 직관 시뮬레이터 – 골짜기 내려가기</div>
+    <p class="small">신경망 학습은 산이 아니라 울퉁불퉁한 지형에서 가장 낮은 골짜기를 찾는 일입니다. 학습률(한 걸음 크기)을 조절해보세요.</p>
+    <div class="canvas-wrap"><canvas id="lossCanvas" width="640" height="220"></canvas></div>
+    <div style="display:flex; gap:10px; margin-top:12px; align-items:center">
+      <span class="small">학습률</span>
+      <input type="range" id="lrSlider" min="0.01" max="0.2" step="0.01" value="0.06">
+      <span class="small" id="lrVal">0.06</span>
+      <button class="btn primary" id="restartLoss">다시 시작</button>
+    </div>
+    <div class="legend">
+      <span>🔴 얕은 골짜기(지역 최소) 함정</span>
+      <span>🔵 진짜 깊은 곳(전역 최소 근처)</span>
+    </div>
+  </div>
+
+  <p class="p">이 자물쇠를 연 건 연구소가 아니었습니다. <b>2012년 토론토 대학 대학원생 알렉스 크리제프스키의 부모님 집 자기 방, 게임용 그래픽카드 2장(GeForce GTX 580)</b>이었습니다. 그가 만든 <b>알렉스넷(AlexNet, 층 8개, 파라미터 6천만 개)</b>이 이미지넷 대회(120만 장을 1000개 항목으로 분류)에 참가합니다.</p>
+
+  <div class="chart-container fade-in">
+    <canvas id="myChart1" height="220"></canvas>
+  </div>
+  <p class="small">수치 원본 유지: 대회는 오차율이 25~26%에 머물러 있었음. 2012년 2위 팀 26.2%, 알렉스넷 15.3%, 격차 10.9%p. 1년에 1% 줄이던 걸 한 번에 10% 이상 줄임.</p>
+
+  <p class="p">2012년 9월 30일 결과 발표 후, 이탈리아 피렌체 학회에서 발표장은 서서 듣는 사람들로 가득 찼습니다. 이미지넷을 만든 <b>페이페이 리는 갓난아기가 있어 안 가려다</b> 성적을 보고 20시간 비행을 감행했습니다. 청중석의 <b>얀 르쿤(훗날 튜링상)</b>이 일어나 <b>"이것은 컴퓨터 비전 역사의 명백한 전환점이다"</b>라고 말했습니다. 2년 안에 참가팀 전원이 같은 방식으로 전환했습니다.</p>
+
+  <div class="h3">왜 하필 게임용 부품이었나</div>
+  <p class="p">현대 AI의 3요소가 처음으로 한자리에 모였습니다. 페이페이 리 정리: <b>① 신경망 ② 빅데이터 ③ GPU 연산</b>. 데이터는 인터넷이, 연산은 게임이 만들었습니다. 그래픽카드는 화면 점 수백만 개를 동시에 계산하도록 <b>단순 연산을 수천 개 병렬 처리</b>하도록 설계됐습니다. 신경망 학습이 정확히 그 계산이었습니다.</p>
+  <p class="p"><b>젠슨 황은 2006년 CUDA(그래픽카드에 직접 접근해 일반 연산을 하게 하는 기술)</b>를 넣기로 결정합니다. 당시엔 데이터를 이미지인 척 위장해야 했습니다. 이 결정으로 시총이 15억 달러까지 떨어질 위험(당시 5분의 1)이 있었습니다. 2012년 엔비디아 시총은 100억 달러 미만, 2026년 현재 4조 달러 이상, <b>400배</b>입니다. 알렉스넷 팀의 대학원생 한 명은 <b>일리야 수츠케버(훗날 OpenAI 공동창업)</b>, 지도교수는 <b>제프리 힌턴(겨울 동안 신경망을 놓지 않은 연구자, 2024년 노벨 물리학상)</b>이었습니다. 힌턴의 농담: <i>"일리야는 하자고 했고, 알렉스는 되게 만들었고, 나는 노벨상을 받았다."</i></p>
+
+  <div class="callout"><b>2장 핵심:</b> 이론은 1980년대에 있었지만 힘이 없었다. 게임이 만든 GPU가 수억 번 단순 반복을 감당하며 AI가 사람 도움 없이 특징을 스스로 찾기 시작했다.</div>
+</div>
+
+<!-- CHAPTER 3 -->
+<div class="section fade-in">
+  <div class="eyebrow">CHAPTER 03 • 2017-2022</div>
+  <div class="h2">다음 단어 맞히기가 세상을 이해하게 된 순간</div>
+  <p class="p"><b>2017년 트랜스포머(Transformer) 구조</b> 발표. 지금 쓰는 AI는 전부 이 위에 있습니다. ChatGPT도, Claude도, Gemini도.</p>
+  <p class="p">훈련 방식은 딱 하나: <b>앞 문장을 보고 다음에 올 단어를 맞히는 것</b>. 인터넷 전체를 놓고 반복합니다. 단순해 보이지만 예상치 못한 일이 생깁니다. "물은 100도에서" 다음을 맞히려면 물이 끓는다는 걸 알아야 합니다. "그가 문을 열자 그녀는" 다음을 맞히려면 감정을 알아야 합니다. <b>다음 단어를 잘 맞히려면 결국 세상을 알아야 합니다.</b></p>
+
+  <div class="chart-container fade-in">
+    <canvas id="myChart2" height="240"></canvas>
+  </div>
+
+  <p class="p">그래서 크기를 키우기 시작합니다. <b>2018년 GPT-1: 1억 개, 2019년 GPT-2: 15억 개, 2020년 GPT-3: 1750억 개, 2년 만에 1700배</b>. 커질 때마다 아무도 시키지 않은 일을 하기 시작합니다. 번역을 가르친 적 없는데 번역하고, 산수를 가르친 적 없는데 세 자리 덧셈을 하고, 코드를 가르친 적 없는데 코드를 짭니다.</p>
+
+  <div class="h3">ChatGPT는 어떻게 만들어졌나</div>
+  <p class="p">GPT-3은 문장을 이어 쓸 줄만 알았지 질문에 답하도록 만들어지지 않았습니다. OpenAI가 두 단계를 더 붙입니다.<br>
+  <b>① 모범 답안 따라 하기:</b> 고용한 사람이 사용자와 AI 역할 둘 다 연기해 대화 데이터 생성<br>
+  <b>② 사람 취향 채점 기계:</b> 같은 질문에 답 여러 개 뽑고 사람이 순위 매김 → 그 순위를 흉내 내는 채점 모델 따로 만듦 → 그 점수가 높아지도록 본체 재훈련(RLHF, 사람의 선호로 강화 학습)</p>
+  <p class="p"><b>2022년 11월 30일</b>, 블로그 글 한 줄: "대화 방식으로 상호작용하는 ChatGPT라는 모델을 훈련시켰습니다." 출시 행사도 없었습니다. <b>5일 만에 100만 명, 2달 만에 1억 명</b>. 같은 숫자에 틱톡은 9개월, 인스타그램은 2년 반이 걸렸습니다.</p>
+
+  <div class="sim-box fade-in">
+    <div class="sim-title">📈 What-if 스케일링 시뮬레이터</div>
+    <p class="small">파라미터 수와 데이터 양을 늘리면 성능이 어떻게 바뀌는지 체험 (스케일링 법칙 단순화 모델)</p>
+    <div style="display:grid; gap:10px">
+      <label class="small">파라미터 수: <span id="paramVal">15억</span></label>
+      <input type="range" id="paramSlider" min="0" max="100" value="30">
+      <label class="small">데이터 양: <span id="dataVal">중간</span></label>
+      <input type="range" id="dataSlider" min="0" max="100" value="50">
+      <div id="scaleResult" class="result-pill" style="background:#ffe4e6; color:var(--accent)">새로운 능력 출현: 문장 이어쓰기 수준</div>
+      <button class="btn" id="resetScale">초기화</button>
+    </div>
+  </div>
+</div>
+
+<!-- CHAPTER 4 -->
+<div class="section fade-in">
+  <div class="eyebrow">CHAPTER 04 • LIMITS</div>
+  <div class="h2">빛이 강할수록 짙어지는 그림자</div>
+  <p class="p">언어모델(LLM)은 진리를 탐구하거나 사실을 확인하도록 훈련받지 않았습니다. <b>오직 다음에 올 가장 그럴듯한 단어를 맞히도록</b> 훈련받았습니다. 우리가 겪는 오류는 고장이 아니라 필연입니다.</p>
+
+  <div class="flip-grid">
+    <div class="flip-card" onclick="this.classList.toggle('open')">
+      <div class="front">1️⃣ 환각(Hallucination) <span class="badge">클릭</span></div>
+      <div class="back">없는 논문을 지어내고 틀린 숫자를 자신 있게 말함. 목표가 사실이 아니라 그럴듯함이기 때문에 학습을 완벽히 해도 사라지지 않음.</div>
+    </div>
+    <div class="flip-card" onclick="this.classList.toggle('open')">
+      <div class="front">2️⃣ 역전의 저주 <span class="badge">클릭</span></div>
+      <div class="back"><b>"톰 크루즈의 어머니는?"</b> 맞히지만 <b>"메리리 파이퍼의 아들은?"</b> 못 맞힘. 같은 사실인데 방향만 바뀜. 인터넷에 한 방향 문장이 많고 반대는 드물어서 문장 순서를 외운 것.</div>
+    </div>
+    <div class="flip-card" onclick="this.classList.toggle('open')">
+      <div class="front">3️⃣ 앨리스 문제 <span class="badge">클릭</span></div>
+      <div class="back">앨리스에게 여동생 4, 남동생 1 → 남동생에게는 여자 형제가 몇? 답은 5명(앨리스+4). 초등학생도 풀지만 GPT-4, Claude도 확신에 차서 틀림.</div>
+    </div>
+    <div class="flip-card" onclick="this.classList.toggle('open')">
+      <div class="front">4️⃣ 스트로베리 문제 <span class="badge">클릭</span></div>
+      <div class="back">strawberry에 r이 몇 개? 답은 3개인데 2개라고 함. 이유는 AI가 글자를 보지 않기 때문. 토큰(덩어리) 단위로 보고 496, 675, 15717 같은 숫자로만 봄.</div>
+    </div>
+  </div>
+
+  <div class="sim-box fade-in">
+    <div class="sim-title">🔤 토큰화 시뮬레이터 – AI의 눈</div>
+    <p class="small">단어를 입력하면 AI가 보는 토큰(덩어리)과 숫자 ID로 어떻게 보이는지 체험합니다. strawberry 문제를 직접 확인해보세요.</p>
+    <input type="text" id="tokenInput" placeholder="예: strawberry, Alice has 4 sisters..." value="strawberry">
+    <div id="tokenOutput" style="margin-top:12px; display:flex; flex-wrap:wrap; gap:6px"></div>
+    <div class="small" id="tokenExplain" style="margin-top:10px; color:var(--accent)"></div>
+  </div>
+
+  <p class="p"><b>해결의 실마리:</b> 질문을 <b>"한 글자씩 써보고 세어봐"</b>로 바꾸면 맞힙니다. 한 글자씩 쓰는 순간 각 글자가 별개의 토큰이 되어 셀 수 있기 때문. 앨리스 문제도 "한 명씩 적어봐" 하면 풉니다. <b>AI는 답을 꺼내는 게 아니라 써나가면서 생각합니다. 쓸 자리를 안 주면 생각할 자리도 없습니다.</b></p>
+
+  <div class="h3">생각하도록 훈련시킨 모델</div>
+  <p class="p"><b>2024년 9월 OpenAI o1(영상에서는 5원)</b> – 구조를 바꾸거나 크기를 키운 게 아니라 <b>답하기 전에 스스로 긴 생각을 쓰도록 훈련</b>했습니다. 실수를 알아차리고 고치는 법, 어려운 걸 단순하게 쪼개는 법, 안 통하면 다른 방법을 시도하는 법을 배우게 함. 사람이 "한 글자씩 써봐"라 시키지 않아도 알아서 그렇게 하도록 만든 것. <b>미국 수학경시대회(AIME) 정답률: 이전 모델 13% → o1 83%</b>. 다만 만드는 법과 생각 과정은 비공개입니다. 요즘 모델이 답하기 전 한참 멈추는 이유가 이것입니다.</p>
+</div>
+
+<!-- CHAPTER 5 -->
+<div class="section fade-in">
+  <div class="eyebrow">CHAPTER 05 • NOW & NEXT</div>
+  <div class="h2">우리가 매일 쓰는 것의 정체</div>
+
+  <div class="callout">
+    <b>언어모델의 3가지 성질 정리</b><br>
+    1) 정답을 찾지 않는다, 가장 그럴듯한 것을 고른다.<br>
+    2) 지식과 추론이 분리되어 있지 않다. 같은 숫자 덩어리에 뒤엉켜 있어 배우지 않은 분야에서는 추론까지 같이 사라진다.<br>
+    3) 아무도 안을 들여다보지 못한다. 수천억 개 숫자가 관여해 뭐가 답을 만들었는지 짚을 수 없다. 그래서 Anthropic, Google DeepMind에는 해석 가능성(Interpretability) 연구팀이 따로 있다.
+  </div>
+
+  <div class="chart-container fade-in">
+    <canvas id="myChart3" height="220"></canvas>
+  </div>
+  <p class="small">1956년 vs 2026년, 두 시기의 호언장담 비교. 역사는 반복되는가?</p>
+
+  <p class="p"><b>1955년 존 매카시는 두 달이면 된다고 적었습니다. 70년이 걸렸습니다.</b> 그가 상상한 규칙 조합으로는 지능에 이를 수 없었습니다. AI는 사람의 통제를 벗어난 막대한 데이터와 연산 속에서 스스로 길을 찾았습니다. 다만 정답을 찾는 것은 아닙니다. 가장 그럴듯한 것을 고를 뿐입니다. 환각이 사라지지 않는 이유입니다. 그리고 왜 작동하는지 만든 사람들도 설명하지 못합니다.</p>
+
+  <p class="p"><b>그리고 2026년, 기업들은 다시 선언합니다.</b> 엔비디아 젠슨 황: "우리는 AGI를 달성했다." OpenAI 샘 올트먼: "우리는 사실상 AGI를 만들었다." 1950년대 과학자들의 말과 비슷해 보이지 않습니까? 그때도 두 달이면, 20년이면, 3~8년이면 된다고 했습니다. 미국 정부가 확인해보니 실상은 달랐습니다.</p>
+
+  <p class="p">기계는 여전히 정답이 아니라 그럴듯함을 고르고, 안에서는 무슨 일이 벌어지는지 만든 사람도 완전히 설명하지 못합니다. 우리는 이 그럴듯한 블랙박스에 문명의 앞날을 맡길 준비가 되었을까요? 여러분의 생각을 댓글로 남겨주십시오. 우리가 마주할 다음 70년의 역사일 것입니다.</p>
+
+  <div class="sim-box fade-in">
+    <div class="sim-title">💬 당신의 AGI 준비도 체크</div>
+    <p class="small">아래 항목을 체크하면 현재 AI 의존도와 이해도가 표시됩니다.</p>
+    <div class="check-row" id="agiChecks">
+      <label><input type="checkbox"> 환각이 필연적이라는 걸 안다</label>
+      <label><input type="checkbox"> AI가 토큰으로 본다는 걸 안다</label>
+      <label><input type="checkbox"> 생각할 시간을 주면 더 잘 푼다는 걸 안다</label>
+      <label><input type="checkbox"> AI 출력을 항상 검증한다</label>
+    </div>
+    <div id="agiScore" class="result-pill" style="background:#1a1a1a; color:white">0/4 – 더 알아볼까요?</div>
+  </div>
+</div>
+
+<div class="section fade-in" style="text-align:center; padding-top:32px">
+  <div class="small">원본 영상: 인공지능 70년 역사 완벽정리 몰아보기 끝판왕<br>이 리포트는 자막 내용을 60% 밀도로 재구성, 중학생 수준 설명을 목표로 작성됨<br>수치 및 연도는 원본 그대로 유지</div>
+  <div style="margin-top:12px"><span class="tag">#AI역사</span><span class="tag">#알렉스넷</span><span class="tag">#트랜스포머</span><span class="tag">#환각</span><span class="tag">#AGI</span></div>
+</div>
+
+</div>
+
+<script>
+// Fade observer
+const fadeObs = new IntersectionObserver((entries) => {
+  entries.forEach((e, i) => {
+    if (e.isIntersecting) {
+      setTimeout(() => e.target.classList.add('visible'), i * 80);
+      fadeObs.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.12 });
+document.querySelectorAll('.fade-in').forEach(el => fadeObs.observe(el));
+
+// Chart configs
+const chartConfigs = {};
+
+chartConfigs['myChart1'] = () => {
+  new Chart(document.getElementById('myChart1'), {
+    type: 'bar',
+    data: {
+      labels: ['2010 대회 평균', '2011 대회 평균', '2012 2위 팀', '2012 알렉스넷'],
+      datasets: [{
+        label: '오차율 (%)',
+        data: [28.2, 25.8, 26.2, 15.3],
+        backgroundColor: ['#6b7280','#6b7280','#1a1a1a','#e11d48'],
+        borderRadius: 8,
+        borderSkipped: false
+      }]
+    },
+    options: {
+      responsive:true,
+      animation:{duration:900},
+      plugins:{
+        legend:{display:false},
+        tooltip:{
+          callbacks:{
+            label: (c) => ` 오차율: ${c.raw}%`,
+            afterLabel: (c) => c.dataIndex===3 ? ' 10.9%p 차이로 압도적 우승' : ''
+          }
+        },
+        title:{display:true, text:'ImageNet 오차율 – 25% 벽을 깬 2012년', color:'#1a1a1a', font:{size:13, weight:'700'}}
+      },
+      scales:{
+        y:{beginAtZero:true, max:35, grid:{color:'#f3f4f6'}, ticks:{callback:v=>v+'%'}}
+      }
+    }
+  });
+};
+
+chartConfigs['myChart2'] = () => {
+  new Chart(document.getElementById('myChart2'), {
+    type: 'line',
+    data: {
+      labels: ['GPT-1 (2018)', 'GPT-2 (2019)', 'GPT-3 (2020)'],
+      datasets: [{
+        label:'파라미터 수 (억 개)',
+        data:[1,15,1750],
+        borderColor:'#e11d48',
+        backgroundColor:'rgba(225,29,72,0.12)',
+        tension:0.35,
+        fill:true,
+        pointBackgroundColor:'#e11d48',
+        pointRadius:6
+      }]
+    },
+    options:{
+      responsive:true,
+      animation:{duration:1000},
+      plugins:{
+        tooltip:{
+          callbacks:{
+            label:(c)=>{
+              const vals=['1억 개','15억 개','1750억 개'];
+              return ` ${vals[c.dataIndex]} (${c.raw}억)`;
+            }
+          }
+        },
+        title:{display:true, text:'GPT 파라미터 폭증 – 2년 만에 1700배', color:'#1a1a1a', font:{size:13, weight:'700'}}
+      },
+      scales:{
+        y:{type:'logarithmic', grid:{color:'#f3f4f6'}, ticks:{callback:(v)=>{if([1,10,100,1000].includes(v)) return v+'억'; return ''}}},
+        x:{grid:{display:false}}
+      }
+    }
+  });
+};
+
+chartConfigs['myChart3'] = () => {
+  new Chart(document.getElementById('myChart3'), {
+    type: 'doughnut',
+    data: {
+      labels: ['1956 두 달이면 된다', '1957 10년이면 체스 챔피언', '1965 20년이면 모든 일 대체', '1970 3~8년이면 인간 지능', '2026 AGI 달성 선언'],
+      datasets: [{
+        data:[8,10,20,5,8],
+        backgroundColor:['#6b7280','#1a1a1a','#e5e5e5','#f43f5e','#e11d48'],
+        borderWidth:0
+      }]
+    },
+    options:{
+      responsive:true,
+      animation:{duration:900},
+      plugins:{
+        legend:{position:'bottom', labels:{boxWidth:10, font:{size:11}, color:'#777'}},
+        title:{display:true, text:'1956 ↔ 2026 호언장담의 반복?', color:'#1a1a1a', font:{size:13, weight:'700'}}
+      },
+      cutout:'62%'
+    }
+  });
+};
+
+const chartObs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const canvas = e.target.querySelector('canvas');
+      if (canvas && chartConfigs[canvas.id]) {
+        chartConfigs[canvas.id]();
+        e.target.classList.add('chart-ready');
+        chartObs.unobserve(e.target);
+      }
+    }
+  });
+}, { threshold: 0.15 });
+document.querySelectorAll('.chart-container').forEach(el => chartObs.observe(el));
+
+// Rule simulator
+const ruleChecks = document.querySelectorAll('#ruleChecks input');
+const ruleResult = document.getElementById('ruleResult');
+const ruleDetail = document.getElementById('ruleDetail');
+function updateRule(){
+  const vals = Array.from(ruleChecks).filter(c=>c.checked).map(c=>c.value);
+  if(vals.length===0){ruleResult.textContent='규칙을 선택하세요'; ruleResult.style.background='#f3f4f6'; ruleResult.style.color='#111'; ruleDetail.textContent=''; return}
+  const has = (k)=>vals.includes(k);
+  if(has('legs')&&has('fur')&&has('bark')&&has('follow')){
+    ruleResult.textContent='❌ 실패: 고양이도 해당될 수 있음, 예외 폭발';
+    ruleResult.style.background='#fee2e2'; ruleResult.style.color='#b91c1c';
+    ruleDetail.textContent='사고로 다리 잃은 개, 털 없는 품종, 안 짖는 개, 고양이 등 예외가 규칙보다 빨리 늘어납니다. 30년간 이걸 반복했습니다.';
+  } else if(has('legs')&&has('bark')){
+    ruleResult.textContent='⚠️ 부분 실패: 여우도 짖고 다리 4개';
+    ruleResult.style.background='#fef3c7'; ruleResult.style.color='#92400e';
+    ruleDetail.textContent='규칙 2개만으로 개를 정의하면 여우가 개가 됩니다.';
+  } else {
+    ruleResult.textContent='🤔 불완전: 아직도 많은 동물이 걸림';
+    ruleResult.style.background='#f3f4f6'; ruleResult.style.color='#111';
+    ruleDetail.textContent='규칙을 하나 고치면 예외가 둘 생깁니다.';
+  }
+}
+ruleChecks.forEach(c=>c.addEventListener('change', updateRule));
+
+// Loss landscape canvas
+const lossCanvas = document.getElementById('lossCanvas');
+const lctx = lossCanvas.getContext('2d');
+let lr = 0.06;
+let animId;
+let ball = {x:50, y:40, vx:0};
+function drawTerrain(){
+  const w=lossCanvas.width, h=lossCanvas.height;
+  lctx.clearRect(0,0,w,h);
+  // background gradient terrain
+  const grad = lctx.createLinearGradient(0,0,0,h);
+  grad.addColorStop(0,'#fff1f2'); grad.addColorStop(1,'#fafafa');
+  lctx.fillStyle=grad; lctx.fillRect(0,0,w,h);
+  // draw hills using sine
+  lctx.beginPath();
+  lctx.moveTo(0,h);
+  for(let x=0;x<w;x++){
+    let y = 70 + 30*Math.sin(x*0.02) + 25*Math.sin(x*0.05+1) + 20*Math.cos(x*0.03) + (x/w)*40;
+    // deeper valleys
+    if(x>400 && x<460) y+=15;
+    if(x>200 && x<260) y+=10;
+    lctx.lineTo(x,y);
+  }
+  lctx.lineTo(w,h); lctx.closePath();
+  lctx.fillStyle='#e5e7eb'; lctx.fill();
+  lctx.strokeStyle='#d1d5db'; lctx.lineWidth=1; lctx.stroke();
+
+  // mark local minima
+  const mins=[{x:230, y:85, label:'얕은 골짜기'}, {x:430, y:115, label:'더 깊은 골짜기'}];
+  mins.forEach(m=>{
+    lctx.beginPath(); lctx.arc(m.x, m.y, 6, 0, Math.PI*2); 
+    lctx.fillStyle = m.x===230 ? '#f43f5e' : '#2563eb'; lctx.fill();
+  });
+
+  // ball
+  lctx.beginPath(); lctx.arc(ball.x, ball.y, 7, 0, Math.PI*2); lctx.fillStyle='#e11d48'; lctx.fill();
+  lctx.strokeStyle='white'; lctx.lineWidth=2; lctx.stroke();
+}
+function getHeight(x){
+  return 70 + 30*Math.sin(x*0.02) + 25*Math.sin(x*0.05+1) + 20*Math.cos(x*0.03) + (x/640)*40 + (x>400&&x<460?15:0) + (x>200&&x<260?10:0);
+}
+function getSlope(x){
+  const eps=2;
+  return (getHeight(x+eps)-getHeight(x-eps))/(2*eps);
+}
+function animate(){
+  const slope=getSlope(ball.x);
+  ball.vx = ball.vx*0.8 - slope*lr*30;
+  ball.x += ball.vx;
+  if(ball.x<10) ball.x=10;
+  if(ball.x>630) ball.x=630;
+  ball.y = getHeight(ball.x);
+  drawTerrain();
+  if(Math.abs(ball.vx)>0.01 || Math.abs(slope)>0.02){
+    animId=requestAnimationFrame(animate);
+  }
+}
+function restartLoss(){
+  cancelAnimationFrame(animId);
+  ball={x:50, y:getHeight(50), vx:0};
+  drawTerrain();
+  animate();
+}
+document.getElementById('lrSlider').addEventListener('input', e=>{
+  lr=parseFloat(e.target.value);
+  document.getElementById('lrVal').textContent=lr.toFixed(2);
+});
+document.getElementById('restartLoss').addEventListener('click', restartLoss);
+restartLoss();
+
+// Scaling simulator
+const paramSlider=document.getElementById('paramSlider');
+const dataSlider=document.getElementById('dataSlider');
+const paramVal=document.getElementById('paramVal');
+const dataVal=document.getElementById('dataVal');
+const scaleResult=document.getElementById('scaleResult');
+function updateScale(){
+  const p=parseInt(paramSlider.value);
+  const d=parseInt(dataSlider.value);
+  let pLabel;
+  if(p<20) pLabel='1억'; else if(p<50) pLabel='15억'; else if(p<80) pLabel='100억'; else pLabel='1750억';
+  paramVal.textContent=pLabel;
+  let dLabel = d<33?'적음': d<66?'중간':'인터넷 전체';
+  dataVal.textContent=dLabel;
+  let score=p+d;
+  if(score<60){scaleResult.textContent='새로운 능력 출현: 문장 이어쓰기 수준'; scaleResult.style.background='#f3f4f6'; scaleResult.style.color='#111'}
+  else if(score<110){scaleResult.textContent='🚀 번역·요약 같은 새 능력 출현! (가르친 적 없음)'; scaleResult.style.background='#dbeafe'; scaleResult.style.color='#1e40af'}
+  else if(score<150){scaleResult.textContent='✨ 세 자리 덧셈·코드 작성 출현! (스케일링의 마법)'; scaleResult.style.background='#ffe4e6'; scaleResult.style.color='#e11d48'}
+  else {scaleResult.textContent='🔥 상식·추론이 한 덩어리로 출현 – 왜 되는지는 설명 불가'; scaleResult.style.background='#1a1a1a'; scaleResult.style.color='white'}
+}
+paramSlider.addEventListener('input', updateScale);
+dataSlider.addEventListener('input', updateScale);
+document.getElementById('resetScale').addEventListener('click', ()=>{paramSlider.value=30; dataSlider.value=50; updateScale()});
+updateScale();
+
+// Tokenizer
+const tokenInput=document.getElementById('tokenInput');
+const tokenOutput=document.getElementById('tokenOutput');
+const tokenExplain=document.getElementById('tokenExplain');
+function tokenizeDemo(text){
+  // very simplified BPE-like demo, not accurate but illustrative
+  tokenOutput.innerHTML='';
+  if(!text){tokenExplain.textContent=''; return}
+  // fake split: try to mimic strawberry -> straw + berry + etc
+  let tokens=[];
+  if(text.toLowerCase()==='strawberry'){
+    tokens=[{t:'straw', id:496}, {t:'berry', id:675}, {t:' (실제론 3덩어리)', id:15717}];
+  } else {
+    // split by space and then chunk 4 chars
+    const words=text.split(' ');
+    words.forEach(w=>{
+      if(w.length<=4) tokens.push({t:w, id: Math.floor(Math.random()*2000)+100});
+      else {
+        for(let i=0;i<w.length;i+=4){
+          tokens.push({t:w.slice(i,i+4), id: Math.floor(Math.random()*2000)+100});
+        }
+      }
+    });
+  }
+  tokens.forEach(tok=>{
+    const el=document.createElement('span');
+    el.style.cssText='border:1px solid #e5e5e5; background:white; padding:6px 10px; border-radius:999px; font-size:12px; display:inline-flex; gap:6px; align-items:center';
+    el.innerHTML=`<b>${tok.t}</b><span style="background:#f3f4f6; padding:2px 6px; border-radius:999px; color:#777">${tok.id}</span>`;
+    tokenOutput.appendChild(el);
+  });
+  if(text.toLowerCase().includes('strawberry')){
+    tokenExplain.textContent='AI 눈에는 글자 r이 없습니다. 숫자 496, 675, 15717만 있습니다. 그래서 r 개수를 못 셉니다. 레고 블록을 뜯지 않고 원자 개수 묻는 것과 같습니다.';
+  } else if(text.toLowerCase().includes('alice')){
+    tokenExplain.textContent='AI는 문장 순서로 외웁니다. "한 명씩 적어봐" 라고 쓸 공간을 주면 각 토큰이 분리되어 셀 수 있습니다.';
+  } else {
+    tokenExplain.textContent=`AI는 ${tokens.length}개 덩어리(토큰)로 보고 숫자로 바꿔 처리합니다. 글자를 직접 보지 않습니다.`;
+  }
+}
+tokenInput.addEventListener('input', e=>tokenizeDemo(e.target.value));
+tokenizeDemo('strawberry');
+
+// AGI check
+const agiChecks=document.querySelectorAll('#agiChecks input');
+const agiScore=document.getElementById('agiScore');
+function updateAgi(){
+  const c=Array.from(agiChecks).filter(x=>x.checked).length;
+  const msgs=['0/4 – 더 알아볼까요?','1/4 – 시작이 좋아요','2/4 – 절반 이해!','3/4 – 거의 준비됐어요','4/4 – 블랙박스를 이해하는 당신, 준비됐습니다!'];
+  agiScore.textContent=msgs[c];
+}
+agiChecks.forEach(c=>c.addEventListener('change', updateAgi));
+</script>
+</body>
+</html>

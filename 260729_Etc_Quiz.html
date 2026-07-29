@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>China DUV Localization – Quiz</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--main:#e11d48; --sub:#f43f5e; --bg:#ffffff; --bg2:#fafafa; --text:#1a1a1a; --text2:#777; --border:#e5e5e5; --ok:#16a34a; --bad:#dc2626; --warn:#f59e0b}
+*{box-sizing:border-box; margin:0; padding:0}
+body{font-family:'Noto Sans KR', sans-serif; background:var(--bg); color:var(--text); line-height:1.7}
+header{max-width:720px; margin:0 auto; padding:28px 20px 12px}
+h1{font-family:'Playfair Display', serif; font-size:26px; line-height:1.3}
+.sub{font-size:13px; color:var(--text2); margin-top:6px}
+.sticky{
+  position:sticky; top:0; z-index:20;
+  background:rgba(255,255,255,.96); backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--border);
+  padding:12px 20px;
+}
+.sticky-inner{max-width:720px; margin:0 auto; display:flex; flex-direction:column; gap:8px}
+.stats{display:flex; gap:16px; font-size:14px; font-weight:500}
+.stats strong{color:var(--main)}
+.progress{height:8px; background:#ffe4e6; border-radius:999px; overflow:hidden}
+.progress-bar{height:100%; width:0%; transition:width .35s ease, background .35s ease; background:var(--bad)}
+.container{max-width:720px; margin:0 auto; padding:18px 20px 100px}
+.card{border:1px solid var(--border); border-radius:16px; background:var(--bg); padding:18px; margin:16px 0; transition:transform .2s}
+.card.solved{border-color:#e5e7eb; background:var(--bg2)}
+.qhead{display:flex; justify-content:space-between; align-items:center; margin-bottom:10px}
+.qnum{font-weight:700; font-size:14px}
+.badges{display:flex; gap:6px}
+.badge{font-size:11px; padding:3px 8px; border-radius:999px; border:1px solid var(--border)}
+.badge.easy{background:#ecfdf5; color:#065f46; border-color:#a7f3d0}
+.badge.medium{background:#fffbeb; color:#92400e; border-color:#fde68a}
+.badge.hard{background:#fef2f2; color:#991b1b; border-color:#fecaca}
+.badge.type{background:#f3f4f6; color:#374151}
+.qtext{font-size:16px; font-weight:600; margin:8px 0 14px; line-height:1.5}
+.options{display:flex; flex-direction:column; gap:8px}
+.opt{padding:12px 14px; border:1px solid var(--border); border-radius:12px; background:#fff; text-align:left; cursor:pointer; font-size:14.5px; transition:.15s; position:relative}
+.opt:hover{border-color:var(--main); background:#fff1f2}
+.opt.correct{background:#dcfce7 !important; border-color:var(--ok) !important; color:#065f46}
+.opt.wrong{background:#fee2e2 !important; border-color:var(--bad) !important; color:#7f1d1d}
+.opt:disabled{cursor:not-allowed; opacity:.9}
+.tag{position:absolute; right:10px; top:50%; transform:translateY(-50%); font-size:11px; font-weight:700; padding:2px 8px; border-radius:999px}
+.tag.ok{background:var(--ok); color:#fff}
+.tag.no{background:var(--bad); color:#fff}
+.short-row{display:flex; gap:8px}
+input[type=text]{flex:1; padding:12px 14px; border:1px solid var(--border); border-radius:12px; font-size:14.5px}
+input[type=text]:focus{outline:none; border-color:var(--main)}
+.btn{padding:11px 16px; border-radius:999px; border:1px solid var(--border); background:#fff; cursor:pointer; font-weight:600; font-size:13px}
+.btn-primary{background:var(--main); color:#fff; border-color:var(--main)}
+.btn:disabled{opacity:.5; cursor:not-allowed}
+.ox-wrap{display:flex; gap:10px}
+.ox{flex:1; padding:14px; border-radius:12px; font-size:18px; font-weight:800}
+.explain{margin-top:12px; padding:12px 14px; background:#f9fafb; border:1px solid var(--border); border-radius:12px; font-size:13.5px; display:none; line-height:1.6}
+.explain.show{display:block; animation:fade .25s ease}
+@keyframes fade{from{opacity:0; transform:translateY(6px)} to{opacity:1; transform:translateY(0)}}
+.explain b{color:var(--main)}
+.final{position:fixed; inset:0; background:rgba(0,0,0,.45); display:none; align-items:center; justify-content:center; z-index:50; padding:20px}
+.final.show{display:flex}
+.final-card{background:#fff; border-radius:20px; padding:26px 22px; max-width:380px; width:100%; text-align:center; box-shadow:0 20px 60px rgba(0,0,0,.18)}
+.grade{font-family:'Playfair Display', serif; font-size:48px; font-weight:700; color:var(--main); margin:8px 0}
+</style>
+</head>
+<body>
+<header>
+  <h1>중국 DUV 국산화 – 이해도 퀴즈</h1>
+  <div class="sub">원본 자막 내용 기반 10문제 · 클릭하면 즉시 채점 · 해설 자동 표시</div>
+</header>
+
+<div class="sticky">
+  <div class="sticky-inner">
+    <div class="stats">
+      <span>푼 문제 <strong id="sSolved">0</strong> / 10</span>
+      <span>맞힌 문제 <strong id="sCorrect">0</strong></span>
+      <span>정답률 <strong id="sRate">0%</strong></span>
+    </div>
+    <div class="progress"><div class="progress-bar" id="pBar"></div></div>
+  </div>
+</div>
+
+<div class="container" id="quizRoot"></div>
+
+<div class="final" id="final">
+  <div class="final-card">
+    <div style="font-size:13px; letter-spacing:.12em; color:var(--text2); font-weight:700">FINAL SCORE</div>
+    <div class="grade" id="fGrade">A</div>
+    <div style="font-size:18px; font-weight:700" id="fScore">10 / 10</div>
+    <div style="font-size:13.5px; color:var(--text2); margin:10px 0 18px" id="fMsg">완벽해요!</div>
+    <button class="btn btn-primary" onclick="resetAll()" style="width:100%">다시 풀기</button>
+  </div>
+</div>
+
+<script>
+const QUIZ_DATA = [
+  {
+    id:1, type:'mcq', difficulty:'easy',
+    question:'현재 최첨단 반도체에서 사용하는 노광장비는 무엇인가요?',
+    options:['건식 DUV','이머전 DUV','EUV','G-line'],
+    answer:2,
+    explanation:'정답은 EUV. 자막: “지금 최첨단 반도체에서 사용하는 노광장비는 EUV인데요. 이번에 중국이 만들었다고 알려진 이머전 DUV는 EUV의 전세대 기술입니다.”'
+  },
+  {
+    id:2, type:'mcq', difficulty:'easy',
+    question:'기술 흐름의 올바른 순서는?',
+    options:['EUV → DUV → 이머전 DUV','건식 DUV → 이머전 DUV → EUV','이머전 DUV → 건식 DUV → EUV','건식 DUV → EUV → 이머전 DUV'],
+    answer:1,
+    explanation:'정답은 건식 DUV → 이머전 DUV → EUV. 자막에서 “일반적인 건식 DUV가 먼저 있었고 그 성능을 끌어올린 이머전 DUV가 그리고 그 다음 세대가 EUV”라고 설명.'
+  },
+  {
+    id:3, type:'mcq', difficulty:'medium',
+    question:'미세공정에 주로 쓰이는 ArF DUV의 파장은?',
+    options:['13.5nm','63nm','193nm','248nm'],
+    answer:2,
+    explanation:'정답 193nm. 자막: “미세공정에 주로 쓰이는 DUV는 파장이 193나노미터인 ArF 레이저를 사용합니다.”'
+  },
+  {
+    id:4, type:'mcq', difficulty:'medium',
+    question:'이머전 리소그래피에서 렌즈와 웨이퍼 사이에 넣는 물질은?',
+    options:['공기','초순수(아주 깨끗한 물)','기름','질소 가스'],
+    answer:1,
+    explanation:'정답은 초순수. 자막: “그 사이에 공기 대신에 아주 깨끗한 물, 초순수를 넣었습니다. 이것이 이머전 리소그래피.” 장비 전체를 물에 담그는 게 아니라고 강조.'
+  },
+  {
+    id:5, type:'mcq', difficulty:'medium',
+    question:'ASML이 업계 최초로 이머전 노광 시스템을 발표한 연도는?',
+    options:['1998년','2003년','2008년','2015년'],
+    answer:1,
+    explanation:'정답 2003년. 자막: “ASML은 2003년 업계 최초의 이머전 노광 시스템을 발표했고 2000년대 중반부터 본격 상용화.”'
+  },
+  {
+    id:6, type:'mcq', difficulty:'hard',
+    question:'ASML NXT 1950i (2008년)의 스펙으로 맞는 것은?',
+    options:['해상도 63nm / 오버레이 8nm','해상도 38nm / 오버레이 2.5nm','해상도 13.5nm / 오버레이 1nm','해상도 28nm / 오버레이 5nm'],
+    answer:1,
+    explanation:'정답은 약 38nm 해상도, 2.5nm 오버레이. 자막: “ASML이 2008년에 출시한 NXT 1950i는 약 38나노미터의 해상도랑 2.5나노미터 수준의 오버레이를 제시.” 중국 과거 ArF는 63nm/8nm였음.'
+  },
+  {
+    id:7, type:'ox', difficulty:'easy',
+    question:'“DUV는 낡은 기술이라 최첨단 팹에서는 전혀 쓰이지 않는다.”',
+    options:['O','X'],
+    answer:1,
+    explanation:'정답 X. 자막: “최첨단 반도체 공장에서도 일부 핵심층은 EUV로 만들지만 나머지 많은 층은 여전히 DUV가 담당하고 있습니다.”'
+  },
+  {
+    id:8, type:'ox', difficulty:'medium',
+    question:'“이번 중국 장비는 EUV를 만든 것이다.”',
+    options:['O','X'],
+    answer:1,
+    explanation:'정답 X. 자막: “이번 중국 장비는 EUV가 아닙니다. ASML 등이 약 20년 전부터 상용화해온 전세대 이머전 DUV를 중국이 자체 장비로 구현하려는 단계.”'
+  },
+  {
+    id:9, type:'short', difficulty:'medium',
+    question:'과거 공개된 중국산 ArF 장비의 해상도는 63나노미터 이하라고 알려졌다. 숫자를 입력하세요.',
+    answer:'63',
+    explanation:'정답 63. 자막: “과거 공개된 중국산 ARF 장비는 해상도 63나노미터 이하, 정렬 오차는 8나노미터 이하 수준.”'
+  },
+  {
+    id:10, type:'short', difficulty:'hard',
+    question:'멀티 패터닝에서 앞선 그림 위에 다음 그림을 얼마나 정확히 맞춰 찍는지 나타내는 정렬 오차 용어는?',
+    answer:'오버레이',
+    accept:['오버레이','overlay','OVERLAY','오버레이(overlay)','오버 레이'],
+    explanation:'정답 오버레이(Overlay). 자막: “이 정렬 오차를 오버레이라고 부릅니다.” 도장 비유로 설명. 이 수치가 좋아야 28nm→14nm→7nm 확장이 가능.'
+  }
+];
+
+let state = { solved:0, correct:0, answered:{} };
+
+function render(){
+  const root=document.getElementById('quizRoot');
+  root.innerHTML='';
+  QUIZ_DATA.forEach((q, idx)=>{
+    const card=document.createElement('div'); card.className='card'; card.id='q'+q.id;
+    if(state.answered[q.id]) card.classList.add('solved');
+    const diffClass = q.difficulty==='easy'?'easy':q.difficulty==='medium'?'medium':'hard';
+    const diffLabel = q.difficulty==='easy'?'쉬움':q.difficulty==='medium'?'보통':'어려움';
+    const typeLabel = q.type==='mcq'?'객관식':q.type==='ox'?'OX':'단답형';
+    card.innerHTML=`
+      <div class="qhead"><span class="qnum">Q${idx+1}</span><div class="badges"><span class="badge ${diffClass}">${diffLabel}</span><span class="badge type">${typeLabel}</span></div></div>
+      <div class="qtext">${q.question}</div>
+      <div id="area-${q.id}"></div>
+      <div class="explain" id="exp-${q.id}"><b>해설:</b> ${q.explanation}</div>
+    `;
+    root.appendChild(card);
+    const area=card.querySelector('#area-'+q.id);
+    if(q.type==='mcq'){
+      const optWrap=document.createElement('div'); optWrap.className='options';
+      q.options.forEach((opt,i)=>{
+        const btn=document.createElement('button'); btn.className='opt'; btn.textContent=opt; btn.id=`q${q.id}-opt${i}`;
+        if(state.answered[q.id]){ btn.disabled=true; if(i===q.answer) btn.classList.add('correct'); if(state.answered[q.id].choice===i && i!==q.answer) btn.classList.add('wrong'); }
+        else btn.onclick=()=>checkMCQ(q.id,i);
+        optWrap.appendChild(btn);
+      });
+      area.appendChild(optWrap);
+    } else if(q.type==='ox'){
+      const oxWrap=document.createElement('div'); oxWrap.className='ox-wrap';
+      ['O','X'].forEach((label,i)=>{
+        const btn=document.createElement('button'); btn.className='opt ox'; btn.textContent=label; btn.id=`q${q.id}-opt${i}`;
+        if(state.answered[q.id]){ btn.disabled=true; if(i===q.answer) btn.classList.add('correct'); if(state.answered[q.id].choice===i && i!==q.answer) btn.classList.add('wrong'); }
+        else btn.onclick=()=>checkMCQ(q.id,i);
+        oxWrap.appendChild(btn);
+      });
+      area.appendChild(oxWrap);
+    } else {
+      const row=document.createElement('div'); row.className='short-row';
+      const inp=document.createElement('input'); inp.type='text'; inp.placeholder='정답 입력'; inp.id=`inp-${q.id}`;
+      const btn=document.createElement('button'); btn.className='btn btn-primary'; btn.textContent='제출'; btn.id=`btn-${q.id}`;
+      if(state.answered[q.id]){ inp.value=state.answered[q.id].text||''; inp.disabled=true; btn.disabled=true; }
+      else btn.onclick=()=>checkShort(q.id);
+      inp.addEventListener('keydown',e=>{ if(e.key==='Enter') checkShort(q.id); });
+      row.appendChild(inp); row.appendChild(btn);
+      area.appendChild(row);
+    }
+    if(state.answered[q.id]){
+      document.getElementById('exp-'+q.id).classList.add('show');
+      showTags(q.id);
+    }
+  });
+  updateSticky();
+}
+
+function checkMCQ(qid, choice){
+  if(state.answered[qid]) return;
+  const q=QUIZ_DATA.find(x=>x.id===qid);
+  const isCorrect = choice===q.answer;
+  state.answered[qid]={choice, correct:isCorrect};
+  state.solved++; if(isCorrect) state.correct++;
+  finalizeQuestion(qid, isCorrect, choice);
+}
+
+function checkShort(qid){
+  if(state.answered[qid]) return;
+  const q=QUIZ_DATA.find(x=>x.id===qid);
+  const inp=document.getElementById('inp-'+qid);
+  const val=inp.value.trim();
+  if(!val){ inp.focus(); inp.style.borderColor='#e11d48'; return; }
+  let isCorrect=false;
+  const norm=v=>v.toLowerCase().replace(/\s/g,'');
+  if(q.accept){
+    isCorrect = q.accept.some(a=>norm(a)===norm(val));
+  } else {
+    // for numeric like 63
+    isCorrect = norm(val).includes(norm(q.answer));
+  }
+  state.answered[qid]={choice:null, text:val, correct:isCorrect};
+  state.solved++; if(isCorrect) state.correct++;
+  finalizeQuestion(qid, isCorrect, null, val);
+}
+
+function finalizeQuestion(qid, isCorrect, choice, text){
+  const q=QUIZ_DATA.find(x=>x.id===qid);
+  // disable all opts
+  if(q.type!=='short'){
+    q.options.forEach((_,i)=>{
+      const btn=document.getElementById(`q${qid}-opt${i}`);
+      if(btn){ btn.disabled=true; }
+    });
+  } else {
+    document.getElementById(`inp-${qid}`).disabled=true;
+    document.getElementById(`btn-${qid}`).disabled=true;
+  }
+  document.getElementById('exp-'+qid).classList.add('show');
+  showTags(qid);
+  updateSticky();
+  if(state.solved===QUIZ_DATA.length) showFinal();
+}
+
+function showTags(qid){
+  const q=QUIZ_DATA.find(x=>x.id===qid);
+  const ans=state.answered[qid];
+  if(q.type==='short'){
+    const inp=document.getElementById(`inp-${qid}`);
+    const card=document.getElementById('q'+qid);
+    const badge=document.createElement('div');
+    badge.style.marginTop='8px'; badge.style.fontSize='13px'; badge.style.fontWeight='700';
+    if(ans.correct){ badge.innerHTML=`<span style="color:#16a34a">✓ 정답! (${q.answer})</span>`; inp.style.borderColor='#16a34a'; inp.style.background='#ecfdf5'; }
+    else { badge.innerHTML=`<span style="color:#dc2626">✗ 오답 – 정답: ${q.answer}</span>`; inp.style.borderColor='#dc2626'; inp.style.background='#fee2e2'; }
+    if(!card.querySelector('.short-feedback')){ badge.className='short-feedback'; card.appendChild(badge); }
+    return;
+  }
+  q.options.forEach((_,i)=>{
+    const btn=document.getElementById(`q${qid}-opt${i}`);
+    if(!btn) return;
+    // clear previous tags
+    const old=btn.querySelector('.tag'); if(old) old.remove();
+    const tag=document.createElement('span'); tag.className='tag';
+    if(i===q.answer){ btn.classList.add('correct'); tag.classList.add('ok'); tag.textContent='✓ 정답'; btn.appendChild(tag); }
+    if(ans.choice===i && i!==q.answer){ btn.classList.add('wrong'); const t=document.createElement('span'); t.className='tag no'; t.textContent='✗ 오답'; btn.appendChild(t); }
+  });
+}
+
+function updateSticky(){
+  document.getElementById('sSolved').textContent=state.solved;
+  document.getElementById('sCorrect').textContent=state.correct;
+  const rate = state.solved? Math.round(state.correct/state.solved*100):0;
+  document.getElementById('sRate').textContent=rate+'%';
+  const bar=document.getElementById('pBar');
+  bar.style.width=(state.solved/QUIZ_DATA.length*100)+'%';
+  if(rate<=40) bar.style.background='#dc2626';
+  else if(rate<=70) bar.style.background='#f59e0b';
+  else bar.style.background='#16a34a';
+}
+
+function showFinal(){
+  const rate=Math.round(state.correct/QUIZ_DATA.length*100);
+  let grade='D', msg='조금 더 복습해봐요. 자막을 다시 보면 쉽게 올라가요!';
+  if(rate>=90){ grade='A'; msg='완벽해요! DUV와 EUV 구분부터 오버레이까지 정확히 이해했어요 🎉'; }
+  else if(rate>=70){ grade='B'; msg='잘했어요! 28nm 자립과 멀티 패터닝 개념을 잘 잡았어요.'; }
+  else if(rate>=50){ grade='C'; msg='절반 넘게 맞췄어요. 오버레이와 해상도 체크리스트 다시 보면 좋아요.'; }
+  document.getElementById('fGrade').textContent=grade;
+  document.getElementById('fScore').textContent=`${state.correct} / 10 · ${rate}%`;
+  document.getElementById('fMsg').textContent=msg;
+  document.getElementById('final').classList.add('show');
+}
+
+function resetAll(){
+  state={solved:0, correct:0, answered:{}};
+  document.getElementById('final').classList.remove('show');
+  render();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+render();
+</script>
+</body>
+</html>

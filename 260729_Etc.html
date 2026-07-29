@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>China DUV Localization – Economic Analysis Report</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root{
+  --bg:#ffffff; --bg2:#fafafa; --text:#1a1a1a; --text2:#777777;
+  --main:#e11d48; --sub:#f43f5e; --border:#e5e5e5;
+}
+*{box-sizing:border-box; margin:0; padding:0}
+body{
+  font-family:'Noto Sans KR', sans-serif;
+  background:var(--bg); color:var(--text);
+  line-height:1.75; -webkit-font-smoothing:antialiased;
+}
+a{color:var(--main); text-decoration:none}
+.container{max-width:720px; margin:0 auto; padding:0 20px 80px}
+header{
+  padding:48px 20px 32px; text-align:left;
+  border-bottom:1px solid var(--border);
+  background:linear-gradient(180deg,#fff 0%,#fafafa 100%);
+}
+.eyebrow{
+  font-size:12px; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--main); font-weight:700; margin-bottom:12px;
+}
+h1{
+  font-family:'Playfair Display', serif;
+  font-size:32px; line-height:1.25; font-weight:800;
+  margin-bottom:14px; letter-spacing:-.02em;
+}
+.meta{font-size:13px; color:var(--text2); display:flex; gap:12px; flex-wrap:wrap}
+.meta span::before{content:"•"; margin-right:8px}
+.meta span:first-child::before{content:""}
+.hero-note{
+  margin-top:18px; background:#fff1f2; border:1px solid #ffe4e6;
+  padding:14px 16px; border-radius:12px; font-size:13.5px; color:#881337;
+}
+h2{
+  font-family:'Playfair Display', serif;
+  font-size:24px; margin:48px 0 14px; line-height:1.35;
+  position:relative; padding-left:14px;
+}
+h2::before{
+  content:""; position:absolute; left:0; top:6px; bottom:6px;
+  width:4px; background:var(--main); border-radius:2px;
+}
+h3{font-size:18px; margin:28px 0 10px; font-weight:700}
+p{margin:12px 0; font-size:15.5px; color:#222}
+.small{font-size:13px; color:var(--text2)}
+.card{
+  background:var(--bg2); border:1px solid var(--border);
+  border-radius:16px; padding:18px 18px; margin:18px 0;
+}
+.badge{
+  display:inline-block; font-size:11px; font-weight:700;
+  background:var(--main); color:#fff; padding:4px 10px; border-radius:999px;
+  letter-spacing:.04em; margin-bottom:8px;
+}
+table{width:100%; border-collapse:collapse; margin:14px 0; font-size:14px; background:var(--bg2); border-radius:12px; overflow:hidden}
+th{background:var(--main); color:#fff; text-align:left; padding:10px 12px; font-weight:700}
+td{padding:10px 12px; border-top:1px solid var(--border)}
+tr:nth-child(even) td{background:#fff}
+ul,ol{padding-left:20px; margin:10px 0}
+li{margin:6px 0; font-size:14.5px}
+.kpi{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:16px 0}
+.kpi div{background:#fff; border:1px solid var(--border); border-radius:12px; padding:14px}
+.kpi strong{font-size:20px; color:var(--main); display:block}
+.kpi span{font-size:12px; color:var(--text2)}
+
+/* REQUIRED CHART PATTERN */
+.fade-in {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.fade-in.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.chart-container {
+  position: relative;
+  max-height: 340px;
+}
+.chart-container canvas {
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  max-height: 300px;
+}
+.chart-container.chart-ready canvas {
+  opacity: 1;
+}
+
+/* Interactive */
+.sim-wrap{border:1px solid var(--border); border-radius:16px; overflow:hidden; background:#fff; margin:18px 0}
+.sim-header{padding:14px 16px; background:var(--bg2); border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center}
+.sim-body{padding:16px}
+.slider-row{display:flex; align-items:center; gap:12px; margin:10px 0}
+.slider-row input[type=range]{flex:1; accent-color:var(--main)}
+.slider-val{min-width:72px; text-align:right; font-weight:700; color:var(--main); font-size:14px}
+.btn{border:1px solid var(--border); background:#fff; padding:8px 14px; border-radius:999px; font-size:13px; cursor:pointer}
+.btn-primary{background:var(--main); color:#fff; border-color:var(--main)}
+.overlay-demo{position:relative; height:120px; background:#fafafa; border:1px dashed #e5e5e5; border-radius:12px; margin:12px 0; overflow:hidden}
+.layer{position:absolute; left:50%; top:50%; width:120px; height:22px; border-radius:6px; transform:translate(-50%,-50%)}
+.layer.odd{background:rgba(225,29,72,.18); border:2px solid var(--main)}
+.layer.even{background:rgba(37,99,235,.18); border:2px solid #2563eb}
+.tooltip{position:absolute; bottom:6px; left:50%; transform:translateX(-50%); font-size:11px; color:var(--text2); background:#fff; padding:2px 8px; border-radius:999px; border:1px solid var(--border)}
+.divider{height:1px; background:var(--border); margin:28px 0}
+.callout{border-left:4px solid var(--main); padding:10px 14px; background:#fff1f2; border-radius:0 12px 12px 0; margin:16px 0; font-size:14px}
+</style>
+</head>
+<body>
+<header>
+  <div class="container" style="padding:0">
+    <div class="eyebrow">ECONOMY • SEMICONDUCTOR EQUIPMENT</div>
+    <h1>중국이 DUV 국산화에 성공합니다…<br>ASML 독점 흔드나 실제 가능한 공정은 어디까지</h1>
+    <div class="meta">
+      <span>2026.07.29</span>
+      <span><a href="https://youtu.be/G5Qn7Hoxq18?si=QhVPlxLrn_wTbE6T" target="_blank">원본 영상 보기</a></span>
+      <span>분석: 경제 관점</span>
+    </div>
+    <div class="hero-note">💡 핵심 한줄: 이번 성과는 EUV 발명이 아니라, ASML이 20년 전 상용화한 이머전 DUV(전세대 핵심 장비)를 중국 공급망으로 처음 구현하기 시작한 단계입니다. 당장 2nm가 아니라 28nm 자립이 1차 목표.</div>
+  </div>
+</header>
+
+<div class="container">
+  <div class="kpi fade-in">
+    <div><strong>193nm → 13.5nm</strong><span>DUV vs EUV 파장(빛의 굵기). 파장이 짧을수록 더 미세하게 찍을 수 있음</span></div>
+    <div><strong>2003 → 2026</strong><span>ASML 첫 이머전 발표부터 중국 첫 생산까지 약 23년 격차</span></div>
+    <div><strong>63nm / 8nm</strong><span>과거 중국산 건식 ArF의 해상도 / 오버레이(정렬오차) 수준</span></div>
+    <div><strong>38nm / 2.5nm</strong><span>ASML NXT 1950i(2008년) 해상도 / 오버레이 – 비교 기준</span></div>
+  </div>
+
+  <h2 class="fade-in">1. 이 장비는 몇 세대인가요?</h2>
+  <p class="fade-in">반도체 회로를 찍는 기계가 노광장비예요. 마스크(도안 필름)에 빛을 쏴서 렌즈로 축소해 웨이퍼(실리콘 원판) 위에 옮겨요. 이걸 수십 번 반복하면 칩이 됩니다.</p>
+  <div class="card fade-in">
+    <span class="badge">기술 로드맵</span>
+    <p><strong>건식 DUV</strong> (공기 사이) → <strong>이머전 DUV</strong> (물 사이, 성능 업) → <strong>EUV</strong> (차세대, 훨씬 짧은 빛)</p>
+    <p class="small">지금 최첨단 팹에서도 핵심 몇 개 층만 EUV로 찍고, 나머지 많은 층은 여전히 DUV가 담당해요. DUV가 낡은 장비가 아니라는 뜻.</p>
+  </div>
+  <p class="fade-in">ASML은 2003년 업계 최초 이머전 시스템을 발표, 2000년대 중반 본격 상용화. 니콘도 비슷한 시기 공급했지만 지금은 ASML이 사실상 독점. 중국 성과는 "새 원리 발명"이 아니라, 20년 전 기술을 자국 공급망으로 구현 시작했다는 데 의미가 있어요.</p>
+
+  <div class="chart-container fade-in">
+    <canvas id="chartGen" height="230"></canvas>
+  </div>
+  <p class="small fade-in" style="text-align:center">* 차트: DUV 세대는 오래됐지만, 여전히 팹에서 가장 많이 쓰이는 층수를 담당</p>
+
+  <h2 class="fade-in">2. 이머전 DUV는 왜 물을 쓰나요?</h2>
+  <p class="fade-in">미세공정용 DUV는 193nm ArF 레이저를 써요. 그런데 어떻게 193nm보다 훨씬 작은 40nm 패턴을 찍을까요?</p>
+  <p class="fade-in">해상도는 파장(λ)만으로 결정 안 돼요. 렌즈가 빛을 얼마나 넓게 모으는지 나타내는 NA(개구수, 빛 모으는 능력)도 중요해요. 공식은 <strong>R = k1 × λ / NA</strong> (k1은 공정 계수).</p>
+  <p class="fade-in">공기에서는 NA를 높이는 데 한계가 있어요. 그래서 렌즈와 웨이퍼 사이 좁은 틈에 초순수(아주 깨끗한 물)를 넣어요. 물의 굴절률 덕에 빛을 더 세게 모아서 건식보다 더 작게 찍을 수 있어요. 장비 전체를 물에 담그는 게 아니라, 움직이는 웨이퍼 위 렌즈 바로 아래에만 물을 넣고 빼는 구조예요. 기포나 물자국이 생기면 바로 불량이라 물 관리가 초정밀 기술의 핵심.</p>
+
+  <div class="sim-wrap fade-in">
+    <div class="sim-header"><strong>🔬 NA 해상도 시뮬레이터</strong><button class="btn" onclick="resetNA()">초기화</button></div>
+    <div class="sim-body">
+      <div class="slider-row"><span style="min-width:60px;font-size:13px">NA</span><input type="range" id="na" min="0.85" max="1.35" step="0.01" value="1.0"><span class="slider-val" id="naV">1.00</span></div>
+      <div class="slider-row"><span style="min-width:60px;font-size:13px">k1 계수</span><input type="range" id="k1" min="0.25" max="0.6" step="0.01" value="0.35"><span class="slider-val" id="k1V">0.35</span></div>
+      <div class="card" style="margin:12px 0; background:#fff1f2">
+        <div style="display:flex; justify-content:space-between"><span>계산 해상도</span><strong id="resOut" style="color:var(--main)">67.6 nm</strong></div>
+        <div class="small">공식: R = k1 × 193nm ÷ NA. NA가 높을수록, k1이 낮을수록 더 미세하게 찍힘</div>
+      </div>
+      <div class="chart-container fade-in" style="max-height:260px"><canvas id="chartNA" height="220"></canvas></div>
+    </div>
+  </div>
+
+  <h2 class="fade-in">3. 중국의 현재 수준 – 무엇이 공개됐고 무엇이 안 됐나</h2>
+  <div class="card fade-in">
+    <span class="badge">FACT CHECK</span>
+    <ul>
+      <li>과거 중국산 건식 ArF: 해상도 63nm 이하, 정렬오차 8nm 이하로 알려짐</li>
+      <li>이번 보도: <strong>이머전 DUV를 올해부터 생산 시작</strong>, SMIC·화홍반도체·창신메모리(CXMT)에서 검증 예정</li>
+      <li><strong>미공개:</strong> 실제 NA, 1회 노광 해상도, 시간당 처리량(WPH), 오버레이(정렬 정확도)</li>
+      <li>일부 핵심 부품은 일본산 사용 정황 보도 – “조립 국산화 ≠ 100% 부품 국산화” 구분 필요</li>
+    </ul>
+  </div>
+  <p class="fade-in">현재로선 ASML과 같은 수준이라고 말하기엔 너무 이르고, 반대로 “옛 기술이니 의미 없다”고 치부하기도 어려워요. 28nm 안정 양산이 가능해지면, 자동차·전력·디스플레이 구동칩 등 지금도 수요 많은 시장을 외산 제한 없이 지킬 수 있으니까요.</p>
+
+  <h2 class="fade-in">4. 가장 큰 오해 – 28nm 장비로 7nm 만든다는 뜻?</h2>
+  <p class="fade-in">여기서 용어 혼동이 많아요. 장비 해상도(한 번에 얼마나 작게 찍는지)와 공정명(28nm, 7nm)은 같은 기준이 아니에요.</p>
+  <div class="card fade-in">
+    <span class="badge">멀티 패터닝 (한 번에 안 되면 나눠 찍기)</span>
+    <p>촘촘한 선 10개를 한 번에 못 찍으면, 먼저 1,3,5번만 찍고, 다시 맞춰서 2,4,6번을 사이에 찍어요. 두 번 합치면 2배 촘촘해지죠.</p>
+    <p class="small">SMIC가 실제로 ASML 이머전 DUV + 멀티 패터닝으로 EUV 없이 7nm급을 만든 적 있어요. 원리상 가능.</p>
+  </div>
+  <p class="fade-in">문제는 비용과 난이도가 폭증해요. 한 번 더 찍을 때마다 노광→현상→식각→증착→계측 전 과정을 반복해야 해요. 마스크 수, 장비 시간, 결함 위험이 배로 늘죠.</p>
+
+  <div class="sim-wrap fade-in">
+    <div class="sim-header"><strong>📈 멀티 패터닝 비용 시뮬레이터</strong><button class="btn" onclick="resetMP()">초기화</button></div>
+    <div class="sim-body">
+      <div class="slider-row"><span style="min-width:90px;font-size:13px">패터닝 횟수</span><input type="range" id="mp" min="1" max="4" step="1" value="1"><span class="slider-val" id="mpV">1회 (Single)</span></div>
+      <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin:12px 0">
+        <div class="card" style="margin:0; padding:10px; text-align:center"><div class="small">공정시간</div><strong id="mpTime" style="color:var(--main)">1.0x</strong></div>
+        <div class="card" style="margin:0; padding:10px; text-align:center"><div class="small">마스크 비용</div><strong id="mpMask" style="color:#1a1a1a">1.0x</strong></div>
+        <div class="card" style="margin:0; padding:10px; text-align:center"><div class="small">결함 확률</div><strong id="mpDef" style="color:#6b7280">1.0x</strong></div>
+      </div>
+      <div class="chart-container"><canvas id="chartMP" height="220"></canvas></div>
+    </div>
+  </div>
+
+  <h2 class="fade-in">5. 진짜 승부는 ‘오버레이’에 있다</h2>
+  <p class="fade-in">멀티 패터닝의 핵심은 앞에서 찍은 그림 위에 다음 그림을 얼마나 정확히 겹치느냐예요. 색도장을 두 번 찍는데 두 번째가 1mm만 밀려도 번져 보이죠? 반도체도 같아요.</p>
+  <p class="fade-in"><strong>오버레이(Overlay, 정렬오차)</strong>는 두 번째 선이 정중앙에서 얼마나 벗어났는지예요. 어긋나면 간격이 좁아지거나 선끼리 붙어버리고 회로가 끊겨요. 수십 개 층을 쌓고 같은 층 안에서도 여러 번 나누면 오버레이가 수천 장 웨이퍼에서 일정해야 해요.</p>
+
+  <div class="sim-wrap fade-in">
+    <div class="sim-header"><strong>🎯 오버레이 정렬 체험</strong><button class="btn" onclick="resetOV()">중앙 맞춤</button></div>
+    <div class="sim-body">
+      <div class="slider-row"><span style="min-width:80px;font-size:13px">정렬오차</span><input type="range" id="ov" min="0" max="20" step="1" value="2"><span class="slider-val" id="ovV">2.0 nm</span></div>
+      <div class="overlay-demo" id="ovDemo">
+        <div class="layer odd" style="left:calc(50% - 20px)"></div>
+        <div class="layer odd" style="left:calc(50% + 20px)"></div>
+        <div class="layer even" id="evenL"></div>
+        <div class="tooltip" id="ovTip">간격 균일 – 양호</div>
+      </div>
+      <div class="callout" id="ovMsg">현재 2.0nm면 ASML NXT 1950i(2.5nm) 수준 근접 – 양산 가능 영역</div>
+    </div>
+  </div>
+
+  <div class="card fade-in">
+    <span class="badge">비교 기준</span>
+    <table>
+      <tr><th>장비</th><th>해상도</th><th>오버레이</th></tr>
+      <tr><td>중국 과거 ArF(건식)</td><td>63nm 이하</td><td>8nm 이하</td></tr>
+      <tr><td>ASML NXT 1950i (2008)</td><td>약 38nm</td><td>약 2.5nm</td></tr>
+      <tr><td>중국 신형 이머전(추정)</td><td>비공개</td><td>비공개 – 업계는 2008년 ASML과 유사 추정</td></tr>
+    </table>
+    <p class="small">※ 중국 장비가 28nm를 안정 양산할지, 14nm/7nm로 확장할지는 이 오버레이 수치가 공개돼야 판단 가능</p>
+  </div>
+
+  <h2 class="fade-in">6. 경제 관점 – ASML 독점은 흔들릴까?</h2>
+  <p class="fade-in">이머전 DUV 한 대가 제대로 돌려면 광학계·정밀 스테이지·위치 센서·열 제어·물 관리·소프트웨어가 모두 맞아야 해요. 단순히 물만 넣은 기계가 아니라 초정밀 스캐너 전체예요. 그래서 ASML이 20년간 쌓은 양산 노하우가 진입장벽이었죠.</p>
+  <div class="chart-container fade-in"><canvas id="chartEcon" height="230"></canvas></div>
+  <p class="fade-in">경제적 의미는 세 단계로 봐야 해요:</p>
+  <ul class="fade-in">
+    <li><strong>단기(28nm 자립):</strong> 자동차·통신·전력관리·DDI 등 제재 영향 적은 레거시 시장의 공급망 안정. 중국 내 수요만으로 충분히 의미 있음.</li>
+    <li><strong>중기(14nm 조건부):</strong> 장비 정밀도 + 공정 최적화가 따라주면 일부 확장 가능. 다만 처리량(WPH)·가동률·수율이 관건.</li>
+    <li><strong>장기(7nm):</strong> 원리상 불가 아님. SMIC가 외산 장비로 이미 증명. 그러나 중국산 장비로 대형 스마트폰/AP·AI 칩을 높은 수율로 양산하는 건 시험 패턴 만들기와 차원이 다른 문제. 5nm 테스트는 가능해도 양산·수율은 별도.</li>
+  </ul>
+  <div class="callout fade-in">중국 입장 1차 목표는 세계 최첨단 2nm 추격이 아닐 수 있어요. 외산 공급이 막혀도 28nm를 안정적으로 돌리고, 그 위에서 14nm·7nm를 점진 개선하는 ‘생산 기반 자립’이 더 현실적.</div>
+
+  <h2 class="fade-in">7. EUV는 왜 필요했나?</h2>
+  <p class="fade-in">EUV는 13.5nm라는 훨씬 짧은 빛을 써요. DUV에서 홀수·짝수로 나눠 여러 번 찍던 패턴을 더 적은 횟수로 만들 수 있어요. 장점은 “더 작게”만이 아니라 “더 단순하게” 만들 수 있다는 점. 물론 EUV도 광원·반사거울·진공·마스크 결함 등 엄청나게 어려운 기술이지만요.</p>
+  <p class="fade-in">중국 장비는 EUV가 아니며, 현재 공개 정보만으로 ASML 동급이라 말할 수 없지만, 지금도 반도체 생산 상당 부분을 담당하는 핵심 장비를 자체 공급망으로 옮기는 시도라는 점에서 무시할 수 없어요.</p>
+
+  <h2 class="fade-in">8. 앞으로 뭘 봐야 하나? – 체크리스트 5</h2>
+  <div class="card fade-in">
+    <ol>
+      <li><strong>한 번에 얼마나 작게 찍나 (해상도)</strong> – 38nm 수준인지</li>
+      <li><strong>얼마나 정확히 겹치나 (오버레이)</strong> – 2.5nm 수준 근접 여부</li>
+      <li><strong>시간당 몇 장 처리하나 (WPH, 생산성)</strong> – 처리량 낮으면 원가 폭등</li>
+      <li><strong>수천 장에서 같은 정확도를 반복하나 (반복성·가동률)</strong></li>
+      <li><strong>실제 수율은? (SMIC·화홍·CXMT 검증 결과)</strong> – 부품 중 일본산 비중도 함께</li>
+    </ol>
+  </div>
+
+  <div class="divider"></div>
+  <p class="fade-in small">정리: 이번 보도는 “중국이 EUV를 만들었다”는 과장과 “옛 기술이니 의미 없다”는 폄하 사이 어딘가에 있어요. 28nm 이름표보다 정렬 정확도·처리량·수율이라는 숫자가 공개될 때 진짜 의미를 판단할 수 있습니다. – Patch</p>
+</div>
+
+<script>
+// ---------- fade observer ----------
+const fadeObs = new IntersectionObserver((entries) => {
+  entries.forEach((e, i) => {
+    if (e.isIntersecting) {
+      setTimeout(() => e.target.classList.add('visible'), i * 80);
+      fadeObs.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.12 });
+document.querySelectorAll('.fade-in').forEach(el => fadeObs.observe(el));
+
+// ---------- chart configs ----------
+const chartConfigs = {};
+chartConfigs['chartGen'] = () => {
+  new Chart(document.getElementById('chartGen'), {
+    type:'bar',
+    data:{
+      labels:['Dry DUV','Immersion DUV','EUV'],
+      datasets:[
+        {label:'팹에서 담당하는 층수 비중(개념)', data:[35,45,20], backgroundColor:['#6b7280','#e11d48','#1a1a1a'], borderRadius:8},
+      ]
+    },
+    options:{responsive:true, plugins:{legend:{display:false}, tooltip:{enabled:true}}, scales:{y:{beginAtZero:true, max:60, ticks:{callback:v=>v+'%'}}}}
+  });
+};
+chartConfigs['chartNA'] = () => {
+  const na = parseFloat(document.getElementById('na').value);
+  const k1 = parseFloat(document.getElementById('k1').value);
+  const labels = []; const data=[];
+  for(let n=0.85;n<=1.35;n+=0.05){ labels.push(n.toFixed(2)); data.push( (k1*193/n).toFixed(1) ); }
+  window.naChart = new Chart(document.getElementById('chartNA'), {
+    type:'line',
+    data:{labels, datasets:[{label:'해상도(nm)', data, borderColor:'#e11d48', backgroundColor:'rgba(225,29,72,.12)', tension:.35, fill:true, pointRadius:0}]},
+    options:{responsive:true, plugins:{legend:{display:false}}, scales:{y:{reverse:false}, x:{title:{display:true,text:'NA'}}}}
+  });
+};
+chartConfigs['chartMP'] = () => {
+  window.mpChart = new Chart(document.getElementById('chartMP'), {
+    type:'bar',
+    data:{
+      labels:['1회','2회','3회','4회'],
+      datasets:[
+        {label:'공정시간 배수', data:[1,2.1,3.4,4.9], backgroundColor:'#e11d48'},
+        {label:'결함위험 배수', data:[1,1.8,2.9,4.3], backgroundColor:'#1a1a1a'}
+      ]
+    },
+    options:{responsive:true, plugins:{legend:{position:'bottom', labels:{boxWidth:12, font:{size:11}}}}, scales:{y:{beginAtZero:true}}}
+  });
+};
+chartConfigs['chartEcon'] = () => {
+  new Chart(document.getElementById('chartEcon'), {
+    type:'line',
+    data:{
+      labels:['28nm Ready','14nm Conditional','7nm Hard','5nm Test/Demo','Mass Yield'],
+      datasets:[{label:'기술 난이도 (개념)', data:[2,4,7,8.5,9.5], borderColor:'#e11d48', backgroundColor:'rgba(225,29,72,.12)', fill:true, tension:.4, pointRadius:4}]
+    },
+    options:{responsive:true, plugins:{legend:{display:false}, tooltip:{callbacks:{label:c=> '난이도: '+c.parsed.y+'/10'}}}, scales:{y:{min:0,max:10}}}
+  });
+};
+
+const chartObs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const canvas = e.target.querySelector('canvas');
+      if (canvas && chartConfigs[canvas.id]) {
+        chartConfigs[canvas.id]();
+        e.target.classList.add('chart-ready');
+        chartObs.unobserve(e.target);
+      }
+    }
+  });
+}, { threshold: 0.15 });
+document.querySelectorAll('.chart-container').forEach(el => chartObs.observe(el));
+
+// ---------- Simulators ----------
+function updateNA(){
+  const na=parseFloat(document.getElementById('na').value);
+  const k1=parseFloat(document.getElementById('k1').value);
+  document.getElementById('naV').textContent=na.toFixed(2);
+  document.getElementById('k1V').textContent=k1.toFixed(2);
+  const res=(k1*193/na).toFixed(1);
+  document.getElementById('resOut').textContent=res+' nm';
+  if(window.naChart){
+    window.naChart.data.datasets[0].data = window.naChart.data.labels.map(l=> (k1*193/parseFloat(l)).toFixed(1));
+    window.naChart.update();
+  }
+}
+function resetNA(){ document.getElementById('na').value=1.0; document.getElementById('k1').value=0.35; updateNA(); }
+document.getElementById('na').addEventListener('input', updateNA);
+document.getElementById('k1').addEventListener('input', updateNA);
+
+function updateMP(){
+  const v=parseInt(document.getElementById('mp').value);
+  const names={1:'1회 (Single)',2:'2회 (Double)',3:'3회 (Triple)',4:'4회 (Quadruple)'};
+  document.getElementById('mpV').textContent=names[v];
+  const times=[1,2.1,3.4,4.9], masks=[1,1.9,2.8,3.9], defs=[1,1.8,2.9,4.3];
+  document.getElementById('mpTime').textContent=times[v-1].toFixed(1)+'x';
+  document.getElementById('mpMask').textContent=masks[v-1].toFixed(1)+'x';
+  document.getElementById('mpDef').textContent=defs[v-1].toFixed(1)+'x';
+}
+function resetMP(){ document.getElementById('mp').value=1; updateMP(); }
+document.getElementById('mp').addEventListener('input', updateMP);
+updateMP();
+
+function updateOV(){
+  const v=parseFloat(document.getElementById('ov').value);
+  document.getElementById('ovV').textContent=v.toFixed(1)+' nm';
+  const offset = Math.min(24, v*2);
+  const el=document.getElementById('evenL');
+  el.style.transform=`translate(calc(-50% + ${offset}px), -50%)`;
+  const tip=document.getElementById('ovTip');
+  const msg=document.getElementById('ovMsg');
+  if(v<=2.5){ tip.textContent='간격 균일 – 양호'; msg.textContent=`현재 ${v.toFixed(1)}nm면 ASML NXT 1950i(2.5nm) 수준 근접 – 양산 가능 영역`; msg.style.color='#166534'; }
+  else if(v<=6){ tip.textContent='간격 불균일 – 수율 저하'; msg.textContent=`${v.toFixed(1)}nm면 선 간격이 좁아져 불량 위험 증가 – 추가 보정 필요`; msg.style.color='#b45309'; }
+  else { tip.textContent='선 붙음/단락 위험!'; msg.textContent=`${v.toFixed(1)}nm 이상이면 선끼리 붙거나 회로 끊김 – 양산 불가`; msg.style.color='#e11d48'; }
+}
+function resetOV(){ document.getElementById('ov').value=2; updateOV(); }
+document.getElementById('ov').addEventListener('input', updateOV);
+updateOV();
+</script>
+</body>
+</html>

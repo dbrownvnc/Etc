@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>초 미세 반도체를 만드는 EUV의 원리 | 매거진 리포트</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root{
+  --bg:#ffffff;
+  --bg2:#fafafa;
+  --text:#1a1a1a;
+  --sub:#777777;
+  --accent:#e11d48;
+  --accent2:#f43f5e;
+  --border:#e5e5e5;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);line-height:1.75;-webkit-font-smoothing:antialiased}
+.serif{font-family:'Playfair Display',serif}
+.wrap{max-width:640px;margin:0 auto;padding:0 20px}
+.header{padding:48px 0 24px;border-bottom:2px solid var(--text)}
+.eyebrow{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);font-weight:700;margin-bottom:12px}
+.h1{font-size:34px;line-height:1.15;font-weight:800;letter-spacing:-0.02em}
+.h1 span{color:var(--accent)}
+.subhead{margin-top:16px;color:var(--sub);font-size:15px;font-weight:300;line-height:1.6}
+.meta{margin-top:20px;display:flex;gap:12px;align-items:center;font-size:12px;color:var(--sub)}
+.dot{width:4px;height:4px;background:var(--accent);border-radius:50%}
+.section{padding:40px 0;border-bottom:1px solid var(--border)}
+.section:last-child{border:none}
+.kicker{font-size:12px;font-weight:700;letter-spacing:.15em;color:var(--accent);margin-bottom:10px;text-transform:uppercase}
+.h2{font-size:22px;font-weight:800;line-height:1.3;margin-bottom:14px;letter-spacing:-0.01em}
+.h3{font-size:16px;font-weight:700;margin:22px 0 10px}
+.p{font-size:15px;color:#2a2a2a;margin-bottom:14px}
+.p b{color:var(--text)}
+.caption{font-size:12px;color:var(--sub);margin-top:8px;line-height:1.5}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:18px 16px;margin:18px 0}
+.card-accent{border-left:4px solid var(--accent)}
+.tag{display:inline-block;background:var(--text);color:#fff;font-size:10px;padding:4px 8px;border-radius:999px;letter-spacing:.05em;margin-right:6px}
+.tag-rose{background:var(--accent)}
+.table-wrap{overflow-x:auto;margin:16px 0;border-radius:12px;border:1px solid var(--border)}
+table{width:100%;border-collapse:collapse;background:var(--bg2);font-size:13px}
+th{background:var(--accent);color:#fff;padding:10px 12px;text-align:left;font-weight:700;font-size:12px}
+td{padding:10px 12px;border-top:1px solid var(--border);color:#333}
+.fade-in{opacity:0;transform:translateY(18px);transition:opacity 0.7s ease, transform 0.7s ease}
+.fade-in.visible{opacity:1;transform:translateY(0)}
+.chart-container{position:relative;max-height:340px;background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:12px 10px 6px;margin:18px 0}
+.chart-container canvas{opacity:0;transition:opacity 0.4s ease;max-height:300px}
+.chart-container.chart-ready canvas{opacity:1}
+.sim-box{background:#fff;border:1.5px solid var(--border);border-radius:16px;padding:16px;margin:18px 0;box-shadow:0 4px 20px rgba(0,0,0,0.04)}
+.sim-title{font-size:13px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.sim-title i{width:6px;height:6px;background:var(--accent);border-radius:50%;display:inline-block}
+input[type=range]{width:100%;accent-color:var(--accent);cursor:pointer}
+.btn{appearance:none;border:1px solid var(--text);background:var(--text);color:#fff;padding:10px 14px;border-radius:999px;font-size:13px;font-weight:600;cursor:pointer;transition:.2s}
+.btn:hover{background:var(--accent);border-color:var(--accent)}
+.btn-outline{background:#fff;color:var(--text)}
+.btn-sm{padding:7px 12px;font-size:12px}
+.flex{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.mono{font-family:ui-monospace,monospace;font-size:12px}
+.pill{display:inline-flex;align-items:center;gap:6px;background:var(--bg2);border:1px solid var(--border);border-radius:999px;padding:6px 10px;font-size:12px}
+.canvas-wrap{width:100%;border-radius:12px;background:radial-gradient(120% 120% at 50% 0%, #fff 0%, #fafafa 70%);border:1px dashed var(--border);overflow:hidden}
+.hint{font-size:11px;color:var(--sub);margin-top:8px}
+.flow{display:flex;gap:0;overflow-x:auto;padding:6px 0}
+.flow-step{min-width:92px;flex:1;background:#fff;border:1px solid var(--border);border-radius:12px;padding:10px 8px;text-align:center;position:relative}
+.flow-step.active{border-color:var(--accent);box-shadow:0 0 0 2px rgba(225,29,72,.15)}
+.flow-arrow{display:flex;align-items:center;padding:0 4px;color:var(--sub)}
+@media(max-width:480px){.h1{font-size:28px}.wrap{padding:0 16px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="header fade-in">
+    <div class="eyebrow">Semiconductor · Deep Dive</div>
+    <h1 class="h1 serif">초 미세 반도체를<br>만드는 <span>EUV</span>의 원리</h1>
+    <p class="subhead">7nm, 5nm, 3nm… 숫자가 작아질수록 왜 더 좋아질까? 눈에 보이지 않는 회로를 빛으로 그리는 기술, EUV를 중학생도 이해할 수 있게 풀어봅니다.</p>
+    <div class="meta"><span>영상: https://youtu.be/kmFfesriafM</span><span class="dot"></span><span>2026.07.29 분석</span></div>
+  </header>
+
+  <section class="section fade-in">
+    <div class="kicker">01. WHY SMALLER?</div>
+    <h2 class="h2">작아질수록 좋은 이유</h2>
+    <p class="p">CPU, GPU, 메모리 안에는 <b>트랜지스터(전류를 켜고 끄는 초미니 스위치)</b>가 수십억 개 들어있어요. 스위치가 작아지면 두 가지가 좋아져요.</p>
+    <div class="card card-accent">
+      <div class="flex" style="margin-bottom:8px"><span class="tag tag-rose">효과 1</span><b>전력 소모 감소</b></div>
+      <div class="flex"><span class="tag">효과 2</span><b>같은 면적에 더 많은 트랜지스터 → 더 고성능</b></div>
+    </div>
+    <p class="p">그래서 트랜지스터 모양도 평평한 플래너(Planar) → 핀 모양의 핀펫(FinFET, 지느러미처럼 솟아있는 구조) → 게이트 올 어라운드(GAA, 게이트가 채널을 사방에서 감싸는 구조)로 진화했어요. 이 진화를 가능하게 한 열쇠가 바로 EUV입니다.</p>
+  </section>
+
+  <section class="section fade-in">
+    <div class="kicker">02. HOW TO MAKE?</div>
+    <h2 class="h2">반도체는 어떻게 만들까?</h2>
+    <p class="p">쇠를 두드리는 단조, 틀에 붓는 주조처럼 만들 수 없어요. 반도체는 <b>빛으로 도안을 찍고(노광), 필요 없는 부분을 깎아내는(식각) 방식</b>으로 만들어요. 그래서 어떤 빛을 쓰느냐가 성능을 결정해요.</p>
+    <div class="flow fade-in">
+      <div class="flow-step"><div style="font-size:20px">💡</div><div class="mono" style="font-size:11px;margin-top:4px">빛 생성</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div style="font-size:20px">🎞️</div><div class="mono" style="font-size:11px;margin-top:4px">레티클 통과</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div style="font-size:20px">🔬</div><div class="mono" style="font-size:11px;margin-top:4px">웨이퍼에 노광</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div style="font-size:20px">🧱</div><div class="mono" style="font-size:11px;margin-top:4px">식각</div></div>
+    </div>
+    <p class="caption">레티클 = 회로도가 새겨진 유리 원판(마스크). 빛이 이걸 통과하며 회로 모양을 갖게 돼요.</p>
+  </section>
+
+  <section class="section fade-in">
+    <div class="kicker">03. PHYSICS</div>
+    <h2 class="h2">파장이 짧을수록 선명하다</h2>
+    <p class="p">빛은 파동이라 좁은 틈을 지나면 퍼져요. 이걸 <b>회절(빛이 퍼지는 현상)</b>이라고 해요. 틈이 미세할수록, 파장이 길수록 더 많이 퍼져서 그림이 흐려져요. 반대로 <b>파장이 짧을수록 덜 퍼져서</b> 더 세밀한 회로를 그릴 수 있어요.</p>
+    
+    <div class="sim-box fade-in">
+      <div class="sim-title"><i></i> 인터랙티브 회절 시뮬레이터 – 파장을 직접 줄여보세요</div>
+      <div class="flex" style="margin-bottom:12px">
+        <span class="pill">파장: <b id="waveVal">193</b> nm</span>
+        <span class="pill">퍼짐: <b id="spreadVal">넓음</b></span>
+      </div>
+      <input type="range" id="waveSlider" min="13.5" max="400" step="0.5" value="193">
+      <div class="canvas-wrap" style="margin-top:12px"><canvas id="diffCanvas" height="180" style="width:100%"></canvas></div>
+      <div class="hint">💡 왼쪽으로 줄일수록(13.5nm에 가까울수록) 빛줄기가 덜 퍼져요. EUV가 왜 필요한지 눈으로 확인해보세요.</div>
+    </div>
+
+    <div class="chart-container fade-in"><canvas id="myChart1" height="220"></canvas></div>
+    <p class="caption">EUV는 13.5nm로, 기존 DUV(193nm)보다 약 14배 짧아요. 가시광선(400~700nm)보다 훨씬 짧습니다.</p>
+  </section>
+
+  <section class="section fade-in">
+    <div class="kicker">04. EUV GENERATION</div>
+    <h2 class="h2">EUV 빛, 어떻게 만드나? – 주석 방울과 레이저 2번</h2>
+    <p class="p">EUV는 자외선보다 더 짧은 빛이라 램프로 못 만들어요. 재료는 <b>주석(Sn, TIN, 금속의 일종)</b>이에요. 액체 주석 방울을 떨어뜨려 초고출력 레이저로 정확히 맞춰야 해요.</p>
+    <div class="card">
+      <div class="h3" style="margin-top:0">영상 속 예술 같은 과정</div>
+      <p class="p" style="margin-bottom:8px">1️⃣ 위에서 주석 방울이 일정한 간격으로 떨어져요.<br>2️⃣ 가운데 구멍에서 레이저가 나와 타이밍 맞춰 <b>딱!</b><br>3️⃣ 레이저가 <b>두 번</b> 나가요 – <span style="color:#eab308;font-weight:700">노란색</span>은 방울을 렌즈 모양으로 펼치고, <span style="color:#ef4444;font-weight:700">빨간색</span>은 초고출력으로 때려요.<br>4️⃣ 고에너지 받은 주석이 <b>플라즈마(원자가 깨져 빛·전기를 내는 상태)</b>가 되며 EUV 빛을 방출해요.</p>
+    </div>
+
+    <div class="sim-box fade-in">
+      <div class="sim-title"><i></i> 타이밍 게임 – 주석 방울을 레이저로 맞춰보세요</div>
+      <div class="canvas-wrap"><canvas id="tinCanvas" height="220" style="width:100%"></canvas></div>
+      <div class="flex" style="margin-top:12px">
+        <button class="btn" id="fireBtn">🔫 레이저 발사!</button>
+        <button class="btn btn-outline btn-sm" id="resetBtn">리셋</button>
+        <span class="pill">명중: <b id="hitCount">0</b> / 시도: <b id="tryCount">0</b></span>
+      </div>
+      <div class="hint">방울이 중앙 구멍(빨간 점선) 앞에 올 때 클릭하면 1차(노랑)→2차(빨강) 레이저가 순서대로 나가요. 2번 맞춰야 플라즈마 발생!</div>
+    </div>
+  </section>
+
+  <section class="section fade-in">
+    <div class="kicker">05. COLLECT & VACUUM</div>
+    <h2 class="h2">만든 빛을 모으고, 진공으로 지킨다</h2>
+    <p class="p">생성된 EUV는 출력이 약해 흩어져요. 아래쪽 오목 거울인 <b>콜렉터 미러(모아주는 거울)</b>가 정확한 각도로 설계돼 한 점으로 모아줘요. 표면은 일반 거울보다 수천~수만 배 더 매끈해요.</p>
+    <p class="p">EUV는 에너지가 높아 <b>공기 중에서는 흡수</b>돼버려요. 그래서 장비 내부 일부는 <b>고진공(공기 입자가 거의 없는 상태)</b>으로 만들어요. 부딪힐 물질이 없으니 흡수 없이 진행돼요.</p>
+    <div class="table-wrap fade-in"><table><tr><th>구분</th><th>특징</th><th>왜 필요?</th></tr><tr><td><b>콜렉터 미러</b></td><td>오목형 초정밀 거울</td><td>약한 EUV를 한 점으로 집광</td></tr><tr><td><b>고진공</b></td><td>공기 제거</td><td>대기 흡수 방지</td></tr></table></div>
+  </section>
+
+  <section class="section fade-in">
+    <div class="kicker">06. RETICLE & PELLICLE</div>
+    <h2 class="h2">반사형 레티클과 보호필름 펠리클</h2>
+    <p class="p"><b>레티클</b>은 회로 정보가 담긴 회로도예요. 원래 패턴 없는 빛이 레티클을 지나면 패턴이 찍힌 빛으로 바뀌어요. 전등 갓에 구멍 뚫린 패턴이 벽에 비치는 것과 같아요.</p>
+    <p class="p">기존에는 빛이 레티클을 <b>투과</b>했는데, EUV는 투과하면 재료에 흡수돼 사라져요. 그래서 EUV에서는 <b>반사형</b>으로 바뀌었어요. 천장에 레티클을 붙이고 반사시켜 쓰는 구조예요.</p>
+    <div class="card">
+      <div class="h3" style="margin-top:0">펠리클 – 수억짜리 레티클의 보호필름</div>
+      <p class="p">펠리클은 핸드폰 액정 보호필름처럼 <b>오염물질로부터 레티클을 보호</b>해요. 설비가 진공이어도 미세 오염은 생기고, 레티클은 수억 원이라 보호가 필수예요.</p>
+      <p class="p">문제는 EUV 레티클이 반사형이라 빛이 펠리클을 <b>두 번 투과</b>해야 한다는 거예요. 들어갈 때 한 번, 반사돼 나올 때 한 번. 투과율이 낮으면 빛이 다 흡수돼요. 예전 70% → 최근 90% 이상 개발됨.</p>
+    </div>
+
+    <div class="sim-box fade-in">
+      <div class="sim-title"><i></i> 펠리클 투과율 계산기 – 2번 통과하면 얼마나 남을까?</div>
+      <div class="flex" style="margin-bottom:10px"><span class="pill">단면 투과율: <b id="pelVal">70</b>%</span><span class="pill" style="background:#e11d48;color:#fff">왕복 후: <b id="pelResult">49.0</b>%</span></div>
+      <input type="range" id="pelSlider" min="50" max="95" step="1" value="70">
+      <div class="chart-container fade-in" style="margin-top:14px"><canvas id="myChart2" height="200"></canvas></div>
+      <div class="hint">계산식: 최종 = 투과율 × 투과율. 70%면 0.7×0.7=49%만 남아요. 90%면 81%가 남죠. 32%포인트 차이는 엄청난 생산성 차이예요.</div>
+    </div>
+  </section>
+
+  <section class="section fade-in">
+    <div class="kicker">07. EXPOSURE</div>
+    <h2 class="h2">웨이퍼에 회로를 새기다</h2>
+    <p class="p">레티클에서 패턴화된 EUV는 여러 반사 거울을 거쳐 <b>웨이퍼(실리콘 판)</b>에 닿아요. 아래 스테이지가 움직이며 정확한 위치에 노광(빛으로 찍기)을 해요. 진짜 어려운 과정을 거쳐 하나의 칩이 완성돼요.</p>
+    <div class="chart-container fade-in"><canvas id="myChart3" height="220"></canvas></div>
+    <p class="caption">EUV 1대는 1,500~3,000억 원. 부대 설비 포함하면 건물 3층 높이. High-NA(더 많은 빛을 모으는 차세대)는 5,000~6,000억 원대.</p>
+  </section>
+
+  <section class="section fade-in">
+    <div class="kicker">08. NEXT</div>
+    <h2 class="h2">High-NA EUV – 더 많은 빛으로 더 미세하게</h2>
+    <p class="p">사진 찍을 때 빛이 많을수록 선명하듯, EUV도 <b>더 많은 빛을 모을수록 더 미세하고 선명한 패턴</b>을 만들 수 있어요. 그게 High-NA EUV예요. 가격은 5천~6천억으로 미쳤다 싶지만, 그만큼 전 세계 천재들이 만든 기술의 집약체예요.</p>
+    <div class="chart-container fade-in"><canvas id="myChart4" height="220"></canvas></div>
+  </section>
+
+  <section class="section fade-in" style="padding-bottom:80px">
+    <div class="kicker">SUMMARY</div>
+    <h2 class="h2 serif">한 눈에 정리</h2>
+    <div class="card" style="border-color:var(--accent)">
+      <p class="p"><b>1.</b> 트랜지스터 작아지면 전력↓ 성능↑ → EUV 필수<br><b>2.</b> 반도체는 빛으로 새긴다, 파장 짧을수록 회절↓ 미세 패터닝↑<br><b>3.</b> EUV=13.5nm, 주석 방울+레이저 2번→플라즈마→빛 발생<br><b>4.</b> 콜렉터 미러로 모으고, 진공으로 보호<br><b>5.</b> 레티클은 반사형으로 전환, 펠리클은 2번 투과, 90% 이상 투과율이 핵심<br><b>6.</b> 장비 3천억, 공장 3층 크기, High-NA는 6천억</p>
+    </div>
+    <p class="caption">원본 자막 기준 60% 압축, 중학생 눈높이로 재구성. 수치는 원본 그대로 유지.</p>
+  </section>
+</div>
+
+<script>
+// --- fade-in observer (필수 패턴) ---
+const fadeObs = new IntersectionObserver((entries) => {
+  entries.forEach((e, i) => {
+    if (e.isIntersecting) {
+      setTimeout(() => e.target.classList.add('visible'), i * 80);
+      fadeObs.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.12 });
+document.querySelectorAll('.fade-in').forEach(el => fadeObs.observe(el));
+
+// --- chart configs (필수 패턴) ---
+const chartConfigs = {};
+
+chartConfigs['myChart1'] = () => {
+  new Chart(document.getElementById('myChart1'), {
+    type: 'bar',
+    data: {
+      labels: ['가시광선','DUV','EUV'],
+      datasets: [{label:'파장 (nm, log)', data:[550,193,13.5], backgroundColor:['#6b7280','#1a1a1a','#e11d48'], borderRadius:8, barThickness:36}]
+    },
+    options: {
+      responsive:true, animation:{duration:900},
+      scales:{y:{type:'logarithmic', grid:{color:'#f0f0f0'}, ticks:{callback:v=>[13.5,193,550].includes(v)?v:''}}, x:{grid:{display:false}}},
+      plugins:{legend:{display:false}, title:{display:true,text:'파장이 짧을수록 미세 패터닝 가능', font:{size:13}}, tooltip:{callbacks:{label:c=>c.raw+' nm'}}}
+    }
+  });
+};
+
+chartConfigs['myChart2'] = () => {
+  const pelCanvas = document.getElementById('myChart2');
+  if(!pelCanvas) return;
+  const chart = new Chart(pelCanvas, {
+    type: 'bar',
+    data: {
+      labels: ['과거 70%','현재 90%+'],
+      datasets: [{label:'왕복 투과율 %', data:[49,81], backgroundColor:['#6b7280','#e11d48'], borderRadius:8}]
+    },
+    options: {
+      responsive:true, animation:{duration:900},
+      scales:{y:{beginAtZero:true,max:100, grid:{color:'#f0f0f0'}}, x:{grid:{display:false}}},
+      plugins:{legend:{display:false}, tooltip:{callbacks:{label:c=>c.raw+'%'}}}
+    }
+  });
+  window._pelChart = chart;
+};
+
+chartConfigs['myChart3'] = () => {
+  new Chart(document.getElementById('myChart3'), {
+    type: 'bar',
+    data: {
+      labels: ['DUV 장비','EUV','High-NA EUV'],
+      datasets: [{label:'가격(억원)', data:[1000,2250,5500], backgroundColor:['#6b7280','#e11d48','#1a1a1a'], borderRadius:8}]
+    },
+    options: {
+      responsive:true, animation:{duration:900},
+      scales:{y:{beginAtZero:true, grid:{color:'#f0f0f0'}, ticks:{callback:v=>v+'억'}}, x:{grid:{display:false}}},
+      plugins:{legend:{display:false}, title:{display:true,text:'설비 가격 비교 (원본 자막 기준)', font:{size:12}}}
+    }
+  });
+};
+
+chartConfigs['myChart4'] = () => {
+  new Chart(document.getElementById('myChart4'), {
+    type: 'line',
+    data: {
+      labels: ['2015','2017','2019','2021','2023','2025','High-NA'],
+      datasets: [
+        {label:'공정 미세화 (nm)', data:[14,10,7,5,3,2,1.5], borderColor:'#e11d48', backgroundColor:'rgba(225,29,72,.12)', tension:.35, fill:true, pointRadius:4},
+        {label:'필요 빛 모음 정도 (상대)', data:[20,30,45,65,85,100,160], borderColor:'#1a1a1a', borderDash:[6,4], tension:.35, pointRadius:0, yAxisID:'y1'}
+      ]
+    },
+    options: {
+      responsive:true, animation:{duration:900},
+      scales:{y:{beginAtZero:false, grid:{color:'#f0f0f0'}}, y1:{position:'right', grid:{display:false}}, x:{grid:{display:false}}},
+      plugins:{legend:{position:'bottom', labels:{font:{size:11}}}}
+    }
+  });
+};
+
+const chartObs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const canvas = e.target.querySelector('canvas');
+      if (canvas && chartConfigs[canvas.id]) {
+        chartConfigs[canvas.id]();
+        e.target.classList.add('chart-ready');
+        chartObs.unobserve(e.target);
+      }
+    }
+  });
+}, { threshold: 0.15 });
+document.querySelectorAll('.chart-container').forEach(el => chartObs.observe(el));
+
+// --- 시뮬레이터 1: 회절 ---
+const dCanvas = document.getElementById('diffCanvas');
+const dCtx = dCanvas.getContext('2d');
+const waveSlider = document.getElementById('waveSlider');
+const waveVal = document.getElementById('waveVal');
+const spreadVal = document.getElementById('spreadVal');
+function drawDiff(){
+  const W = dCanvas.width = dCanvas.clientWidth*2;
+  const H = dCanvas.height = 180*2;
+  const wave = parseFloat(waveSlider.value);
+  const spread = (wave/400)*80 + 8; // 파장 클수록 퍼짐 큼
+  waveVal.textContent = wave;
+  spreadVal.textContent = spread>60?'매우 넓음':spread>40?'넓음':spread>20?'보통':'아주 좁음';
+  dCtx.clearRect(0,0,W,H);
+  // 슬릿
+  dCtx.fillStyle='#1a1a1a';
+  dCtx.fillRect(0,0,6,H);
+  const slitY = H*0.5-18;
+  dCtx.clearRect(6,slitY,10,36);
+  // 빛
+  const grad = dCtx.createLinearGradient(16,0,W,0);
+  grad.addColorStop(0,'rgba(225,29,72,0.9)');
+  grad.addColorStop(1,'rgba(225,29,72,0.05)');
+  dCtx.fillStyle=grad;
+  dCtx.beginPath();
+  dCtx.moveTo(16,slitY+2);
+  dCtx.lineTo(W, H*0.5 - spread*2);
+  dCtx.lineTo(W, H*0.5 + spread*2);
+  dCtx.lineTo(16, slitY+34);
+  dCtx.closePath(); dCtx.fill();
+  // 라벨
+  dCtx.fillStyle='#777'; dCtx.font='20px sans-serif'; dCtx.fillText('레티클 틈', 18, 30);
+  dCtx.fillStyle='#e11d48'; dCtx.fillText('웨이퍼 도달 폭: '+Math.round(spread*2)+'px', W*0.35, H-20);
+}
+waveSlider.addEventListener('input', drawDiff);
+window.addEventListener('resize', drawDiff);
+drawDiff();
+
+// --- 시뮬레이터 2: 주석 방울 ---
+const tCanvas = document.getElementById('tinCanvas');
+const tCtx = tCanvas.getContext('2d');
+let drops=[], animId, hit=0, tries=0;
+let laserPhase=0, laserTimer=0;
+let tW, tH;
+function resizeTin(){tW=tCanvas.width=tCanvas.clientWidth*2; tH=tCanvas.height=220*2}
+resizeTin();
+window.addEventListener('resize', resizeTin);
+function spawnDrop(){ drops.push({x: tW*0.5 + (Math.random()-0.5)*40, y:-20, vy:2+Math.random()*1.5, hit1:false, hit2:false, plasma:0}) }
+let lastSpawn=0;
+function loopTin(ts){
+  if(!lastSpawn) lastSpawn=ts;
+  if(ts-lastSpawn>800){spawnDrop(); lastSpawn=ts}
+  tCtx.clearRect(0,0,tW,tH);
+  // 구멍/레이저 원점
+  const cx=tW*0.5, cy=tH*0.5;
+  tCtx.strokeStyle='rgba(225,29,72,0.5)'; tCtx.setLineDash([8,8]); tCtx.beginPath(); tCtx.arc(cx,cy,22,0,Math.PI*2); tCtx.stroke(); tCtx.setLineDash([]);
+  tCtx.fillStyle='#1a1a1a'; tCtx.beginPath(); tCtx.arc(tW*0.1,cy,8,0,Math.PI*2); tCtx.fill();
+  tCtx.fillStyle='#777'; tCtx.font='20px sans-serif'; tCtx.fillText('레이저 구멍', 12, cy-18);
+  // 레이저 빔
+  if(laserPhase===1){
+    tCtx.strokeStyle='rgba(234,179,8,0.9)'; tCtx.lineWidth=6; tCtx.beginPath(); tCtx.moveTo(tW*0.1,cy); tCtx.lineTo(cx,cy); tCtx.stroke();
+    laserTimer--; if(laserTimer<=0){laserPhase=2; laserTimer=10}
+  } else if(laserPhase===2){
+    tCtx.strokeStyle='rgba(239,68,68,0.95)'; tCtx.lineWidth=10; tCtx.beginPath(); tCtx.moveTo(tW*0.1,cy); tCtx.lineTo(cx,cy); tCtx.stroke();
+    laserTimer--; if(laserTimer<=0){laserPhase=0}
+  }
+  // drops
+  for(let i=drops.length-1;i>=0;i--){
+    let d=drops[i];
+    if(!d.hit1 && !d.hit2) d.y+=d.vy*2;
+    if(d.plasma>0){ d.plasma-=0.04; const r= (1-d.plasma)*60; tCtx.fillStyle=`rgba(225,29,72,${d.plasma})`; tCtx.beginPath(); tCtx.arc(d.x,d.y,r,0,Math.PI*2); tCtx.fill(); if(d.plasma<=0) drops.splice(i,1); continue; }
+    if(d.hit1 && !d.hit2){
+      tCtx.fillStyle='#facc15'; tCtx.beginPath(); tCtx.ellipse(d.x,d.y,18,10,0,0,Math.PI*2); tCtx.fill();
+    } else if(!d.hit1){
+      tCtx.fillStyle='#9ca3af'; tCtx.beginPath(); tCtx.arc(d.x,d.y,9,0,Math.PI*2); tCtx.fill();
+    }
+    if(d.y>tH+30) drops.splice(i,1);
+  }
+  animId=requestAnimationFrame(loopTin);
+}
+loopTin(0);
+document.getElementById('fireBtn').addEventListener('click', ()=>{
+  tries++; document.getElementById('tryCount').textContent=tries;
+  let target=null, minDist=9999;
+  const cx=tW*0.5, cy=tH*0.5;
+  for(let d of drops){ if(d.hit1||d.plasma>0) continue; const dist=Math.hypot(d.x-cx,d.y-cy); if(dist<60 && dist<minDist){minDist=dist; target=d} }
+  if(target){
+    if(!target.hit1){ target.hit1=true; laserPhase=1; laserTimer=12; setTimeout(()=>{ if(target){ target.hit2=true; target.plasma=1; hit++; document.getElementById('hitCount').textContent=hit; laserPhase=2; laserTimer=12 }}, 280); }
+  } else { laserPhase=1; laserTimer=8 }
+});
+document.getElementById('resetBtn').addEventListener('click', ()=>{drops=[]; hit=0; tries=0; document.getElementById('hitCount').textContent=0; document.getElementById('tryCount').textContent=0});
+
+// --- 시뮬레이터 3: 펠리클 ---
+const pelSlider=document.getElementById('pelSlider');
+const pelVal=document.getElementById('pelVal');
+const pelResult=document.getElementById('pelResult');
+function updatePel(){
+  const v=parseInt(pelSlider.value); pelVal.textContent=v;
+  const finalVal=(v/100)*(v/100)*100; pelResult.textContent=finalVal.toFixed(1);
+  if(window._pelChart){ window._pelChart.data.datasets[0].data=[(70*70)/100, finalVal]; window._pelChart.update(); }
+}
+pelSlider.addEventListener('input', updatePel);
+updatePel();
+</script>
+</body>
+</html>

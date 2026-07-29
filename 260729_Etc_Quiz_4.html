@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EUV Light Source Quiz - Interactive</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<style>
+:root{--accent:#e11d48;--accent2:#f43f5e;--bg:#ffffff;--bg2:#fafafa;--text:#1a1a1a;--text2:#777777;--border:#e5e5e5}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+h1,h2{font-family:'Playfair Display',serif}
+.sticky{position:sticky;top:0;z-index:100;background:#fff;border-bottom:2px solid var(--accent);padding:12px 16px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;box-shadow:0 4px 12px rgba(0,0,0,.06)}
+.sticky-left{display:flex;gap:16px;font-size:13px;font-weight:600}
+.sticky-left span b{color:var(--accent)}
+.progress{height:8px;background:#ffe4e6;border-radius:10px;overflow:hidden;width:100%;margin-top:8px}
+.progress-bar{height:100%;width:0%;transition:width .4s, background .4s;background:var(--accent)}
+.container{max-width:720px;margin:0 auto;padding:18px 16px 80px}
+.hero{padding:28px 0 10px}
+.hero h1{font-size:26px;line-height:1.3}
+.hero h1 span{color:var(--accent)}
+.hero p{color:var(--text2);font-size:14px;margin-top:8px}
+.card{background:#fff;border:1px solid var(--border);border-radius:16px;padding:18px;margin:16px 0;transition:all .3s}
+.card.solved{border-color:#ddd}
+.card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.num{font-weight:800;font-size:13px;letter-spacing:1px}
+.badges{display:flex;gap:6px}
+.badge{font-size:11px;padding:3px 8px;border-radius:12px;font-weight:700}
+.d-easy{background:#dcfce7;color:#166534}
+.d-med{background:#fef9c3;color:#854d0e}
+.d-hard{background:#ffe4e6;color:#9f1239}
+.type{font-size:11px;color:var(--text2);border:1px solid var(--border);padding:2px 8px;border-radius:12px}
+.q{font-size:16px;font-weight:600;margin-bottom:14px;line-height:1.5}
+.options{display:flex;flex-direction:column;gap:8px}
+.opt{padding:12px 14px;border:1.5px solid var(--border);border-radius:12px;background:#fff;cursor:pointer;font-size:14px;text-align:left;transition:all .2s}
+.opt:hover{border-color:var(--accent);transform:translateY(-1px)}
+.opt.correct{background:#dcfce7 !important;border-color:#22c55e !important;color:#166534}
+.opt.wrong{background:#fee2e2 !important;border-color:#ef4444 !important;color:#991b1b}
+.opt:disabled{cursor:not-allowed;opacity:.9}
+.short-row{display:flex;gap:8px}
+.input{flex:1;padding:12px;border:1.5px solid var(--border);border-radius:12px;font-size:14px}
+.input:focus{outline:none;border-color:var(--accent)}
+.btn{padding:10px 16px;border-radius:20px;border:1px solid var(--border);background:var(--accent);color:#fff;font-weight:700;font-size:13px;cursor:pointer}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.ox-row{display:flex;gap:10px}
+.ox{flex:1;padding:14px;border-radius:12px;border:1.5px solid var(--border);background:#fff;font-size:18px;font-weight:800;cursor:pointer}
+.ox.correct{background:#dcfce7;border-color:#22c55e;color:#166534}
+.ox.wrong{background:#fee2e2;border-color:#ef4444;color:#991b1b}
+.explain{margin-top:14px;padding:14px;background:var(--bg2);border-radius:12px;border-left:4px solid var(--accent);font-size:13px;display:none;line-height:1.6}
+.explain.show{display:block}
+.explain b{color:var(--accent)}
+.result-badge{display:inline-block;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:800;margin-left:8px}
+.result-badge.ok{background:#dcfce7;color:#166534}
+.result-badge.no{background:#fee2e2;color:#991b1b}
+.final{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:200;padding:20px}
+.final.show{display:flex}
+.final-card{background:#fff;border-radius:20px;padding:28px;max-width:420px;width:100%;text-align:center;box-shadow:0 20px 40px rgba(0,0,0,.2)}
+.final-card h2{font-size:26px;margin-bottom:8px}
+.score-big{font-size:48px;font-weight:900;color:var(--accent);margin:12px 0}
+.grade{font-size:18px;font-weight:700;margin-bottom:12px}
+</style>
+</head>
+<body>
+<div class="sticky">
+  <div style="flex:1;min-width:260px">
+    <div class="sticky-left">
+      <span>푼 문제 <b id="solvedCount">0</b> / 10</span>
+      <span>맞힌 문제 <b id="correctCount">0</b></span>
+      <span>정답률 <b id="rate">0%</b></span>
+    </div>
+    <div class="progress"><div class="progress-bar" id="prog"></div></div>
+  </div>
+  <div style="font-size:11px;color:var(--text2)">ASML EUV 광원 퀴즈 · 경제 관점 분석 기반</div>
+</div>
+
+<div class="container">
+  <div class="hero">
+    <h1>EUV 광원과 병목의 진짜 이야기 <span>확인 퀴즈</span></h1>
+    <p>원본 인터뷰(ASML San Diego 출신)에 나온 내용만 출제. 클릭 즉시 채점 + 근거 해설 자동 표시.</p>
+  </div>
+  <div id="quizRoot"></div>
+</div>
+
+<div class="final" id="finalModal">
+  <div class="final-card">
+    <h2 id="finalTitle">퀴즈 완료!</h2>
+    <div class="score-big" id="finalScore">0%</div>
+    <div class="grade" id="finalGrade"></div>
+    <p id="finalMsg" style="font-size:13px;color:var(--text2);margin-bottom:16px"></p>
+    <button class="btn" style="width:100%" onclick="location.reload()">[다시 풀기]</button>
+  </div>
+</div>
+
+<script>
+const QUIZ_DATA = [
+{
+ id:1, type:'mcq', difficulty:'쉬움',
+ question:'ASML을 순수 네덜란드 회사로 아는 사람이 많지만, 실제 핵심 연구소 3곳은 어디에 있나?',
+ options:['암스테르담·로테르담·헤이그','벨트호벤(네덜란드)·윌턴(美 동부)·샌디에이고(美 서부)','베를린·뮌헨·샌디에이고','아이즈미르·오사카·샌디에이고'],
+ answer:1,
+ explanation:'정답: 벨트호벤·윌턴·샌디에이고. 원본 자막: “실제 ASML의 핵심 연구소는 크게 한 세 군데 정도 있습니다… 폴란드 본사 벨트호벤, 미국 동부 윌턴, 서부 샌디에고”. 특히 샌디에이고가 EUV 광원을 담당.'
+},
+{
+ id:2, type:'mcq', difficulty:'쉬움',
+ question:'EUV 빛의 파장과 DUV 빛의 파장은 각각 몇 nm인가?',
+ options:['EUV 193nm / DUV 13.5nm','EUV 13.5nm / DUV 193nm','EUV 7nm / DUV 20nm','EUV 40nm / DUV 20nm'],
+ answer:1,
+ explanation:'정답: EUV 13.5nm, DUV 193nm. 원본: “EUV 빛 파장은 13.5나노미터고 그 전 가장 최신 세대의 DUV 공정 사용할 때 DUV는 193나노미터거든요. 파장만 보면 거의 14배 정도 차이”'
+},
+{
+ id:3, type:'mcq', difficulty:'보통',
+ question:'EUV가 지금도 반도체 병목으로 남아있는 이유 2가지를 올바르게 짝지은 것은?',
+ options:['렌즈 부족 + 자외선 유해성','공급망 증설의 물리적 시간 + 칩 메이커의 투자 효용 검증 시간','중국 수출 금지 + 전력 부족','주석 가격 폭등 + 물 부족'],
+ answer:1,
+ explanation:'정답: 공급망 한계와 검증 시간. 원본: “첫 번째는 공급망의 한계… 협력사들도 공장을 다 증설해야 되고… 두 번째는 칩 메이커들이 이 장비를 샀을 때 투자한 만큼의 효용이 있는가 검증 과정” TSMC가 2018~19년 첫 도입 후 다른 업체들이 뒤따름.'
+},
+{
+ id:4, type:'mcq', difficulty:'보통',
+ question:'파장이 14배 차이 나는데 실제 구현 가능한 피처(선폭)는 DUV 약 40nm, EUV 약 20nm로 2배 차이에 불과한 이유는?',
+ options:['EUV가 사실 DUV보다 어두워서','DUV가 렌즈 가공·이머전(물) 기술 등으로 이론 한계까지 도달했고, 해상도는 파장뿐 아니라 광학계 완성도(NA)에 달렸기 때문','측정 오류','EUV는 거울이 없어서'],
+ answer:1,
+ explanation:'정답: 광학계 완성도 덕분. 원본: “193나노미터 빛을 사용하면서 그 노광기의 광학적 성능은 이론적 한계까지 거의 도달했습니다… 이머전이라고 해서… numerical aperture NA를 크게… 그래서 가장 최신 DUV랑 EUV 사이에 실제 웨이퍼에 도달했을 때 해상도는 한 2배 정도밖에 차이”'
+},
+{
+ id:5, type:'mcq', difficulty:'보통',
+ question:'인터뷰에서 말하는 EUV의 진짜 가치는 무엇인가?',
+ options:['불가능한 공정을 가능하게 하는 것','경제성 – 여러 번 찍을 것을 한 번에 찍어 돈을 아끼는 것','전력 소모를 0으로 만드는 것','장비를 가볍게 만드는 것'],
+ answer:1,
+ explanation:'정답: 경제성. 원본: “EUV 노광 장비의 가치는 불가능한 걸 가능하게 한다 라기보다는 경제성에 있습니다… 여러가지 단계들 다 없애고 한번에 필요한 수준의 정밀도로 미세한 패턴을 찍어내는 것… 몇천억짜리 장비를 구매하는데 그게 결과적으로 제일 싼 방법”'
+},
+{
+ id:6, type:'mcq', difficulty:'어려움',
+ question:'EUV 광원 물질 후보로 제논(Xe)과 주석(Sn)이 있었을 때, 주석이 선택된 결정적 이유는?',
+ options:['주석이 더 싸서','같은 에너지 투입 시 주석이 13.5nm 근처 빛을 5~10배 더 많이 방출해 효율이 압도적이어서','제논이 진공을 오염시켜서','주석이 액체가 되기 쉬워서'],
+ answer:1,
+ explanation:'정답: 효율이 5~10배. 원본: “똑같은 에너지를 투입해서 플라즈마를 만들었을 때 주석이 제논을 사용했을 때보다 13.5나노미터 근처에서의 빛을 한 5배에서 10배 이상 많은 방출… 효율이 압도적이다 보니까 주석을 사용하는 것이 대량 생산을 위한 노광기에는 더 적합”'
+},
+{
+ id:7, type:'short', difficulty:'쉬움',
+ question:'EUV 광원에서 사용하는 액체 주석 방울의 크기는 약 몇 마이크로미터인가? (숫자만 입력: 예 30)',
+ options:[], answer:'30',
+ explanation:'정답: 약 30마이크로미터. 원본: “방울 한 30마이크로미터 정도 되는 구슬 형태의 방울로 만듭니다… 초속 100m 이상으로 날아가는 30마이크로짜리 그 작은 주석 방울을…” 추가: 가열 200도 이상, 초당 5만 번, 속도 100m/s.'
+},
+{
+ id:8, type:'short', difficulty:'보통',
+ question:'기존 더블 펄스에서 메인 펄스 안에 같이 있던 ‘저에너지 기화’ 과정을 독립 펄스로 분리해 조절 자유도(Degree of freedom)를 늘린 신기술 이름은?',
+ options:[], answer:'트리플 펄스',
+ explanation:'정답: 트리플 펄스 아키텍처. 원본: “트리플 펄스 방식은… 레이저를 3번 맞추는 겁니다. 중간에 그 이베퍼레이션 시키는 그 과정을 아예 독립된 펄스로 분리를… 주석 방울을 조절할 수 있는 그런 조작 노브가 하나 더 생긴 거죠. degree of freedom이 압도적으로 늘어나는 겁니다.”'
+},
+{
+ id:9, type:'ox', difficulty:'보통',
+ question:'ASML의 EUV 광원 연구소는 네덜란드 본사 벨트호벤에만 있고, 미국에는 없다.',
+ options:['O','X'], answer:'X',
+ explanation:'정답: X. 원본: “제가 얼마 전까지 일했던 곳이 캘리포니아 샌디에이고에 있는 그 asml 소스 연구소… 원래 샌디에고에 UCSD 교수님들이 창업한 사이머라는 노광 장비 광원 기업… 2013년도에 광원 회사였던 미국 사이머를 아예 통째로 인수” 미국 기술이 포함되어 있어 수출 통제 근거가 된다.'
+},
+{
+ id:10, type:'ox', difficulty:'어려움',
+ question:'ASML은 트리플 펄스 방식을 이용하면 큰 아키텍처 변화 없이도 EUV 출력을 현재 500~600W에서 1.5kW까지 높일 수 있다고 발표했다.',
+ options:['O','X'], answer:'O',
+ explanation:'정답: O. 원본: “ASML은 앞으로 큰 아키텍처 변화 없이도 이 트리플펄스 방식을 이용을 하면 EUV 출력을 약 1.5kW까지 높여서… 현재 500에서 600와트 급에서 1.5킬로와트 급으로 출력이 향상”이 가능하다고 발표. 이는 시간당 웨이퍼 생산량 증가로 이어진다.'
+}
+];
+
+let state={solved:0, correct:0};
+
+function render(){
+  const root=document.getElementById('quizRoot');
+  root.innerHTML='';
+  QUIZ_DATA.forEach((q, idx)=>{
+    const card=document.createElement('div');
+    card.className='card';
+    card.id='card-'+q.id;
+    const diffClass = q.difficulty==='쉬움'?'d-easy':q.difficulty==='보통'?'d-med':'d-hard';
+    card.innerHTML=`
+      <div class="card-header">
+        <div style="display:flex;gap:8px;align-items:center">
+          <span class="num">Q${idx+1}</span>
+          <span class="badge ${diffClass}">${q.difficulty}</span>
+          <span class="type">${q.type==='mcq'?'객관식':q.type==='short'?'단답형':'OX'}</span>
+        </div>
+        <span id="result-${q.id}"></span>
+      </div>
+      <div class="q">${q.question}</div>
+      <div id="body-${q.id}"></div>
+      <div class="explain" id="explain-${q.id}"><b>해설:</b> ${q.explanation}</div>
+    `;
+    root.appendChild(card);
+    const body=document.getElementById('body-'+q.id);
+    if(q.type==='mcq'){
+      const optWrap=document.createElement('div');optWrap.className='options';
+      q.options.forEach((opt,i)=>{
+        const b=document.createElement('button');
+        b.className='opt';b.textContent=opt;
+        b.onclick=()=>checkMCQ(q.id,i,b);
+        optWrap.appendChild(b);
+      });
+      body.appendChild(optWrap);
+    }else if(q.type==='short'){
+      const row=document.createElement('div');row.className='short-row';
+      row.innerHTML=`<input class="input" id="input-${q.id}" placeholder="정답 입력 (예: 30 또는 트리플 펄스)"><button class="btn" id="btn-${q.id}">제출</button>`;
+      body.appendChild(row);
+      setTimeout(()=>{
+        document.getElementById('btn-'+q.id).onclick=()=>checkShort(q.id);
+        document.getElementById('input-'+q.id).addEventListener('keydown',e=>{if(e.key==='Enter') checkShort(q.id);});
+      },0);
+    }else{
+      const row=document.createElement('div');row.className='ox-row';
+      row.innerHTML=`<button class="ox" id="oxO-${q.id}">O</button><button class="ox" id="oxX-${q.id}">X</button>`;
+      body.appendChild(row);
+      setTimeout(()=>{
+        document.getElementById('oxO-'+q.id).onclick=()=>checkOX(q.id,'O');
+        document.getElementById('oxX-'+q.id).onclick=()=>checkOX(q.id,'X');
+      },0);
+    }
+  });
+}
+
+function markSolved(id, isCorrect){
+  const card=document.getElementById('card-'+id);
+  card.classList.add('solved');
+  const explain=document.getElementById('explain-'+id);
+  explain.classList.add('show');
+  const res=document.getElementById('result-'+id);
+  if(isCorrect){res.innerHTML='<span class="result-badge ok">✓ 정답!</span>';}else{res.innerHTML='<span class="result-badge no">✗ 오답</span>';}
+  state.solved++;
+  if(isCorrect) state.correct++;
+  updateBoard();
+  if(state.solved===10) showFinal();
+}
+
+function updateBoard(){
+  document.getElementById('solvedCount').textContent=state.solved;
+  document.getElementById('correctCount').textContent=state.correct;
+  const rate = state.solved ? Math.round(state.correct/state.solved*100) : 0;
+  document.getElementById('rate').textContent=rate+'%';
+  const prog=document.getElementById('prog');
+  prog.style.width=(state.solved/10*100)+'%';
+  if(rate<=40) prog.style.background='#ef4444';
+  else if(rate<=70) prog.style.background='#f97316';
+  else prog.style.background='#22c55e';
+}
+
+function checkMCQ(id, chosen, btnEl){
+  const q=QUIZ_DATA.find(x=>x.id===id);
+  const cardBody=document.getElementById('body-'+id);
+  const allBtns=cardBody.querySelectorAll('.opt');
+  allBtns.forEach(b=>b.disabled=true);
+  const isCorrect = chosen===q.answer;
+  if(isCorrect){btnEl.classList.add('correct');}
+  else{
+    btnEl.classList.add('wrong');
+    allBtns[q.answer].classList.add('correct');
+  }
+  markSolved(id,isCorrect);
+}
+
+function normalizeShort(s){return s.trim().toLowerCase().replace(/\s+/g,'').replace('마이크로미터','').replace('μm','').replace('um','');}
+function checkShort(id){
+  const q=QUIZ_DATA.find(x=>x.id===id);
+  const input=document.getElementById('input-'+id);
+  const btn=document.getElementById('btn-'+id);
+  const val=input.value.trim();
+  if(!val){alert('답을 입력하세요');return;}
+  input.disabled=true;btn.disabled=true;
+  let isCorrect=false;
+  const normVal=normalizeShort(val);
+  const normAns=normalizeShort(q.answer);
+  if(id===7){
+    isCorrect = normVal.includes('30') || normVal==='30마이크로' || normVal==='30';
+  }else if(id===8){
+    isCorrect = normVal.includes('트리플') || normVal.includes('triple') || normVal.includes('3');
+  }else{
+    isCorrect = normVal===normAns;
+  }
+  input.style.borderColor = isCorrect ? '#22c55e' : '#ef4444';
+  input.style.background = isCorrect ? '#dcfce7' : '#fee2e2';
+  markSolved(id,isCorrect);
+}
+
+function checkOX(id, chosen){
+  const q=QUIZ_DATA.find(x=>x.id===id);
+  const oBtn=document.getElementById('oxO-'+id);
+  const xBtn=document.getElementById('oxX-'+id);
+  oBtn.disabled=true;xBtn.disabled=true;
+  const isCorrect = chosen===q.answer;
+  const target = chosen==='O'?oBtn:xBtn;
+  const other = chosen==='O'?xBtn:oBtn;
+  if(isCorrect){target.classList.add('correct');}
+  else{target.classList.add('wrong'); other.classList.add('correct');}
+  markSolved(id,isCorrect);
+}
+
+function showFinal(){
+  const rate = Math.round(state.correct/10*100);
+  let grade='D',msg='';
+  if(rate>=90){grade='A';msg='ASML 광원 전문가 수준! 경제성 관점까지 완벽히 이해했어요 🎉';}
+  else if(rate>=70){grade='B';msg='훌륭해요! EUV 병목과 트리플 펄스 핵심을 잘 잡았습니다.';}
+  else if(rate>=50){grade='C';msg='좋은 시작! 오답 해설을 다시 읽으면 전체 흐름이 더 선명해져요.';}
+  else{grade='D';msg='괜찮아요. 리포트 다시 보고 재도전! 주석 방울 30μm, 100m/s, 5만Hz만 기억해도 절반은 성공.';}
+  document.getElementById('finalScore').textContent=rate+'%';
+  document.getElementById('finalGrade').textContent=`등급 ${grade} · ${state.correct}/10`;
+  document.getElementById('finalMsg').textContent=msg;
+  document.getElementById('finalModal').classList.add('show');
+}
+
+render();
+</script>
+</body>
+</html>

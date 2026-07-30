@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YouTube Medical Credibility Crisis Analysis Report</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+:root{
+  --bg:#ffffff; --bg2:#fafafa; --text:#1a1a1a; --text2:#777777;
+  --accent:#e11d48; --accent2:#f43f5e; --border:#e5e5e5;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-serif;line-height:1.7;overflow-x:hidden}
+h1,h2,h3{font-family:'Playfair Display',serif;letter-spacing:-0.02em}
+.container{max-width:640px;margin:0 auto;padding:0 20px}
+.hero{padding:52px 20px 36px;background:linear-gradient(180deg,#fff 0%,#fafafa 100%);border-bottom:1px solid var(--border)}
+.eyebrow{display:inline-block;background:var(--accent);color:#fff;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700;letter-spacing:0.05em;margin-bottom:16px}
+.hero h1{font-size:32px;line-height:1.25;margin-bottom:14px}
+.hero h1 span{color:var(--accent)}
+.hero .sub{color:var(--text2);font-size:15px;line-height:1.6}
+.meta{margin-top:18px;display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--text2)}
+.meta b{color:var(--text)}
+
+.fade-in{opacity:0;transform:translateY(18px);transition:opacity 0.7s ease,transform 0.7s ease}
+.fade-in.visible{opacity:1;transform:translateY(0)}
+.chart-container{position:relative;max-height:340px;background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:16px 12px;margin:18px 0}
+.chart-container canvas{opacity:0;transition:opacity 0.4s ease;max-height:300px}
+.chart-container.chart-ready canvas{opacity:1}
+
+.card{background:var(--bg);border:1px solid var(--border);border-radius:16px;padding:20px;margin:16px 0}
+.card.bg2{background:var(--bg2)}
+.kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:20px 0}
+.kpi{background:#fff;border:1px solid var(--border);border-left:4px solid var(--accent);border-radius:12px;padding:14px}
+.kpi .num{font-size:22px;font-weight:800;color:var(--accent);font-family:'Playfair Display'}
+.kpi .label{font-size:12px;color:var(--text2);margin-top:4px}
+
+.tag{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700;margin-right:6px}
+.tag-A{background:#1a1a1a;color:#fff}
+.tag-B{background:#2563eb;color:#fff}
+.tag-C{background:#f59e0b;color:#fff}
+.tag-D{background:var(--accent);color:#fff}
+
+table{width:100%;border-collapse:collapse;background:var(--bg2);border-radius:12px;overflow:hidden;border:1px solid var(--border)}
+th{background:var(--accent);color:#fff;padding:12px 10px;font-size:13px;text-align:left}
+td{padding:12px 10px;border-top:1px solid var(--border);font-size:13px}
+tr:last-child td{border-bottom:none}
+
+.section{padding:32px 0;border-bottom:1px solid #f1f1f1}
+.section h2{font-size:22px;margin-bottom:10px}
+.section h2 em{font-style:normal;color:var(--accent)}
+.section .desc{color:var(--text2);font-size:14px;margin-bottom:16px}
+
+.badge{display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid var(--border);padding:6px 10px;border-radius:20px;font-size:12px}
+.dot{width:8px;height:8px;border-radius:50%}
+.sim-box{background:#fff;border:2px solid var(--accent);border-radius:16px;padding:18px;margin-top:14px}
+input[type=range]{width:100%;accent-color:var(--accent)}
+.btn{border:none;background:var(--accent);color:#fff;padding:10px 16px;border-radius:10px;font-weight:700;font-size:13px;cursor:pointer}
+.btn.ghost{background:#1a1a1a}
+.btn-row{display:flex;gap:8px;margin-top:12px}
+.alert{background:#fff1f2;border:1px solid #fecdd3;border-left:4px solid var(--accent);padding:14px;border-radius:10px;font-size:13px;margin:12px 0}
+.tip{background:#eff6ff;border:1px solid #bfdbfe;border-left:4px solid #2563eb;padding:14px;border-radius:10px;font-size:13px;margin:12px 0}
+
+.toggle-group{display:flex;background:var(--bg2);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin:12px 0}
+.toggle-group button{flex:1;padding:10px;border:none;background:transparent;font-size:13px;font-weight:600;cursor:pointer}
+.toggle-group button.active{background:var(--accent);color:#fff}
+
+@media (max-width:400px){.hero h1{font-size:26px}.kpi-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="hero">
+<div class="container">
+<div class="eyebrow">SBS 8NEWS · 2026.07.31</div>
+<h1>의사·약사 말만 믿었는데,<br><span>절대 먹지 마</span> 조회수 폭발의 비밀</h1>
+<p class="sub">국립암센터가 유튜브 의료 영상 300개를 분석했습니다. 믿을 만한 정보는 19.7%에 불과했고, 근거가 가장 빈약한 영상이 오히려 34.6% 더 많이 봤습니다. 왜 이런 역전이 일어날까요?</p>
+<div class="meta"><span><b>출처</b> SBS 8뉴스 / JAMA Network Open</span><span><b>분석</b> 조회수 1만+ 영상 300개</span></div>
+</div>
+</div>
+
+<div class="container">
+<div class="kpi-grid fade-in">
+<div class="kpi"><div class="num">300개</div><div class="label">분석 대상 (조회수 1만 이상, 암·당뇨 주제)</div></div>
+<div class="kpi"><div class="num">62.5%</div><div class="label">근거 없는 D급 정보 비중 (가장 많음)</div></div>
+<div class="kpi"><div class="num">19.7%</div><div class="label">가장 신뢰 높은 A급 정보 비중</div></div>
+<div class="kpi"><div class="num">+34.6%</div><div class="label">D급이 A급보다 평균 조회수 높은 정도</div></div>
+</div>
+
+<div class="section fade-in">
+<h2>01. 연구가 <em>어떻게</em> 진행됐나요?</h2>
+<p class="desc">중학생도 이해할 수 있게 풀어쓴 연구 방법입니다.</p>
+<div class="card bg2">
+<p style="font-size:14px"><b>누가?</b> 국립암센터 연구팀<br><b>무엇을?</b> 의사·약사가 나온 유튜브 영상 중 암과 당뇨를 다룬 영상<br><b>조건은?</b> 조회수 1만 회 이상인 영상 300여 개<br><b>어떻게 나눴나?</b> 의학적 근거(과학적 증거)가 얼마나 탄탄한지로 A(가장 좋음)부터 D(근거 없음)까지 4등급</p>
+<div class="alert">💡 <b>등급이란?</b> A= 논문·가이드라인 등 검증된 자료 기반 / D= 개인 경험·주장만 있고 임상 근거(사람 대상 실험 결과) 없음</div>
+</div>
+</div>
+
+<div class="section fade-in">
+<h2>02. 신뢰도 분포, <em>충격적인</em> 현실</h2>
+<p class="desc">300개 영상 중 믿을 수 있는 영상은 5개 중 1개뿐이었습니다.</p>
+<div class="chart-container fade-in">
+<canvas id="gradeChart" height="240"></canvas>
+</div>
+<table>
+<tr><th>등급</th><th>의미</th><th>비중</th></tr>
+<tr><td><span class="tag tag-A">A급</span></td><td>검증된 데이터 기반, 가장 신뢰</td><td><b>19.7%</b> (약 59개)</td></tr>
+<tr><td><span class="tag tag-B">B급</span></td><td>어느 정도 근거 있음</td><td>14.6%</td></tr>
+<tr><td><span class="tag tag-C">C급</span></td><td>근거 약함</td><td>3.2%</td></tr>
+<tr><td><span class="tag tag-D">D급</span></td><td>임상 근거 없음, 믿기 어려움</td><td><b>62.5%</b> (약 188개)</td></tr>
+</table>
+<div class="tip">🔎 <b>계산법:</b> A급은 보도에서 정확한 수치가 잘려서, 100% - (B 14.6% + C 3.2% + D 62.5%) = <b>19.7%</b>로 역산했습니다.</div>
+</div>
+
+<div class="section fade-in">
+<h2>03. 왜 <em>D급이 더 잘</em> 터질까?</h2>
+<p class="desc">의학적 근거가 없을수록 조회수가 높다는 역전 현상입니다.</p>
+<div class="chart-container fade-in">
+<canvas id="viewChart" height="240"></canvas>
+</div>
+<div class="card">
+<p style="font-size:14px"><b>사례 1 - C급:</b> “암 환자는 철분제 먹을 필요 없다. 절대 먹지 마” → 위암 전문가 반박<br>
+<b>사례 2 - D급:</b> “콩류·조개류 먹고 당뇨 완치”, “당뇨약 없이 당근·오이·미나리로 혈당 뚝”</p>
+<p style="font-size:13px;color:var(--text2);margin-top:10px">이런 자극적인 제목(절대 먹지 마, 완치, 뚝 떨어진다)이 클릭을 유도합니다.</p>
+</div>
+</div>
+
+<div class="section fade-in">
+<h2>04. 유튜브 <em>알고리즘의 함정</em> 시뮬레이터</h2>
+<p class="desc">슬라이더를 움직여 보세요. 자극성과 채널 유형이 조회수에 미치는 영향을 체험합니다.</p>
+<div class="sim-box">
+<label style="font-size:13px;font-weight:700">자극성 지수 (제목·썸네일) : <span id="shockVal" style="color:var(--accent)">50</span>%</label>
+<input type="range" id="shock" min="0" max="100" value="50">
+<div style="height:10px"></div>
+<label style="font-size:13px;font-weight:700">채널 유형</label>
+<div class="toggle-group">
+<button id="btnPersonal" class="active">개인 채널 (의사·약사 개인)</button>
+<button id="btnOfficial">공식 채널 (대학병원·학회·공공기관)</button>
+</div>
+<div class="kpi-grid" style="margin:10px 0 0">
+<div class="kpi" style="border-left-color:#6b7280"><div class="num" id="predTrust">중간</div><div class="label">예상 신뢰도</div></div>
+<div class="kpi"><div class="num" id="predView">+0%</div><div class="label">예상 조회수 보정 (A급 대비)</div></div>
+</div>
+<p id="simExplain" style="font-size:12px;color:var(--text2);margin-top:10px"></p>
+<div class="btn-row"><button class="btn ghost" id="resetSim">초기화</button></div>
+</div>
+<div class="chart-container fade-in">
+<canvas id="trustSourceChart" height="220"></canvas>
+</div>
+</div>
+
+<div class="section fade-in">
+<h2>05. 그럼 <em>무엇을 믿어야</em> 할까?</h2>
+<p class="desc">연구진이 말한 믿을 만한 영상의 3가지 특징입니다.</p>
+<div class="card bg2">
+<p style="font-size:14px;font-weight:700;margin-bottom:8px">✅ 믿을 만한 영상의 공통점</p>
+<ul style="font-size:14px;margin-left:18px">
+<li>개인 경험 일반화가 아니라, <b>학술지 논문·가이드라인</b> 같은 검증된 데이터 제시</li>
+<li>“내가 해보니 좋더라”가 아니라, 다수 연구 결과를 종합</li>
+<li><b>대학병원·학회·공공기관</b> 채널에 올라온 경우가 많음</li>
+</ul>
+</div>
+<div class="card">
+<p style="font-size:14px;font-weight:700;margin-bottom:8px">⚠️ 시청자가 꼭 기억할 방어 3원칙</p>
+<div class="toggle-group" id="defenseTabs">
+<button class="active" data-tab="1">① 조회수 ≠ 정확도</button>
+<button data-tab="2">② 출처 확인</button>
+<button data-tab="3">③ 교차 검증</button>
+</div>
+<div id="defenseContent" style="font-size:13px;margin-top:10px;line-height:1.6">
+<b>조회수는 인기도일 뿐, 의학적 정확도가 아닙니다.</b> 알고리즘은 오래 보고 많이 본 영상을 더 띄워줍니다. D급이 A급보다 34.6% 더 많이 본 이유입니다.
+</div>
+</div>
+<div class="alert">📊 <b>해외 연구:</b> 전 세계 3,000명 조사에서 유튜브 시청자의 <b>85%</b>가 영상 내용을 근거로 건강 관련 결정을 내린다고 답했습니다. 그래서 더 위험합니다.</div>
+</div>
+
+<div class="section fade-in">
+<h2>06. 유튜브 헬스 인증, <em>만능이 아니다</em></h2>
+<p class="desc">유튜브가 만든 안전장치도 한계가 있습니다.</p>
+<div class="card">
+<p style="font-size:14px"><b>유튜브 헬스(YouTube Health)란?</b><br>유튜브가 채널 운영자의 자격(의사·간호사 등)을 검증해 제목 아래에 “보건 전문가 채널”이라고 표기해주는 제도입니다.</p>
+<p style="font-size:13px;color:var(--text2);margin-top:8px">❌ 하지만 <b>콘텐츠 내용까지 검증하지는 않습니다.</b> 자격이 있어도 D급 정보를 말할 수 있다는 뜻입니다.</p>
+</div>
+<div class="card bg2" style="text-align:center">
+<div style="font-size:13px;color:var(--text2)">핵심 메시지</div>
+<div style="font-family:'Playfair Display';font-size:20px;font-weight:800;margin:6px 0">“개인 말보다 기관 견해,<br>하나보다 여러 정보로”</div>
+<div style="font-size:12px;color:var(--text2)">국립암센터 연구팀 + SBS 보도 종합</div>
+</div>
+</div>
+
+<div style="padding:30px 0 60px;text-align:center;color:var(--text2);font-size:12px" class="fade-in">
+<p>JAMA Network Open 게재 연구 기반 분석 리포트<br>모바일 최적화 · 매거진 에디토리얼 테마</p>
+</div>
+</div>
+
+<script>
+const fadeObs = new IntersectionObserver((entries) => {
+  entries.forEach((e, i) => {
+    if (e.isIntersecting) {
+      setTimeout(() => e.target.classList.add('visible'), i * 80);
+      fadeObs.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.12 });
+document.querySelectorAll('.fade-in').forEach(el => fadeObs.observe(el));
+
+const chartConfigs = {};
+chartConfigs['gradeChart'] = () => {
+  new Chart(document.getElementById('gradeChart'), {
+    type:'doughnut',
+    data:{
+      labels:['A급 19.7%','B급 14.6%','C급 3.2%','D급 62.5%'],
+      datasets:[{data:[19.7,14.6,3.2,62.5],backgroundColor:['#1a1a1a','#2563eb','#f59e0b','#e11d48'],borderWidth:0,hoverOffset:6}]
+    },
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{family:'Noto Sans KR',size:12},padding:14}},tooltip:{callbacks:{label:(c)=>`${c.label}: ${c.parsed}%`}}},cutout:'52%'}
+  });
+};
+chartConfigs['viewChart'] = () => {
+  new Chart(document.getElementById('viewChart'), {
+    type:'bar',
+    data:{
+      labels:['A급 (신뢰 높음)','B급','C급','D급 (근거 없음)'],
+      datasets:[{label:'A급 대비 평균 조회수 차이',data:[0,-5,12,34.6],backgroundColor:['#1a1a1a','#6b7280','#f59e0b','#e11d48'],borderRadius:8}]
+    },
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:(c)=> c.parsed.y===0 ? '기준 (0%)' : `${c.parsed.y>0?'+':''}${c.parsed.y}%`}}},scales:{y:{beginAtZero:true,ticks:{callback:(v)=>v+'%'},grid:{color:'#f1f1f1'}},x:{grid:{display:false}}}}
+  });
+};
+chartConfigs['trustSourceChart'] = () => {
+  new Chart(document.getElementById('trustSourceChart'), {
+    type:'bar',
+    data:{
+      labels:['개인 채널','대학병원/학회/공공기관'],
+      datasets:[{label:'신뢰도 높은 영상 비율 (연구 기반)',data:[25,78],backgroundColor:['#6b7280','#e11d48'],borderRadius:8}]
+    },
+    options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:(c)=>`${c.parsed.x}%`}}},scales:{x:{max:100,ticks:{callback:v=>v+'%'},grid:{color:'#f1f1f1'}},y:{grid:{display:false}}}}
+  });
+};
+
+const chartObs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const canvas = e.target.querySelector('canvas');
+      if (canvas && chartConfigs[canvas.id]) {
+        chartConfigs[canvas.id]();
+        e.target.classList.add('chart-ready');
+        chartObs.unobserve(e.target);
+      }
+    }
+  });
+}, { threshold: 0.15 });
+document.querySelectorAll('.chart-container').forEach(el => chartObs.observe(el));
+
+// simulator logic
+const shock = document.getElementById('shock');
+const shockVal = document.getElementById('shockVal');
+const btnPersonal = document.getElementById('btnPersonal');
+const btnOfficial = document.getElementById('btnOfficial');
+const predTrust = document.getElementById('predTrust');
+const predView = document.getElementById('predView');
+const simExplain = document.getElementById('simExplain');
+let isOfficial = false;
+
+function updateSim(){
+  const s = parseInt(shock.value);
+  shockVal.textContent = s;
+  const viewBoost = Math.round((s*0.8) + (isOfficial ? -15 : 15) + (s>70 ? 20 : 0));
+  let trust = '낮음';
+  if(isOfficial && s<40) trust='매우 높음';
+  else if(isOfficial && s<70) trust='높음';
+  else if(!isOfficial && s<30) trust='중간';
+  else if(!isOfficial && s>70) trust='매우 낮음';
+  else trust='낮음~중간';
+  predTrust.textContent = trust;
+  predView.textContent = (viewBoost>0?'+':'')+viewBoost+'%';
+  predView.style.color = viewBoost>20 ? '#e11d48' : '#1a1a1a';
+  if(s>70 && !isOfficial){
+    simExplain.textContent = '자극적인 제목(절대 먹지 마, 완치, 뚝) + 개인 채널 조합은 알고리즘이 가장 좋아합니다. 조회수는 높지만 신뢰도는 급락합니다.';
+  } else if(isOfficial){
+    simExplain.textContent = '공식 채널은 자극성을 낮게 유지할수록 논문·가이드라인 기반 설명이 많아 A급 비율이 높습니다.';
+  } else {
+    simExplain.textContent = '자극성을 높일수록 클릭은 늘지만, 의학적 근거와 거리가 멀어질 위험이 커집니다.';
+  }
+}
+shock.addEventListener('input', updateSim);
+btnPersonal.addEventListener('click',()=>{isOfficial=false;btnPersonal.classList.add('active');btnOfficial.classList.remove('active');updateSim()});
+btnOfficial.addEventListener('click',()=>{isOfficial=true;btnOfficial.classList.add('active');btnPersonal.classList.remove('active');updateSim()});
+document.getElementById('resetSim').addEventListener('click',()=>{shock.value=50;isOfficial=false;btnPersonal.classList.add('active');btnOfficial.classList.remove('active');updateSim()});
+updateSim();
+
+// defense tabs
+const defenseMap = {
+  '1':'<b>조회수는 인기도일 뿐, 의학적 정확도가 아닙니다.</b> 알고리즘은 오래 보고 많이 본 영상을 더 띄워줍니다. D급이 A급보다 34.6% 더 많이 본 이유입니다.',
+  '2':'<b>누가 말했나보다 어디 채널인가를 보세요.</b> 개인 채널보다 대학병원·학회·공공기관 채널이 A급 비율이 훨씬 높았습니다. 유튜브 헬스 인증만으로는 내용까지 보장되지 않습니다.',
+  '3':'<b>하나의 영상으로 결정하지 마세요.</b> 최소 2~3개 공식 기관 정보를 교차 검증하세요. 85%가 영상 하나로 건강 결정을 내린다는 해외 조사 결과는 그래서 더 위험합니다.'
+};
+document.querySelectorAll('#defenseTabs button').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('#defenseTabs button').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('defenseContent').innerHTML = defenseMap[btn.dataset.tab];
+  });
+});
+</script>
+</body>
+</html>

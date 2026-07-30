@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SBS Medical YouTube Analysis Quiz</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--accent:#e11d48;--accent2:#f43f5e;--bg:#ffffff;--bg2:#fafafa;--text:#1a1a1a;--text2:#777777;--border:#e5e5e5;--green:#16a34a;--orange:#ea580c}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-serif;line-height:1.6}
+.container{max-width:640px;margin:0 auto;padding:0 16px 100px}
+.sticky{position:sticky;top:0;z-index:50;background:rgba(255,255,255,0.96);backdrop-filter:blur(8px);border-bottom:1px solid var(--border);padding:12px 16px}
+.score-row{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.score-row b{font-family:'Playfair Display';font-size:18px}
+.score-pill{background:var(--bg2);border:1px solid var(--border);padding:6px 10px;border-radius:20px;font-size:12px;font-weight:700}
+.progress-wrap{height:8px;background:#f1f1f1;border-radius:20px;margin-top:10px;overflow:hidden}
+.progress{height:100%;width:0%;background:var(--accent);transition:width 0.4s ease,background 0.3s ease}
+.hero{padding:28px 16px 18px}
+.hero h1{font-family:'Playfair Display';font-size:28px;line-height:1.25}
+.hero h1 span{color:var(--accent)}
+.hero p{color:var(--text2);font-size:13px;margin-top:8px}
+
+.card{background:#fff;border:1px solid var(--border);border-radius:16px;padding:18px;margin:16px 0;transition:box-shadow 0.2s}
+.card.solved{border-color:#e5e7eb;box-shadow:0 4px 20px rgba(0,0,0,0.05)}
+.q-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.q-num{font-family:'Playfair Display';font-weight:700;font-size:14px;background:var(--text);color:#fff;padding:4px 10px;border-radius:20px}
+.badge{font-size:11px;padding:3px 8px;border-radius:12px;font-weight:700}
+.badge-easy{background:#dcfce7;color:#166534}
+.badge-medium{background:#ffedd5;color:#9a3412}
+.badge-hard{background:#fee2e2;color:#991b1b}
+.q-text{font-size:15px;font-weight:600;margin:8px 0 12px;line-height:1.5}
+
+.opt-btn{display:block;width:100%;text-align:left;padding:12px 14px;margin:7px 0;background:var(--bg2);border:1px solid var(--border);border-radius:10px;font-size:14px;cursor:pointer;transition:all 0.15s}
+.opt-btn:hover{border-color:var(--accent);transform:translateY(-1px)}
+.opt-btn.correct{background:#dcfce7!important;border-color:var(--green)!important;color:#14532d}
+.opt-btn.wrong{background:#fee2e2!important;border-color:#ef4444!important;color:#7f1d1d}
+.opt-btn:disabled{cursor:not-allowed;opacity:0.9}
+
+.input-row{display:flex;gap:8px;margin:8px 0}
+.input-row input{flex:1;padding:11px 12px;border:1px solid var(--border);border-radius:10px;font-size:14px}
+.input-row button{padding:10px 16px;border:none;background:var(--accent);color:#fff;border-radius:10px;font-weight:700;cursor:pointer}
+
+.ox-row{display:flex;gap:10px}
+.ox-btn{flex:1;padding:14px;border:2px solid var(--border);border-radius:12px;font-size:18px;font-weight:800;background:var(--bg2);cursor:pointer}
+.ox-btn.correct{border-color:var(--green);background:#dcfce7}
+.ox-btn.wrong{border-color:#ef4444;background:#fee2e2}
+
+.explain{display:none;margin-top:12px;padding:12px;background:#fff7f8;border:1px solid #fecdd3;border-left:4px solid var(--accent);border-radius:10px;font-size:13px;line-height:1.6}
+.explain.show{display:block}
+.explain b{color:var(--accent)}
+
+.result-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:100;align-items:center;justify-content:center;padding:20px}
+.result-overlay.show{display:flex}
+.result-card{background:#fff;border-radius:20px;padding:24px;max-width:380px;width:100%;text-align:center;border:1px solid var(--border)}
+.result-card h2{font-family:'Playfair Display';font-size:26px;margin-bottom:6px}
+.grade{font-size:48px;font-weight:800;color:var(--accent);font-family:'Playfair Display';margin:8px 0}
+.btn{border:none;background:var(--accent);color:#fff;padding:12px 18px;border-radius:12px;font-weight:700;cursor:pointer;margin-top:12px;width:100%}
+</style>
+</head>
+<body>
+<div class="sticky">
+<div class="container" style="padding:0">
+<div class="score-row">
+<div><span class="score-pill">푼 문제 <b id="solvedCount">0</b> / 10</span> <span class="score-pill">맞힌 문제 <b id="correctCount">0</b></span></div>
+<div class="score-pill">정답률 <b id="rate">0%</b></div>
+</div>
+<div class="progress-wrap"><div class="progress" id="progressBar"></div></div>
+</div>
+</div>
+
+<div class="container">
+<div class="hero">
+<h1>SBS 8뉴스 <span>의학 유튜브 신뢰도</span><br>인터랙티브 퀴즈</h1>
+<p>원본 자막에 실제로 나온 내용만 출제 · 클릭 즉시 채점 · 해설 자동 표시</p>
+</div>
+<div id="quizRoot"></div>
+</div>
+
+<div class="result-overlay" id="resultOverlay">
+<div class="result-card">
+<h2>퀴즈 완료!</h2>
+<div class="grade" id="finalGrade">A</div>
+<div style="font-size:15px;font-weight:600" id="finalScoreText">10점 / 10점</div>
+<div style="font-size:13px;color:#777;margin-top:8px" id="finalMsg">훌륭해요! 이제 유튜브 의학 정보 보는 눈이 생겼네요.</div>
+<button class="btn" onclick="resetQuiz()">다시 풀기</button>
+</div>
+</div>
+
+<script>
+const QUIZ_DATA = [
+{
+ id:1, type:'multiple', difficulty:'easy',
+ question:'이 연구를 수행한 기관은 어디인가요?',
+ options:['국립암센터 연구팀','질병관리청','서울대병원 단독','유튜브 본사'],
+ answer:0,
+ explanation:'정답: 국립암센터. 원문: "국립암센터 연구팀이 암과 당뇨를 다룬 의료인의 유튜브 영상 중 조회수가 1만 번이 넘는 300여 개를 골라..."'
+},
+{
+ id:2, type:'multiple', difficulty:'easy',
+ question:'분석 대상이 된 영상의 조건은?',
+ options:['조회수 1만 회 이상 300여 개, 암·당뇨 주제','조회수 10만 이상 100개, 전체 의학','의사 채널 50개','최근 1주일 영상 전체'],
+ answer:0,
+ explanation:'정답: 조회수 1만 이상 300여 개. 원문 자막에 그대로 언급됩니다. "조회수가 1만 번이 넘는 300여 개를 골라"'
+},
+{
+ id:3, type:'multiple', difficulty:'medium',
+ question:'4등급 중 가장 많은 비중을 차지한 등급은?',
+ options:['A급 19.7%','B급 14.6%','C급 3.2%','D급 62.5%'],
+ answer:3,
+ explanation:'정답: D급 62.5%. "임상 근거가 없어서 믿을 게 못 되는 D급 정보는 62.5%를 차지했습니다." 전체 중 절반 이상이 D급이었습니다.'
+},
+{
+ id:4, type:'multiple', difficulty:'medium',
+ question:'가장 신뢰도 높은 A급 영상의 비중은 약 몇 %인가요? (계산 필요)',
+ options:['5.3%','19.7%','34.6%','85%'],
+ answer:1,
+ explanation:'정답: 19.7%. 보도의 B 14.6% + C 3.2% + D 62.5% = 80.3%를 100%에서 빼면 A는 19.7%입니다. 5개 중 1개도 안 되는 셈이죠.'
+},
+{
+ id:5, type:'multiple', difficulty:'medium',
+ question:'"암 환자는 철분제를 먹을 필요 없다. 절대 먹지 마"라는 정보는 몇 등급으로 분류됐나요?',
+ options:['A급','B급','C급','D급'],
+ answer:2,
+ explanation:'정답: C급. 원문: "암환자는 철분제를 먹을 필요가 없다는 정보는 C급으로 분류됐고" 위암 전문가 의견과 달랐습니다.'
+},
+{
+ id:6, type:'multiple', difficulty:'medium',
+ question:'D급 영상의 평균 조회수는 A급보다 얼마나 높았나요?',
+ options:['14.6% 높음','34.6% 높음','62.5% 높음','85% 높음'],
+ answer:1,
+ explanation:'정답: 34.6% 높음. 원문: "영상의 조회수는 D급이 A급보다 평균 34.6% 높은 걸로 조사됐습니다." 근거가 없을수록 더 많이 봤습니다.'
+},
+{
+ id:7, type:'short', difficulty:'medium',
+ question:'연구 결과가 게재된 국제학술지 이름은? (영문 또는 한글)',
+ options:[],
+ answer:'JAMA Network Open',
+ answerList:['jama network open','미국의학회지 네트워크 오픈','미국 의학회지 네트워크 오픈','jama'],
+ explanation:'정답: JAMA Network Open (미국의학회지 네트워크 오픈). 원문: "연구팀의 분석 결과는 국제학술지인 미국의학회지 네트워크 오픈에 발표됐습니다."'
+},
+{
+ id:8, type:'short', difficulty:'hard',
+ question:'해외 논문에서 유튜브 내용을 근거로 건강 관련 결정을 내린다고 답한 시청자 비율은?',
+ options:[],
+ answer:'85%',
+ answerList:['85%','85','85퍼센트','85 percent'],
+ explanation:'정답: 85%. 원문: "전 세계 3천 명을 조사한 해외 논문에 따르면 유튜브 시청자의 85%가 영상 내용을 근거로 건강에 관한 결정을 내리는 것으로 나타났습니다."'
+},
+{
+ id:9, type:'ox', difficulty:'easy',
+ question:'대학병원·학회·공공기관 채널에 올라온 영상들은 신뢰도가 대체로 높게 나타났다.',
+ options:['O','X'],
+ answer:0,
+ explanation:'정답: O. 기자 문답: "300여 개의 영상 가운데 대학병원이나 학회, 공공기관 채널에 올라온 영상들은 신뢰도가 대체로 높게 나타났습니다."'
+},
+{
+ id:10, type:'ox', difficulty:'hard',
+ question:'유튜브 헬스 인증 제도는 채널 운영자의 자격뿐 아니라 콘텐츠 내용까지 검증해준다.',
+ options:['O','X'],
+ answer:1,
+ explanation:'정답: X. 원문: "유튜브는 유튜브 헬스라는 인증 제도를 운영... 하지만 콘텐츠 내용까지 검증해주는 건 아니라서". 자격만 보고 내용까지는 보장 안 합니다.'
+}
+];
+
+let state = {solved:0, correct:0, answers:{}};
+
+function render(){
+ const root = document.getElementById('quizRoot');
+ root.innerHTML = '';
+ QUIZ_DATA.forEach((q, idx)=>{
+   const card = document.createElement('div');
+   card.className = 'card';
+   card.id = `q-${q.id}`;
+   const diffClass = q.difficulty==='easy'?'badge-easy':q.difficulty==='medium'?'badge-medium':'badge-hard';
+   const diffLabel = q.difficulty==='easy'?'쉬움':q.difficulty==='medium'?'보통':'어려움';
+   let body = '';
+   if(q.type==='multiple'){
+     body = q.options.map((opt,i)=>`<button class="opt-btn" data-q="${q.id}" data-idx="${i}" onclick="checkMultiple(${q.id},${i})">${i+1}. ${opt}</button>`).join('');
+   } else if(q.type==='short'){
+     body = `<div class="input-row"><input type="text" id="input-${q.id}" placeholder="정답을 입력하세요"><button onclick="checkShort(${q.id})">제출</button></div>`;
+   } else if(q.type==='ox'){
+     body = `<div class="ox-row"><button class="ox-btn" onclick="checkOX(${q.id},0)">O</button><button class="ox-btn" onclick="checkOX(${q.id},1)">X</button></div>`;
+   }
+   card.innerHTML = `
+     <div class="q-head"><span class="q-num">Q${idx+1}</span><span class="badge ${diffClass}">${diffLabel}</span></div>
+     <div class="q-text">${q.question}</div>
+     ${body}
+     <div class="explain" id="explain-${q.id}"></div>
+   `;
+   root.appendChild(card);
+ });
+}
+
+function updateScoreboard(){
+ document.getElementById('solvedCount').textContent = state.solved;
+ document.getElementById('correctCount').textContent = state.correct;
+ const rate = state.solved===0?0:Math.round(state.correct/state.solved*100);
+ document.getElementById('rate').textContent = rate+'%';
+ const bar = document.getElementById('progressBar');
+ bar.style.width = (state.solved/10*100)+'%';
+ if(rate<40) bar.style.background = '#ef4444';
+ else if(rate<70) bar.style.background = '#ea580c';
+ else bar.style.background = '#16a34a';
+ if(state.solved===10){
+   setTimeout(showFinal, 400);
+ }
+}
+
+function lockQuestion(qId){
+ const card = document.getElementById(`q-${qId}`);
+ card.classList.add('solved');
+ card.querySelectorAll('button').forEach(b=>b.disabled=true);
+ card.querySelectorAll('input').forEach(i=>i.disabled=true);
+}
+
+function showExplain(qId, isCorrect){
+ const q = QUIZ_DATA.find(x=>x.id===qId);
+ const el = document.getElementById(`explain-${qId}`);
+ const icon = isCorrect ? '✓ 정답!' : '✗ 오답';
+ el.innerHTML = `<div style="margin-bottom:6px"><b>${icon}</b></div>${q.explanation}`;
+ el.classList.add('show');
+}
+
+function checkMultiple(qId, chosen){
+ if(state.answers[qId]!==undefined) return;
+ const q = QUIZ_DATA.find(x=>x.id===qId);
+ const isCorrect = chosen===q.answer;
+ state.answers[qId]=isCorrect;
+ state.solved++; if(isCorrect) state.correct++;
+ const card = document.getElementById(`q-${qId}`);
+ card.querySelectorAll('.opt-btn').forEach((btn,i)=>{
+   if(i===q.answer) btn.classList.add('correct');
+   if(i===chosen && !isCorrect) btn.classList.add('wrong');
+ });
+ // badge for chosen
+ const btns = card.querySelectorAll('.opt-btn');
+ if(isCorrect){
+   btns[chosen].insertAdjacentHTML('beforeend',' <span style="float:right">✓ 정답!</span>');
+ } else {
+   btns[chosen].insertAdjacentHTML('beforeend',' <span style="float:right">✗ 오답</span>');
+   btns[q.answer].insertAdjacentHTML('beforeend',' <span style="float:right">정답</span>');
+ }
+ lockQuestion(qId);
+ showExplain(qId,isCorrect);
+ updateScoreboard();
+}
+
+function checkOX(qId, chosen){
+ if(state.answers[qId]!==undefined) return;
+ const q = QUIZ_DATA.find(x=>x.id===qId);
+ const isCorrect = chosen===q.answer;
+ state.answers[qId]=isCorrect;
+ state.solved++; if(isCorrect) state.correct++;
+ const card = document.getElementById(`q-${qId}`);
+ card.querySelectorAll('.ox-btn').forEach((b,i)=>{
+   if(i===q.answer) b.classList.add('correct');
+   if(i===chosen && !isCorrect) b.classList.add('wrong');
+ });
+ lockQuestion(qId);
+ showExplain(qId,isCorrect);
+ updateScoreboard();
+}
+
+function checkShort(qId){
+ if(state.answers[qId]!==undefined) return;
+ const input = document.getElementById(`input-${qId}`);
+ const val = input.value.trim();
+ if(!val){ input.focus(); return; }
+ const q = QUIZ_DATA.find(x=>x.id===qId);
+ const norm = val.toLowerCase().replace(/\s+/g,'');
+ let isCorrect = false;
+ if(q.id===7){
+   const low = val.toLowerCase();
+   if(low.includes('jama') || low.includes('네트워크 오픈') || low.includes('network open')) isCorrect=true;
+ } else if(q.id===8){
+   if(norm.includes('85')) isCorrect=true;
+ }
+ state.answers[qId]=isCorrect;
+ state.solved++; if(isCorrect) state.correct++;
+ const card = document.getElementById(`q-${qId}`);
+ const exp = document.getElementById(`explain-${qId}`);
+ if(isCorrect){
+   input.style.borderColor='#16a34a'; input.style.background='#dcfce7';
+ } else {
+   input.style.borderColor='#ef4444'; input.style.background='#fee2e2';
+ }
+ lockQuestion(qId);
+ showExplain(qId,isCorrect);
+ updateScoreboard();
+}
+
+function showFinal(){
+ const rate = Math.round(state.correct/10*100);
+ let grade='D', msg='';
+ if(rate>=90){grade='A';msg='완벽합니다! 이제 가짜 의학 정보를 바로 걸러낼 수 있어요.'}
+ else if(rate>=70){grade='B';msg='훌륭해요! 핵심을 정확히 이해했네요. 주변에도 알려주세요.'}
+ else if(rate>=50){grade='C';msg='잘했어요! 조금만 더 복습하면 전문가 수준이에요.'}
+ else {grade='D';msg='괜찮아요! 리포트를 다시 읽고 도전해보세요. 건강 정보는 천천히 교차 검증이 중요해요.'}
+ document.getElementById('finalGrade').textContent=grade;
+ document.getElementById('finalScoreText').textContent=`${state.correct} / 10문제 정답 (${rate}%)`;
+ document.getElementById('finalMsg').textContent=msg;
+ document.getElementById('resultOverlay').classList.add('show');
+}
+
+function resetQuiz(){
+ state={solved:0,correct:0,answers:{}};
+ document.getElementById('resultOverlay').classList.remove('show');
+ render();
+ updateScoreboard();
+ window.scrollTo({top:0,behavior:'smooth'});
+}
+
+render();
+updateScoreboard();
+</script>
+</body>
+</html>

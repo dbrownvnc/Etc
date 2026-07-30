@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Korea as Giant AI Factory - NVIDIA Strategy Analysis</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700,800&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+  :root{
+    --bg:#ffffff;
+    --bg2:#fafafa;
+    --text:#1a1a1a;
+    --text2:#777777;
+    --main:#e11d48;
+    --sub:#f43f5e;
+    --border:#e5e5e5;
+    --c1:#e11d48;
+    --c2:#1a1a1a;
+    --c3:#6b7280;
+    --c4:#2563eb;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-serif;line-height:1.7;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:720px;margin:0 auto;padding:0 20px 80px}
+  .top-label{margin:28px 0 12px;font-size:12px;letter-spacing:0.18em;color:var(--main);font-weight:700}
+  h1{font-family:'Playfair Display',serif;font-size:32px;line-height:1.25;letter-spacing:-0.02em;margin-bottom:14px}
+  h1 span{color:var(--main)}
+  .meta{color:var(--text2);font-size:13px;display:flex;gap:10px;flex-wrap:wrap;margin-bottom:24px}
+  .hero{border:1px solid var(--border);background:var(--bg2);border-radius:18px;padding:22px 20px;margin-bottom:28px}
+  .hero p{font-size:15px;color:#333}
+  .hero b{color:var(--main)}
+  h2{font-family:'Playfair Display',serif;font-size:22px;margin:42px 0 14px;padding-top:8px}
+  h2 em{font-style:normal;color:var(--main)}
+  h3{font-size:17px;font-weight:700;margin:28px 0 10px}
+  p{font-size:15px;margin-bottom:14px;color:#222}
+  .caption{font-size:13px;color:var(--text2);margin-top:-6px;margin-bottom:18px}
+  .card{background:var(--bg);border:1px solid var(--border);border-radius:16px;padding:18px 16px;margin:16px 0}
+  .card.bg2{background:var(--bg2)}
+  .pill{display:inline-block;font-size:11px;font-weight:700;padding:4px 9px;border-radius:999px;background:#fff1f2;color:var(--main);border:1px solid #ffe4e6;margin-bottom:8px}
+  table{width:100%;border-collapse:collapse;font-size:14px;margin:12px 0;border:1px solid var(--border);border-radius:12px;overflow:hidden}
+  th{background:var(--main);color:white;text-align:left;padding:10px 12px;font-weight:700}
+  td{padding:10px 12px;border-top:1px solid var(--border);background:var(--bg2);vertical-align:top}
+  tr:nth-child(even) td{background:#ffffff}
+  ul{padding-left:18px;margin-bottom:14px}
+  li{font-size:14.5px;margin-bottom:6px}
+  .fade-in{
+    opacity:0;
+    transform:translateY(18px);
+    transition:opacity 0.7s ease, transform 0.7s ease;
+  }
+  .fade-in.visible{
+    opacity:1;
+    transform:translateY(0);
+  }
+  .chart-container{
+    position:relative;
+    max-height:340px;
+    background:#fff;
+    border:1px solid var(--border);
+    border-radius:16px;
+    padding:12px 10px 6px;
+    margin:18px 0;
+  }
+  .chart-container canvas{
+    opacity:0;
+    transition:opacity 0.4s ease;
+    max-height:300px;
+  }
+  .chart-container.chart-ready canvas{
+    opacity:1;
+  }
+  .sim-box{border:1.5px solid #ffe4e6;background:linear-gradient(180deg,#fff 0%,#fff7f8 100%);border-radius:18px;padding:18px 16px;margin:18px 0}
+  .sim-row{display:flex;justify-content:space-between;align-items:center;margin:10px 0}
+  .sim-row label{font-size:13px;font-weight:700;color:#333}
+  .sim-row input[type=range]{flex:1;margin:0 12px;accent-color:var(--main)}
+  .sim-val{font-size:13px;font-weight:700;color:var(--main);min-width:52px;text-align:right}
+  .loop-diagram{display:flex;gap:8px;overflow-x:auto;padding:6px 0 10px;scroll-snap-type:x mandatory}
+  .loop-step{min-width:128px;scroll-snap-align:start;border:1px solid var(--border);border-radius:14px;padding:12px;background:#fff;cursor:pointer;transition:all .2s}
+  .loop-step.active{border-color:var(--main);box-shadow:0 6px 20px rgba(225,29,72,.15);transform:translateY(-2px)}
+  .loop-step .num{width:26px;height:26px;border-radius:999px;background:var(--main);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;margin-bottom:8px}
+  .loop-step h4{font-size:13px;margin-bottom:4px}
+  .loop-step p{font-size:11.5px;color:var(--text2);margin:0;line-height:1.4}
+  .result-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+  .result-item{background:#fff;border:1px solid var(--border);border-radius:12px;padding:10px;text-align:center}
+  .result-item .k{font-size:11px;color:var(--text2)}
+  .result-item .v{font-size:16px;font-weight:800;color:var(--text);margin-top:2px}
+  .btn-reset{margin-top:12px;width:100%;padding:10px;border-radius:10px;border:1px solid var(--border);background:#fff;font-weight:700;font-size:13px;cursor:pointer}
+  .btn-reset:active{transform:scale(.98)}
+  @media(max-width:480px){h1{font-size:26px}h2{font-size:20px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top-label">ECONOMY INSIGHT · 2026.07.31 · SAN FRANCISCO AI SUMMIT</div>
+  <h1>한국을 <span>거대한 AI 공장</span>으로… 엔비디아가 한국 전체를 AI로 묶는 이유</h1>
+  <div class="meta"><span>원본: 패치 / YouTube</span><span>분석: 경제 관점</span><span>참석: 젠슨 황, 샘 알트만, 다리오 아모데이, 혹 탄, 이재용, 최태원, 정의선, 이해진</span></div>
+
+  <div class="hero fade-in">
+    <p>이번 샌프란시스코 AI 서밋의 핵심은 <b>GPU 판매가 아니라 AI가 계속 배우는 공장 시스템</b>을 한국에 설치하려는 시도입니다. 데이터(네이버) → 컴퓨팅(SK) → 현실 검증(현대차) → 다시 데이터로 돌아오는 <b>5단계 순환 고리</b>를 엔비디아가 네모트론·옴니버스·코스모스로 연결합니다. 한국은 단순 구매자가 아니라 메모리·통신·공간·공장을 동시에 가진 유일한 테스트베드입니다.</p>
+  </div>
+
+  <h2><em>01</em> 전체 그림: 끝없는 학습 루프</h2>
+  <p>기존 AI는 “거대 모델을 한 번 학습 → 배포”로 끝났습니다. 엔비디아가 그리는 다음 단계는 배포가 시작입니다. 모델이 현실에서 실패한 순간(질문 오해, 에이전트가 멈춘 단계, 로봇이 물체를 놓친 장면)을 수집 → 부족한 상황을 합성 데이터(인공적으로 만든 학습 데이터)로 대량 생성 → 재학습 → 재배포합니다.</p>
+  <div class="card bg2 fade-in">
+    <span class="pill">핵심 공식</span>
+    <p style="margin-bottom:6px"><b>데이터 생성 → 모델 학습 → 현실 배포 → 실패 수집 → 재학습</b></p>
+    <p class="caption">이 순환이 돌수록 컴퓨팅 수요는 끝나지 않습니다. 모델을 잘 만드는 능력이 아니라, 순환을 빨리 돌리는 산업 시스템이 승부처입니다.</p>
+  </div>
+
+  <div class="loop-diagram fade-in" id="loopDiagram"></div>
+  <div class="card fade-in" id="loopDesc">
+    <h4 style="font-size:14px;margin-bottom:6px">① 데이터 생성 단계</h4>
+    <p style="font-size:14px;margin:0;color:#444">단계 카드를 눌러 설명을 확인해보세요. 실제 운영에서 어떤 데이터가 만들어지는지 시뮬레이션으로 이해할 수 있습니다.</p>
+  </div>
+
+  <div class="chart-container fade-in"><canvas id="chartLoop" height="220"></canvas></div>
+  <p class="caption">전통적 개발은 학습 1회로 끝나지만, AI 공장 모델은 배포 후 재학습이 전체 컴퓨팅의 70% 이상을 차지합니다 (개념적 비교).</p>
+
+  <h2><em>02</em> 왜 가상 한국인 실험을 했을까?</h2>
+  <p>올해 4월 서울 네모트론 Developer Day에서 엔비디아는 충격적인 실험을 했습니다. 글로벌 LLM(대규모 언어 모델)에 “통계 조건 없이 가상의 한국인을 만들어봐”라고 하자, 직업이 유자재배 농민·요양보호사에 몰리고, 좋아하는 음식에 샐러드가 과도하게 등장했습니다.</p>
+  <p>이유는 간단합니다. 모델이 아는 한국은 균형 잡힌 조사가 아니라, 인터넷에 자주 보이는 뉴스(고령화 기사 → 요양보호사)를 통해 추정한 이미지이기 때문입니다. 한국어 문장을 유창하게 만드는 것과 한국 사회 구조를 이해하는 것은 전혀 다른 문제입니다.</p>
+
+  <div class="card fade-in">
+    <span class="pill">해법: NemoTron Personas Korea</span>
+    <p><b>통계청·대법원·건보공단·농촌경제연구원 등 공공통계</b>를 기반으로 개인정보 없이 만든 100만 개의 합성 페르소나(가상의 인물 데이터)입니다. 연령·성별·학력·직업·거주지뿐 아니라 소득·주거형태·건강·소비성향까지 조건으로 쓸 수 있습니다.</p>
+    <ul>
+      <li>예: 농촌 70대에게는 접종 장소·동행 여부, 수도권 20대 직장인에게는 모바일 예약·운영 시간을 다르게 설명</li>
+      <li>한계: 공개 통계만으로 변수 간 복잡한 상호작용을 다 재현할 수 없어 일부는 독립 가정(서로 영향 없다고 가정)이 적용됨</li>
+    </ul>
+  </div>
+
+  <div class="chart-container fade-in"><canvas id="chartPersona" height="230"></canvas></div>
+  <p class="caption">합성 데이터 전략: 선생 모델(문항 생성) → 평가 모델(부정확 필터) → 학생 모델(재학습)의 3단계 파이프라인.</p>
+
+  <h2><em>03</em> 3대 축의 경제학: 네이버 · SK · 현대차</h2>
+
+  <table class="fade-in">
+    <tr><th>축</th><th>담당</th><th>핵심 자산</th><th>발표 내용</th></tr>
+    <tr><td><b>네이버</b></td><td>데이터·모델·에이전트</td><td>검색·지도·거리뷰·쇼핑 데이터</td><td>HyperCLOVA X를 Nemotron 3 Ultra 기반으로 발전, Nemotron 연합 참여, 하반기 Nemotron Blueprint 기반 에이전트 플랫폼 출시</td></tr>
+    <tr><td><b>SK그룹</b></td><td>컴퓨팅 인프라</td><td>HBM·데이터센터·전국망 운영</td><td>SK텔레콤 2GW DSX AI Factory 구축, SK하이닉스 차세대 AI 메모리 장기 공급·공동개발, 2027년 첫 공장 가동 목표</td></tr>
+    <tr><td><b>현대차그룹</b></td><td>현실 검증</td><td>공장·차량·보스턴다이내믹스 로봇</td><td>로봇 레퍼런스 플랫폼 공동개발, 대학·스타트업에 공통 하드웨어·개발환경 제공</td></tr>
+  </table>
+
+  <h3>네이버: 유통회사 논란의 진실</h3>
+  <p>네이버는 기존 소버린 AI(자국 기술·데이터로 파운데이션 모델을 처음부터 만드는 전략)를 강조했지만, 이번엔 글로벌 오픈 모델 위에 자체 데이터와 사후학습(미세조정)을 결합하겠다고 했습니다. “외부 AI 유통회사로 전락 아니냐”는 비판이 나왔지만, 경제 관점에서는 합리적 전환입니다. 기반 모델 학습 비용이 기하급수적으로 증가하는 상황에서, 차별화는 <b>한국 현실 공간 데이터</b>에 있습니다.</p>
+  <div class="card bg2 fade-in">
+    <span class="pill">월드 모델</span>
+    <p><b>서울 월드 모델</b>은 네이버 거리뷰 120만 장 파노라마를 학습해 건물·도로 위치를 넘어, “다음 순간에 차량·사람·로봇이 어떻게 움직일지”를 예측하는 모델입니다. 한국어 텍스트는 누구나 학습하지만, 서울 골목·건물 입구·보행 환경 데이터는 네이버만 오래 축적했습니다. 단, 시간·물리 상호작용·센서 결합이 더 필요해 아직 개발 단계입니다.</p>
+  </div>
+
+  <h3>SK: 부품을 넘어 공장을 운영</h3>
+  <p>SK의 포인트는 <b>수직 계열화</b>입니다. 하이닉스가 메모리(특히 HBM, 고대역폭 메모리)를 만들고, 텔레콤이 엔비디아 GPU·네트워크·전력·냉각·운영SW가 묶인 DSX AI 팩토리를 직접 운영합니다. 경쟁력은 “GPU 몇 개 샀나”가 아니라, <b>같은 전력에서 이용률·격리·배치 효율</b>입니다.</p>
+
+  <div class="chart-container fade-in"><canvas id="chartSK" height="220"></canvas></div>
+
+  <h3>현대차: 실패가 자산이 되는 곳</h3>
+  <p>로봇 연구는 팀마다 팔 길이·관절·카메라 위치가 달라 이전이 어렵습니다. 현대차·엔비디아가 공통 레퍼런스 플랫폼을 만들면, 대학이 만든 모델을 공장에 바로 옮길 수 있습니다. 현실 실패 → 옴니버스에서 조명·마찰·동선을 바꾼 합성 장면 대량 생성 → 재학습 → 재배포. 현대차는 이를 <b>데이터 플라이휠(데이터가 돌수록 성능이 좋아지는 바퀴)</b>이라 부릅니다. 인터넷 텍스트는 경쟁사도 구하지만, “공정에서 왜 실패했고 어떤 조치로 성공했는지”는 현장 기업만 압니다.</p>
+
+  <h2><em>04</em> 엔비디아의 진짜 비즈니스</h2>
+  <p>왜 가중치·합성 데이터·사후학습 레시피까지 공개할까요? 모델 하나를 팔면 거래는 끝나지만, <b>생산 라인을 팔면 컴퓨팅 수요는 무한 반복</b>됩니다. 네모트론(기본 모델) → 네모 도구(데이터 생성·학습) → NIM/다이나모(배포·대규모 추론) → 네모 에이전트 툴킷(도구 사용·다단계 업무) → 코스모스·옴니버스(물리적 AI 학습·검증) → GPU·네트워크·DSX AI 팩토리. 전체 수명주기를 묶어 판매하는 것이 목적입니다.</p>
+
+  <div class="sim-box fade-in">
+    <span class="pill">인터랙티브 시뮬레이터: AI 공장이 돌면?</span>
+    <h3 style="margin-top:6px">현실 배포량을 늘리면 컴퓨팅 수요는?</h3>
+    <div class="sim-row"><label>월간 현실 배포 로봇·서비스</label><input id="deployRange" type="range" min="100" max="10000" step="100" value="1000"><span id="deployVal" class="sim-val">1000</span></div>
+    <div class="sim-row"><label>실패 수집률</label><input id="failRange" type="range" min="1" max="30" step="1" value="8"><span id="failVal" class="sim-val">8%</span></div>
+    <div class="sim-row"><label>합성 데이터 배수 (실패 1건당 생성)</label><input id="synRange" type="range" min="10" max="500" step="10" value="100"><span id="synVal" class="sim-val">100x</span></div>
+    <div class="result-grid">
+      <div class="result-item"><div class="k">월간 재학습 데이터</div><div id="resData" class="v">8만 건</div></div>
+      <div class="result-item"><div class="k">예상 추가 GPU 시간</div><div id="resGpu" class="v">1,200 H100 시간</div></div>
+      <div class="result-item"><div class="k">필요 HBM (추정)</div><div id="resHbm" class="v">3.2 TB·일</div></div>
+      <div class="result-item"><div class="k">컴퓨팅 비용 지수</div><div id="resCost" class="v">100</div></div>
+    </div>
+    <button class="btn-reset" id="resetSim">초기값으로 리셋</button>
+    <p class="caption" style="margin-top:10px">시뮬레이션은 이해를 돕기 위한 단순 모델입니다. 배포가 늘수록 실패 데이터가 늘고, 합성 데이터와 재학습이 기하급수적으로 증가하는 구조를 보여줍니다.</p>
+  </div>
+
+  <h2><em>05</em> 또 다른 축: 브로드컴과 2000억 달러 협력</h2>
+  <p>서밋에서 삼성전자는 브로드컴과 향후 5년간 2000억 달러(약 270조원) 이상 규모 전략적 협력을 추진한다고 발표했습니다. HBM뿐 아니라 2나노 이하 파운드리(반도체 위탁생산), 2.5D·3D 첨단 패키징(칩을 쌓아 연결하는 기술)까지 포함입니다.</p>
+  <p>AI 반도체 시장은 두 갈래로 커집니다. 범용 추론·학습은 엔비디아 플랫폼이, 같은 추론을 수십억 번 반복하는 빅테크(구글·메타 등)는 자신만의 <b>커스텀 가속기</b>를 원합니다. 브로드컴은 이 커스텀 칩 설계·연결의 대표 주자입니다. 한국은 두 축 모두에서 핵심입니다: 하이닉스는 엔비디아 차세대 메모리 공동개발, 삼성은 브로드컴 커스텀 가속기에 메모리+파운드리+패키징을 한 번에 제공합니다.</p>
+
+  <div class="chart-container fade-in"><canvas id="chartDual" height="220"></canvas></div>
+
+  <h2><em>06</em> 경제 관점 시사점</h2>
+  <div class="card fade-in">
+    <ul>
+      <li><b>부품 공급자 → 시스템 운영자:</b> 과거 한국은 AI에 필요한 부품을 팔았지만, 이제는 데이터·컴퓨팅·현실 검증이 연결된 순환 자체에 참여합니다.</li>
+      <li><b>소버린 AI 재정의:</b> 모든 가중치를 처음부터 만드는 것이 주권이 아니라, 한국 데이터로 모델을 한국 산업에 맞게 바꾸고 운영하는 능력이 경쟁력입니다.</li>
+      <li><b>대학·스타트업 생태계:</b> 카이스트에 에이전틱 AI 공동연구소, 서울대·카이스트 기계공학과와 피지컬 AI 협력으로 인력 순환도 묶습니다.</li>
+      <li><b>리스크:</b> 월드 모델·레퍼런스 로봇은 아직 개발 단계. 지도·공장이 있다고 바로 정확한 모델이 되지 않으며, 센서·행동 데이터 결합이 과제입니다.</li>
+    </ul>
+  </div>
+
+  <p style="margin-top:28px;color:var(--text2);font-size:13px">정리: 다음 AI 경쟁은 가장 큰 모델을 만드는 능력이 아니라, 모델이 현실에서 계속 배우도록 만드는 데이터·컴퓨팅·산업 현장의 순환을 누가 가장 빨리 구축하느냐의 싸움입니다. 한국은 그 루프의 여러 지점을 한 국가 안에 동시에 가진 드문 국가이며, 엔비디아가 한국 전체를 하나의 AI 공장으로 묶으려는 이유입니다.</p>
+</div>
+
+<script>
+const loopSteps = [
+  {n:'1',t:'데이터 생성',d:'검색·지도·거리뷰·공장 로그에서 문제 정의',desc:'네이버 검색·지도·쇼핑, 현대차 공장 센서에서 “어떤 상황에서 실패하는지” 문제 자체를 정의하는 단계. 합성 페르소나 100만 개도 여기에 해당.'},
+  {n:'2',t:'모델 학습',d:'네모트론 3 기반 사전·사후·강화학습',desc:'네이버는 Nemotron 3 Ultra를 기반으로 HyperCLOVA X를 발전. SK텔레콤의 2GW DSX AI 팩토리에서 학습. 공개 도구로 누구나 사후학습 가능.'},
+  {n:'3',t:'현실 배포',d:'에이전트·공장·차량·로봇에 투입',desc:'네모 에이전트 툴킷 기반 에이전트를 서비스에, 코스모스·옴니버스 기반 모델을 공장·차량·로봇에 배포. 서울 월드 모델은 공간 예측에 활용.'},
+  {n:'4',t:'실패 수집',d:'오해·멈춤·낙하 등 현실 행동 로그',desc:'현대차 공장에서 로봇이 부품을 놓친 순간, 조명 때문에 카메라가 오인한 순간, 에이전트가 어느 단계에서 실패했는지 로그로 수집. 이게 가장 귀한 자산.'},
+  {n:'5',t:'재학습',d:'합성 데이터 대량 생성 후 개선',desc:'실패 상황을 옴니버스에서 조명·위치·마찰을 바꿔 수천 개로 합성. 선생 모델이 문항·해설을 만들고 평가 모델이 걸러낸 뒤 학생 모델이 재학습.'},
+];
+const diagramEl = document.getElementById('loopDiagram');
+const descEl = document.getElementById('loopDesc');
+function renderLoop(){
+  diagramEl.innerHTML='';
+  loopSteps.forEach((s,i)=>{
+    const div=document.createElement('div');
+    div.className='loop-step'+(i===0?' active':'');
+    div.innerHTML=`<div class="num">${s.n}</div><h4>${s.t}</h4><p>${s.d}</p>`;
+    div.onclick=()=>{
+      document.querySelectorAll('.loop-step').forEach(e=>e.classList.remove('active'));
+      div.classList.add('active');
+      descEl.innerHTML=`<h4 style="font-size:14px;margin-bottom:6px">${s.n}. ${s.t}</h4><p style="font-size:14px;margin:0;color:#444">${s.desc}</p>`;
+    };
+    diagramEl.appendChild(div);
+  });
+}
+renderLoop();
+
+const fadeObs = new IntersectionObserver((entries) => {
+  entries.forEach((e, i) => {
+    if (e.isIntersecting) {
+      setTimeout(() => e.target.classList.add('visible'), i * 80);
+      fadeObs.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.12 });
+document.querySelectorAll('.fade-in').forEach(el => fadeObs.observe(el));
+
+const chartConfigs = {};
+chartConfigs['chartLoop'] = () => {
+  new Chart(document.getElementById('chartLoop'), {
+    type: 'bar',
+    data: {
+      labels: ['학습(1회)', '배포', '실패수집', '합성데이터', '재학습(반복)'],
+      datasets: [
+        {label:'전통적 개발',data:[85,15,0,0,0],backgroundColor:'#6b7280'},
+        {label:'AI 공장 모델',data:[20,15,10,25,70],backgroundColor:'#e11d48'}
+      ]
+    },
+    options: {
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom',labels:{font:{size:11}}},title:{display:true,text:'AI 개발 컴퓨팅 비중 변화 (개념)',font:{size:13}}},
+      scales:{y:{beginAtZero:true,stacked:false,title:{display:true,text:'상대적 비중'}}}
+    }
+  });
+};
+chartConfigs['chartPersona'] = () => {
+  new Chart(document.getElementById('chartPersona'), {
+    type: 'doughnut',
+    data: {
+      labels: ['선생 모델 생성','평가 모델 필터','학생 모델 학습'],
+      datasets: [{data:[45,20,35],backgroundColor:['#e11d48','#1a1a1a','#6b7280'],borderWidth:0}]
+    },
+    options: {
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom',labels:{font:{size:11}}},title:{display:true,text:'합성 데이터 파이프라인',font:{size:13}}}
+    }
+  });
+};
+chartConfigs['chartSK'] = () => {
+  new Chart(document.getElementById('chartSK'), {
+    type: 'radar',
+    data: {
+      labels: ['GPU 확보','전력 효율','격리·보안','배치 최적화','운영 경험','HBM 공급'],
+      datasets: [
+        {label:'일반 데이터센터',data:[80,40,50,45,60,30],borderColor:'#6b7280',backgroundColor:'rgba(107,114,128,.12)',pointBackgroundColor:'#6b7280'},
+        {label:'SK DSX AI Factory',data:[85,85,85,90,80,95],borderColor:'#e11d48',backgroundColor:'rgba(225,29,72,.15)',pointBackgroundColor:'#e11d48'}
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom',labels:{font:{size:11}}},title:{display:true,text:'SK AI Factory 경쟁력 요소',font:{size:13}}},
+      scales:{r:{beginAtZero:true,max:100,ticks:{display:false}}}
+    }
+  });
+};
+chartConfigs['chartDual'] = () => {
+  new Chart(document.getElementById('chartDual'), {
+    type: 'line',
+    data: {
+      labels: ['2024','2025','2026','2027','2028','2029','2030'],
+      datasets: [
+        {label:'범용 AI 플랫폼 (NVIDIA)',data:[60,75,90,110,135,160,190],borderColor:'#e11d48',backgroundColor:'rgba(225,29,72,.12)',tension:0.35,fill:true},
+        {label:'커스텀 가속기 (Broadcom 중심)',data:[40,55,75,100,130,165,210],borderColor:'#2563eb',backgroundColor:'rgba(37,99,235,.1)',tension:0.35,fill:true}
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom',labels:{font:{size:11}}},title:{display:true,text:'AI 반도체 시장 두 축 성장 (2000억 달러 협력 배경)',font:{size:12}}},
+      scales:{y:{beginAtZero:true,title:{display:true,text:'상대 시장 규모 지수'}}}
+    }
+  });
+};
+
+const chartObs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const canvas = e.target.querySelector('canvas');
+      if (canvas && chartConfigs[canvas.id]) {
+        chartConfigs[canvas.id]();
+        e.target.classList.add('chart-ready');
+        chartObs.unobserve(e.target);
+      }
+    }
+  });
+}, { threshold: 0.15 });
+document.querySelectorAll('.chart-container').forEach(el => chartObs.observe(el));
+
+// simulator
+const deployRange=document.getElementById('deployRange');
+const failRange=document.getElementById('failRange');
+const synRange=document.getElementById('synRange');
+const deployVal=document.getElementById('deployVal');
+const failVal=document.getElementById('failVal');
+const synVal=document.getElementById('synVal');
+const resData=document.getElementById('resData');
+const resGpu=document.getElementById('resGpu');
+const resHbm=document.getElementById('resHbm');
+const resCost=document.getElementById('resCost');
+function updateSim(){
+  const deploy=parseInt(deployRange.value);
+  const fail=parseInt(failRange.value);
+  const syn=parseInt(synRange.value);
+  deployVal.textContent=deploy.toLocaleString();
+  failVal.textContent=fail+'%';
+  synVal.textContent=syn+'x';
+  const fails = deploy * fail /100;
+  const data = fails * syn;
+  const gpu = Math.round(data * 0.015);
+  const hbm = (gpu * 0.0027).toFixed(1);
+  const cost = Math.round((deploy/1000)*10 + data/1000*1.2);
+  resData.textContent = data>=10000? (data/10000).toFixed(1)+'만 건' : data.toLocaleString()+' 건';
+  resGpu.textContent = gpu.toLocaleString()+' H100 시간';
+  resHbm.textContent = hbm+' TB·일';
+  resCost.textContent = cost.toLocaleString();
+}
+deployRange.addEventListener('input',updateSim);
+failRange.addEventListener('input',updateSim);
+synRange.addEventListener('input',updateSim);
+document.getElementById('resetSim').addEventListener('click',()=>{
+  deployRange.value=1000;failRange.value=8;synRange.value=100;updateSim();
+});
+updateSim();
+</script>
+</body>
+</html>
